@@ -43,8 +43,13 @@ function addReadingItem(url, title) {
   var link = document.createElement('a');
   link.href = url;
   link.setAttribute('alt', title);
-  link.textContent = title;
-  link.textContent += ' | ' + link.hostname;
+  var linkTitle = document.createElement('span');
+  linkTitle.className = 'title';
+  linkTitle.textContent = title;
+  link.appendChild(linkTitle);
+  var linkHost = document.createElement('span');
+  linkHost.textContent = link.hostname;
+  link.appendChild(linkHost);
   var delBtn = document.createElement('button');
   delBtn.textContent = 'X';
   delBtn.id = url;
@@ -78,20 +83,33 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Listen for click events
+  // Listen for click events in the reading list
   RL.addEventListener('click', function (e) {
-    if (e.target.tagName === 'A') {
+    var target = e.target;
+
+    // If the target's parent is an <a> we pretend the <a> is the target
+    if (target.parentNode.tagName === 'A') {
+      target = target.parentNode;
+    }
+
+    // Default <a> behaviour is to load the page in the popup
+    // We prevent the default and load in the current tab instead
+    if (target.tagName === 'A') {
       e.preventDefault();
       chrome.tabs.getSelected(null, function(tab) {
-        chrome.tabs.update(tab.id, {url: e.target.href});
+        chrome.tabs.update(tab.id, {url: target.href});
         window.close();
       });
-    } else if (e.target.tagName === 'BUTTON') {
+    }
+    // If the target is a button, it is a delete button
+    // Remove the item from the reading list
+    else if (target.tagName === 'BUTTON') {
       this.removeChild(e.target.parentNode);
-      chrome.storage.sync.remove(e.target.id);
+      chrome.storage.sync.remove(target.id);
     }
   });
 
+  // Save the page open in the current tab to the reading list
   document.getElementById('savepage').addEventListener('click', function() {
     getCurrentTabInfo(function (url, title) {
       var setObj = {};
