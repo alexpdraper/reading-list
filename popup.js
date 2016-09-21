@@ -12,7 +12,7 @@ function getCurrentTabInfo(callback) {
     currentWindow: true
   };
 
-  chrome.tabs.query(queryInfo, function(tabs) {
+  chrome.tabs.query(queryInfo, function (tabs) {
     // chrome.tabs.query invokes the callback with a list of tabs that match the
     // query. When the popup is opened, there is certainly a window and at least
     // one tab, so we can safely assume that |tabs| is a non-empty array.
@@ -43,19 +43,11 @@ function addReadingItem(url, title) {
   var link = document.createElement('a');
   link.href = url;
   link.setAttribute('alt', title);
-  link.addEventListener('click', function () {
-    chrome.tabs.getSelected(null,function(tab) {
-      chrome.tabs.update(tab.id, {url: link.href});
-      window.close();
-    });
-  });
   link.textContent = title;
+  link.textContent += ' | ' + link.hostname;
   var delBtn = document.createElement('button');
   delBtn.textContent = 'X';
-  delBtn.addEventListener('click', function () {
-    item.parentNode.removeChild(item);
-    chrome.storage.sync.remove(url);
-  });
+  delBtn.id = url;
   item.appendChild(link);
   item.appendChild(delBtn);
   return item;
@@ -86,8 +78,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
+  // Listen for click events
+  RL.addEventListener('click', function (e) {
+    if (e.target.tagName === 'A') {
+      e.preventDefault();
+      chrome.tabs.getSelected(null, function(tab) {
+        chrome.tabs.update(tab.id, {url: e.target.href});
+        window.close();
+      });
+    } else if (e.target.tagName === 'BUTTON') {
+      this.removeChild(e.target.parentNode);
+      chrome.storage.sync.remove(e.target.id);
+    }
+  });
+
   document.getElementById('savepage').addEventListener('click', function() {
-    getCurrentTabInfo(function(url, title) {
+    getCurrentTabInfo(function (url, title) {
       var setObj = {};
       setObj[url] = {
         url: url,
