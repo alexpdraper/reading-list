@@ -1,7 +1,7 @@
 /**
  * Get the current URL and title.
  *
- * @param {function(string)} callback - called when the URL and title of the current tab
+ * @param {function(string, string)} callback - called when the URL and title of the current tab
  *   is found.
  */
 function getCurrentTabInfo(callback) {
@@ -23,13 +23,7 @@ function getCurrentTabInfo(callback) {
     // A tab is a plain object that provides information about the tab.
     // See https://developer.chrome.com/extensions/tabs#type-Tab
     var url = tab.url;
-
     var title = tab.title;
-
-    // tab.url is only available if the "activeTab" permission is declared.
-    // If you want to see the URL of other tabs (e.g. after removing active:true
-    // from |queryInfo|), then the "tabs" permission is required to see their
-    // "url" properties.
     console.assert(typeof url == 'string', 'tab.url should be a string');
     console.assert(typeof title == 'string', 'tab.title should be a string');
 
