@@ -45,7 +45,7 @@ function addReadingItem(url, title) {
   linkHost.textContent = link.hostname;
   link.appendChild(linkHost);
   var delBtn = document.createElement('button');
-  delBtn.textContent = 'X';
+  delBtn.innerHTML = '&times;';
   delBtn.id = url;
   item.appendChild(link);
   item.appendChild(delBtn);
@@ -55,27 +55,38 @@ function addReadingItem(url, title) {
 document.addEventListener('DOMContentLoaded', function() {
   var RL = document.getElementById('reading-list');
 
-  // Get the reading list from storage
-  chrome.storage.sync.get(null, function (pages) {
-    // Array of page objects with url, title, and addedAt
-    var pageList = [];
-    for (page in pages) {
-      if (pages.hasOwnProperty(page)) {
-        pageList.push(pages[page]);
-      }
+  function renderReadingList() {
+    // Remove all children from the reading list
+    while (RL.firstChild) {
+      RL.removeChild(RL.firstChild);
     }
 
-    // Sort reading list by most to least recent
-    pageList.sort(function (a, b) {
-      return b.addedAt - a.addedAt;
-    });
+    // Get the reading list from storage
+    chrome.storage.sync.get(null, function (pages) {
+      // Array of page objects with url, title, and addedAt
+      var pageList = [];
+      for (page in pages) {
+        if (pages.hasOwnProperty(page)) {
+          pageList.push(pages[page]);
+        }
+      }
 
-    // Add each page to the reading list
-    pageList.forEach(function (page) {
-      var readingItem = addReadingItem(page.url, page.title);
-      RL.appendChild(readingItem);
+      // Sort reading list by most to least recent
+      pageList.sort(function (a, b) {
+        return b.addedAt - a.addedAt;
+      });
+
+      // Add each page to the reading list
+      pageList.forEach(function (page) {
+        var readingItem = addReadingItem(page.url, page.title);
+
+        RL.appendChild(readingItem);
+      });
     });
-  });
+  }
+
+  // Render the reading list
+  renderReadingList();
 
   // Listen for click events in the reading list
   RL.addEventListener('click', function (e) {
@@ -112,8 +123,18 @@ document.addEventListener('DOMContentLoaded', function() {
         title: title,
         addedAt: Date.now()
       };
+
       chrome.storage.sync.set(setObj, function () {
-        RL.insertBefore(addReadingItem(url, title), RL.firstChild);
+        // Look for a delete button witht the id of the url
+        var currentItem = document.getElementById(url);
+        // If it exists, remove it from the list
+        // Prevents duplicates
+        if (currentItem) {
+          RL.removeChild(currentItem.parentNode);
+        }
+
+        var readingItem = addReadingItem(url, title);
+        RL.insertBefore(readingItem, RL.firstChild);
       });
     });
   });
