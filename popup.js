@@ -101,10 +101,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // We prevent the default and load in the current tab instead
     if (target.tagName === 'A') {
       e.preventDefault();
-      chrome.tabs.getSelected(null, function(tab) {
-        chrome.tabs.update(tab.id, {url: target.href});
-        window.close();
-      });
+      // Open in new tab
+      chrome.tabs.create({url: target.href});
     }
     // If the target is a button, it is a delete button
     // Remove the item from the reading list
