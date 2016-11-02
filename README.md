@@ -1,11 +1,16 @@
 # Reading List
-A Chrome extension for saving pages to read later.
+A Chrome extension for saving pages to read later. Free on the [Chrome Web Store](https://chrome.google.com/webstore/detail/lloccabjgblebdmncjndmiibianflabo).
 
 ![Chrome Reading List extension](https://raw.githubusercontent.com/alexpdraper/reading-list/master/screenshot.png)
 
 ## Putting it to Use
 
 ### Installation
+#### The Easy Way
+1. Download from the [Chrome Web Store](https://chrome.google.com/webstore/detail/lloccabjgblebdmncjndmiibianflabo) for free
+
+#### The Less Easy Way
+
 1. Download this repo
 2. Go to chrome://extensions/
 3. Check “Developer Mode”
