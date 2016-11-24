@@ -1,7 +1,7 @@
 # Reading List
 A Chrome extension for saving pages to read later. Free on the [Chrome Web Store](https://chrome.google.com/webstore/detail/lloccabjgblebdmncjndmiibianflabo).
 
-![Chrome Reading List extension](https://raw.githubusercontent.com/alexpdraper/reading-list/master/screenshot.png)
+![Chrome Reading List extension](screenshot.png)
 
 ## Putting it to Use
 
@@ -19,7 +19,7 @@ A Chrome extension for saving pages to read later. Free on the [Chrome Web Store
 
 ### Actually Using the Extension
 1. Go to a page you want to save for later
-2. Click the reading list icon on the top right of your browser ![Chrome Reading List icon](https://raw.githubusercontent.com/alexpdraper/reading-list/master/icon32.png)
+2. Click the reading list icon on the top right of your browser ![Chrome Reading List icon](icon32.png)
 3. Click the plus button
 4. When you want to read a page you saved, open up the extension and click the reading item you want to read
 5. Done with a page? Click the &times; next to said page in your reading list.
