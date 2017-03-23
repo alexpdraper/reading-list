@@ -31,40 +31,76 @@ function getCurrentTabInfo(callback) {
   });
 }
 
-function addReadingItem(url, title) {
+/**
+ * Create and return the DOM element for a reading list item.
+ *
+ * @param {string} url - the URL of the page
+ * @param {string} title - the URL of the page
+ * @param {string} itemClass (optional) - a class to add to the element, used to animate
+ *   incoming reading items
+ */
+function addReadingItem(url, title, itemClass) {
   var item = document.createElement('div');
   item.className = 'reading-item';
+
+  if (itemClass) {
+    item.className += ' ' + itemClass;
+  }
+
   var link = document.createElement('a');
   link.href = url;
   link.setAttribute('alt', title);
+
   var linkTitle = document.createElement('span');
   linkTitle.className = 'title';
   linkTitle.textContent = title;
   link.appendChild(linkTitle);
+
   var linkHost = document.createElement('span');
   linkHost.textContent = link.hostname;
   link.appendChild(linkHost);
+
   var delBtn = document.createElement('button');
   delBtn.innerHTML = '&times;';
   delBtn.id = url;
   item.appendChild(link);
   item.appendChild(delBtn);
+
   return item;
+}
+
+/**
+ * Remove a reading list item from the DOM and optionally from storage.
+ *
+ * @param {elementNodeReference} element - the reading list item DOM element
+ * @param {string} id (optional) - the ID of the page in storage
+ */
+function removeReadingItem(element, id) {
+  // If the id is set, remove the reading item from storage
+  if (typeof id !== 'undefined') {
+    chrome.storage.sync.remove(id);
+  }
+
+  // Listen for the end of an animation
+  element.addEventListener('animationend', function() {
+    // Remove the item from the DOM when the animation is finished
+    element.remove();
+  });
+
+  // Add the class to start the animation
+  element.className += ' slideout';
 }
 
 document.addEventListener('DOMContentLoaded', function() {
   var RL = document.getElementById('reading-list');
 
-  function renderReadingList() {
-    // Remove all children from the reading list
-    while (RL.firstChild) {
-      RL.removeChild(RL.firstChild);
-    }
-
+  // TODO: Refactor to store the sorted reading list array
+  (function renderReadingList() {
     // Get the reading list from storage
     chrome.storage.sync.get(null, function (pages) {
       // Array of page objects with url, title, and addedAt
       var pageList = [];
+
       for (page in pages) {
         if (pages.hasOwnProperty(page)) {
           pageList.push(pages[page]);
@@ -83,10 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
         RL.appendChild(readingItem);
       });
     });
-  }
-
-  // Render the reading list
-  renderReadingList();
+  })();
 
   // Listen for click events in the reading list
   RL.addEventListener('click', function (e) {
@@ -98,24 +131,35 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Default <a> behaviour is to load the page in the popup
-    // We prevent the default and load in the current tab instead
     if (target.tagName === 'A') {
       e.preventDefault();
-      // Open in new tab
-      chrome.tabs.create({url: target.href});
+
+      // If the control key or meta key (⌘ on Mac, ⊞ on Windows) is pressed
+      if (e.ctrlKey || e.metaKey) {
+        // Open in new tab
+        chrome.tabs.create({url: target.href});
+      } else {
+        // Otherwise open in the current tab
+        chrome.tabs.getSelected(null, function(tab) {
+          chrome.tabs.update(tab.id, {url: target.href});
+          window.close();
+        });
+      }
     }
     // If the target is a button, it is a delete button
     // Remove the item from the reading list
     else if (target.tagName === 'BUTTON') {
-      this.removeChild(e.target.parentNode);
-      chrome.storage.sync.remove(target.id);
+      // Remove the reading list item from storage
+      removeReadingItem(e.target.parentNode, target.id);
     }
   });
 
   // Save the page open in the current tab to the reading list
   document.getElementById('savepage').addEventListener('click', function() {
+    // TODO: Grab the favicon url as well
     getCurrentTabInfo(function (url, title) {
       var setObj = {};
+
       setObj[url] = {
         url: url,
         title: title,
@@ -123,15 +167,16 @@ document.addEventListener('DOMContentLoaded', function() {
       };
 
       chrome.storage.sync.set(setObj, function () {
-        // Look for a delete button witht the id of the url
+        // Look for a delete button with the ID of the url
         var currentItem = document.getElementById(url);
+
         // If it exists, remove it from the list
         // Prevents duplicates
         if (currentItem) {
-          RL.removeChild(currentItem.parentNode);
+          removeReadingItem(currentItem.parentNode);
         }
 
-        var readingItem = addReadingItem(url, title);
+        var readingItem = addReadingItem(url, title, 'slidein');
         RL.insertBefore(readingItem, RL.firstChild);
       });
     });

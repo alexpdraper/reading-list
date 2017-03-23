@@ -1,0 +1,178 @@
+@import url('https://fonts.googleapis.com/css?family=Fira+Sans:400,600');
+
+* {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+*:before,
+*:after {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Fira Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.42857143;
+  color: #555;
+  width: 400px;
+  margin: 0;
+  padding-top: 80px;
+}
+
+button {
+  font-weight: bold;
+  color: #fff;
+  border: 1px solid #44aa76;
+  border-width: 0 0 3px 0;
+  background-color: #66cc98;
+  padding: 5px;
+  border-radius: 6px;
+  width: 30px;
+}
+
+button:hover {
+  cursor: pointer;
+  background-color: #44aa76;
+  color: #fff;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  height: 80px;
+  width: 100%;
+  border-bottom: 1px solid #ccc;
+  background-color: #fff;
+}
+
+#savepage {
+  height: 30px;
+  vertical-align: middle;
+}
+
+h1 {
+  margin: 0;
+  padding: 0;
+  line-height: 80px;
+  text-align: center;
+}
+
+.container {
+  position: relative;
+  padding: 15px;
+  padding-top: 5px;
+}
+
+.reading-item {
+  border-radius: 3px;
+  padding: 0;
+  margin: 10px 0 0 0;
+  background-color: #f7f7f7;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 2px 3px rgba(0, 0, 0, 0.15);
+  transition: all 0.5s ease 0s;
+}
+
+.reading-item a {
+  text-decoration: none;
+  display: block;
+  width: 100%;
+  color: #555;
+  padding: 10px 40px 10px 15px;
+  min-height: 40px;
+}
+
+.reading-item a:hover {
+  color: #66cc98;
+  background-color: #fff;
+}
+
+.reading-item a span {
+  display: block;
+}
+
+.reading-item a span.title {
+  font-weight: bold;
+}
+
+.reading-item button {
+  position: absolute;
+  top: 0;
+  right: 5px;
+  border-radius: 0 0 6px 6px;
+}
+
+/* TODO: Prefix the animations */
+.slidein {
+  animation: 0.2s linear slidein;
+}
+
+.slidein a {
+  animation: 0.8s ease-out slidein-bounce;
+}
+
+@keyframes slidein-bounce {
+  0% {
+    transform: translateX(400px) scaleY(0);
+  }
+
+  40% {
+    transform: translateX(400px) scaleY(0);
+  }
+
+  50% {
+    transform: translateX(30px) scaleY(1);
+  }
+
+  60% {
+    transform: translateX(0) scaleY(1);
+  }
+
+  80% {
+    transform: translateX(35px) scaleY(1);
+  }
+
+  100% {
+    transform: translateX(0) scaleY(1);
+  }
+}
+
+@keyframes slidein {
+  0% {
+    max-height: 0px;
+    transform: translateX(400px) scaleY(0);
+  }
+
+  80% {
+    max-height: 100px;
+  }
+
+  100% {
+    transform: translateX(0) scaleY(1);
+  }
+}
+
+.slideout {
+  margin: 0;
+  animation: 0.65s slideout;
+}
+
+@keyframes slideout {
+  0% {
+    max-height: 100px;
+    transform: translateX(0) scaleY(1);
+  }
+
+  40% {
+    max-height: 0px;
+  }
+
+  100% {
+    max-height: 0px;
+    transform: translateX(400px) scaleY(0);
+  }
+}
