@@ -3,6 +3,10 @@ A Chrome extension for saving pages to read later. Free on the [Chrome Web Store
 
 ![Chrome Reading List extension](screenshot.png)
 
+The latest version features nifty animations!
+
+![Chrome Reading List add item animation](add-item-gif.gif)
+
 ## Putting it to Use
 
 ### Installation
@@ -28,7 +32,8 @@ Or, if you would rather do it the hard way:
 
 ## Todo
 
-  - Refactor way pages are stored—store the reading list array, instead of each page as its own storage object
+  - <del>Refactor way pages are stored—store the reading list array, instead of each page as its own storage object</del>
+    - Turns out the whole list as an array can result in going over the storage limits for a single item and delete the whole list
   - Save favicons and display them in the reading list
   - Add a check to see if the user’s browser allows CSS animations, and provide backups if it does not
   - Add a directory structure to organize reading list items (maybe)
