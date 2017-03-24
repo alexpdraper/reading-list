@@ -12,7 +12,7 @@ function getCurrentTabInfo(callback) {
     currentWindow: true
   };
 
-  chrome.tabs.query(queryInfo, function (tabs) {
+  chrome.tabs.query(queryInfo, function(tabs) {
     // chrome.tabs.query invokes the callback with a list of tabs that match the
     // query. When the popup is opened, there is certainly a window and at least
     // one tab, so we can safely assume that |tabs| is a non-empty array.
@@ -76,11 +76,6 @@ function addReadingItem(url, title, itemClass) {
  * @param {string} id (optional) - the ID of the page in storage
  */
 function removeReadingItem(element, id) {
-  // If the id is set, remove the reading item from storage
-  if (typeof id !== 'undefined') {
-    chrome.storage.sync.remove(id);
-  }
-
   // Listen for the end of an animation
   element.addEventListener('animationend', function() {
     // Remove the item from the DOM when the animation is finished
@@ -91,38 +86,67 @@ function removeReadingItem(element, id) {
   element.className += ' slideout';
 }
 
+/**
+ * Update the storage to the new storage style
+ *
+ * @param {object} items - all the items from storage
+ * @param {function(array)} callback - callback that passes in the reading list array
+ */
+function updateStorage(items, callback) {
+  var pageList = [];
+  var keysToRemove = [];
+
+  for (item in items) {
+    if (items.hasOwnProperty(item) && typeof items[item].url !== 'undefined') {
+      pageList.push(items[item]);
+      keysToRemove.push(item);
+    }
+  }
+
+  // Sort reading list by most to least recent
+  pageList.sort(function(a, b) {
+    return b.addedAt - a.addedAt;
+  });
+
+  chrome.storage.sync.set({ readingList: pageList }, function() {
+    chrome.storage.sync.remove(keysToRemove, function() {
+      callback(pageList);
+    });
+  });
+}
+
+/**
+ * Get the reading list from storage
+ *
+ * @param {function(array)} callback - callback that passes in the reading list array
+ */
+function getReadingList(callback) {
+  // Get everything from storage
+  chrome.storage.sync.get(null, function(items) {
+    console.log('Items in storage:', items);
+
+    if (items.hasOwnProperty('readingList')) {
+      callback(items.readingList);
+    } else {
+      updateStorage(items, callback);
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   var RL = document.getElementById('reading-list');
+  var pageList = [];
 
-  // TODO: Refactor to store the sorted reading list array
-  (function renderReadingList() {
-    // Get the reading list from storage
-    chrome.storage.sync.get(null, function (pages) {
-      // Array of page objects with url, title, and addedAt
-      var pageList = [];
+  getReadingList(function(readingListItems) {
+    pageList = readingListItems;
 
-      for (page in pages) {
-        if (pages.hasOwnProperty(page)) {
-          pageList.push(pages[page]);
-        }
-      }
-
-      // Sort reading list by most to least recent
-      pageList.sort(function (a, b) {
-        return b.addedAt - a.addedAt;
-      });
-
-      // Add each page to the reading list
-      pageList.forEach(function (page) {
-        var readingItem = addReadingItem(page.url, page.title);
-
-        RL.appendChild(readingItem);
-      });
-    });
-  })();
+    for (var i = 0; i < pageList.length; i++) {
+      RL.appendChild(addReadingItem(pageList[i].url, pageList[i].title));
+    }
+  });
 
   // Listen for click events in the reading list
-  RL.addEventListener('click', function (e) {
+  RL.addEventListener('click', function(e) {
     var target = e.target;
 
     // If the target's parent is an <a> we pretend the <a> is the target
@@ -149,8 +173,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // If the target is a button, it is a delete button
     // Remove the item from the reading list
     else if (target.tagName === 'BUTTON') {
+      for (var i = 0; i < pageList.length; i++) {
+        if (pageList[i].url === target.id) {
+          pageList.splice(i, 1);
+        }
+      }
+
+      chrome.storage.sync.set({ readingList: pageList }, function() {});
+
       // Remove the reading list item from storage
-      removeReadingItem(e.target.parentNode, target.id);
+      removeReadingItem(e.target.parentNode);
     }
   });
 
@@ -158,26 +190,34 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('savepage').addEventListener('click', function() {
     // TODO: Grab the favicon url as well
     getCurrentTabInfo(function (url, title) {
-      var setObj = {};
+      // Look for a delete button with the ID of the url
+      var currentItem = document.getElementById(url);
 
-      setObj[url] = {
+      // If it exists, remove it from the list
+      // Prevents duplicates
+      if (currentItem) {
+        for (var i = 0; i < pageList.length; i++) {
+          if (pageList[i].url === url) {
+            pageList.splice(i, 1);
+          }
+        }
+      }
+
+      // Prepend the item to the list
+      pageList.unshift({
         url: url,
         title: title,
         addedAt: Date.now()
-      };
+      });
 
-      chrome.storage.sync.set(setObj, function () {
-        // Look for a delete button with the ID of the url
-        var currentItem = document.getElementById(url);
-
-        // If it exists, remove it from the list
-        // Prevents duplicates
+      // Update storage
+      chrome.storage.sync.set({ readingList: pageList }, function() {
+        // Remove the current item from the DOM if it exists
         if (currentItem) {
           removeReadingItem(currentItem.parentNode);
         }
 
-        var readingItem = addReadingItem(url, title, 'slidein');
-        RL.insertBefore(readingItem, RL.firstChild);
+        RL.insertBefore(addReadingItem(url, title, 'slidein'), RL.firstChild);
       });
     });
   });
