@@ -91,15 +91,35 @@ function removeReadingItem(element, id) {
   element.className += ' slideout';
 }
 
+function repairStorage(readingList) {
+  var setObj = {};
+
+  for (var i = 0; i < readingList.length; i++) {
+    setObj[readingList[i].url] = readingList[i];
+  }
+
+  chrome.storage.sync.set(setObj, function() {
+    chrome.storage.sync.remove('readingList');
+  });
+
+  return setObj;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   var RL = document.getElementById('reading-list');
 
-  // TODO: Refactor to store the sorted reading list array
   (function renderReadingList() {
     // Get the reading list from storage
-    chrome.storage.sync.get(null, function (pages) {
+    chrome.storage.sync.get(null, function(pages) {
       // Array of page objects with url, title, and addedAt
       var pageList = [];
+      var extraItems;
+
+      if (pages.readingList) {
+        extraItems = repairStorage(pages.readingList);
+        delete pages.readingList;
+        Object.assign(pages, extraItems);
+      }
 
       for (page in pages) {
         if (pages.hasOwnProperty(page)) {
