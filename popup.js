@@ -123,6 +123,8 @@ function updateStorage(items, callback) {
 function getReadingList(callback) {
   // Get everything from storage
   chrome.storage.sync.get(null, function(items) {
+    console.log('Items in storage:', items);
+
     if (items.hasOwnProperty('readingList')) {
       callback(items.readingList);
     } else {
