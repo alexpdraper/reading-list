@@ -1,7 +1,7 @@
 /**
- * Get the current URL and title.
+ * Get the current tab’s URL, title, and ID.
  *
- * @param {function(string, string)} callback - called when the URL and title of the current tab
+ * @param {function(string, string, number)} callback - called when the URL, title, and ID of the current tab
  *   is found.
  */
 function getCurrentTabInfo(callback) {
@@ -12,7 +12,7 @@ function getCurrentTabInfo(callback) {
     currentWindow: true
   };
 
-  chrome.tabs.query(queryInfo, function (tabs) {
+  chrome.tabs.query(queryInfo, function(tabs) {
     // chrome.tabs.query invokes the callback with a list of tabs that match the
     // query. When the popup is opened, there is certainly a window and at least
     // one tab, so we can safely assume that |tabs| is a non-empty array.
@@ -24,10 +24,12 @@ function getCurrentTabInfo(callback) {
     // See https://developer.chrome.com/extensions/tabs#type-Tab
     var url = tab.url;
     var title = tab.title;
-    console.assert(typeof url == 'string', 'tab.url should be a string');
-    console.assert(typeof title == 'string', 'tab.title should be a string');
+    var tabId = tab.id;
+    console.assert(typeof url === 'string', 'tab.url should be a string');
+    console.assert(typeof title === 'string', 'tab.title should be a string');
+    console.assert(typeof tabId === 'number', 'tab.id should be a number');
 
-    callback(url, title);
+    callback(url, title, tabId);
   });
 }
 
@@ -79,6 +81,19 @@ function removeReadingItem(element, id) {
   // If the id is set, remove the reading item from storage
   if (typeof id !== 'undefined') {
     chrome.storage.sync.remove(id);
+
+    // Find tabs with the reading item’s url
+    chrome.tabs.query({ url: id.replace(/#.*/, '') }, function(tabs) {
+      for (var i = 0; i < tabs.length; i++) {
+        // If the url is identical, remove the “✔” from the badge
+        if (tabs[i].url === id) {
+          chrome.browserAction.setBadgeText({
+            text: '',
+            tabId: tabs[i].id
+          });
+        }
+      }
+    });
   }
 
   // Listen for the end of an animation
@@ -91,6 +106,11 @@ function removeReadingItem(element, id) {
   element.className += ' slideout';
 }
 
+/**
+ * Update storage, removing the “readingList” key and storing each URL as a key
+ *
+ * @param {array} readingList - an array of reading list items
+ */
 function repairStorage(readingList) {
   var setObj = {};
 
@@ -128,21 +148,20 @@ document.addEventListener('DOMContentLoaded', function() {
       }
 
       // Sort reading list by most to least recent
-      pageList.sort(function (a, b) {
+      pageList.sort(function(a, b) {
         return b.addedAt - a.addedAt;
       });
 
       // Add each page to the reading list
-      pageList.forEach(function (page) {
+      pageList.forEach(function(page) {
         var readingItem = addReadingItem(page.url, page.title);
-
         RL.appendChild(readingItem);
       });
     });
   })();
 
   // Listen for click events in the reading list
-  RL.addEventListener('click', function (e) {
+  RL.addEventListener('click', function(e) {
     var target = e.target;
 
     // If the target's parent is an <a> we pretend the <a> is the target
@@ -157,11 +176,15 @@ document.addEventListener('DOMContentLoaded', function() {
       // If the control key or meta key (⌘ on Mac, ⊞ on Windows) is pressed
       if (e.ctrlKey || e.metaKey) {
         // Open in new tab
-        chrome.tabs.create({url: target.href});
+        chrome.tabs.create({
+          url: target.href,
+          active: false
+        });
       } else {
         // Otherwise open in the current tab
-        chrome.tabs.getSelected(null, function(tab) {
-          chrome.tabs.update(tab.id, {url: target.href});
+        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+          var tab = tabs[0];
+          chrome.tabs.update(tab.id, { url: target.href });
           window.close();
         });
       }
@@ -177,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Save the page open in the current tab to the reading list
   document.getElementById('savepage').addEventListener('click', function() {
     // TODO: Grab the favicon url as well
-    getCurrentTabInfo(function (url, title) {
+    getCurrentTabInfo(function(url, title, tabId) {
       var setObj = {};
 
       setObj[url] = {
@@ -186,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
         addedAt: Date.now()
       };
 
-      chrome.storage.sync.set(setObj, function () {
+      chrome.storage.sync.set(setObj, function() {
         // Look for a delete button with the ID of the url
         var currentItem = document.getElementById(url);
 
@@ -198,6 +221,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var readingItem = addReadingItem(url, title, 'slidein');
         RL.insertBefore(readingItem, RL.firstChild);
+
+        chrome.browserAction.setBadgeText({
+          text: '✔',
+          tabId: tabId
+        });
+
+        chrome.browserAction.getBadgeText({ tabId: tabId }, function(badgeText) {
+          console.log('Badge text:', badgeText);
+        })
       });
     });
   });

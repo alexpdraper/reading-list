@@ -12,11 +12,10 @@
 }
 
 body {
-  font-family: "Fira Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: Quasimoda, "Fira Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
   line-height: 1.42857143;
   color: #555;
-  width: 400px;
   margin: 0;
   padding-top: 80px;
 }
@@ -41,6 +40,7 @@ button:hover {
 header {
   position: fixed;
   top: 0;
+  left: 0;
   z-index: 1000;
   height: 80px;
   width: 100%;
@@ -64,6 +64,9 @@ h1 {
   position: relative;
   padding: 15px;
   padding-top: 5px;
+  width: 400px;
+  max-width: 100%;
+  margin: 0 auto;
 }
 
 .reading-item {

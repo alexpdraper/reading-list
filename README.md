@@ -7,7 +7,7 @@ The latest version features nifty animations!
 
 ![Chrome Reading List add item animation](add-item-gif.gif)
 
-## Putting it to Use
+## Putting it to use
 
 ### Installation
 
@@ -21,11 +21,12 @@ Or, if you would rather do it the hard way:
   4. Click “Load unpacked extension…”
   5. Load it up
 
-### Actually Using the Extension
+### Actually using the extension
 
   1. Go to a page you want to save for later
   2. Click the reading list icon on the top right of your browser ![Chrome Reading List icon](icon32.png)
   3. Click the `+` button
+    - You can also right-click anywhere on the page and select “Add page to Reading List”
   4. When you want to read a page you saved, open up the extension and click the reading item you want to read
     - `Control + click` or `command ⌘/windows key ⊞ + click` to open the page in a new tab
   5. Done with a page? Click the `×` next to said page in your reading list, and it will magically vanish.
