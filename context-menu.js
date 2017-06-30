@@ -1,10 +1,18 @@
+chrome.browserAction.setBadgeText({ text: '' });
 chrome.browserAction.setBadgeBackgroundColor({
   color: '#2ea99c'
 });
 
-var menuItem = chrome.contextMenus.create({
-  title: 'Add page to Reading List',
-  onclick: addPageToList
+var menuItem;
+
+chrome.management.getSelf(function(result) {
+  var menuTitle = 'Add page to Reading List';
+  menuTitle += (result.installType === 'development') ? ' (dev)' : '';
+
+  menuItem = chrome.contextMenus.create({
+    title: menuTitle,
+    onclick: addPageToList
+  });
 });
 
 /**
@@ -19,6 +27,7 @@ function addPageToList(info, tab) {
   setObj[tab.url] = {
     url: tab.url,
     title: tab.title,
+    favIconUrl: tab.favIconUrl,
     addedAt: Date.now()
   };
 
@@ -55,6 +64,13 @@ function removePageFromList(info, tab) {
  * @param {function(boolean)} callback - called when the badge text is updated
  */
 function updateBadge(url, tabId, callback) {
+  if (!tabId) {
+    chrome.browserAction.setBadgeText({ text: '' });
+    return;
+  } else if (!url) {
+    return;
+  }
+
   // Check the reading list for the url
   chrome.storage.sync.get(url, function(item) {
     var onList = (item && item.hasOwnProperty(url));
@@ -67,14 +83,26 @@ function updateBadge(url, tabId, callback) {
     });
 
     if (typeof callback === 'function') {
-      callback(onList);
+      callback(onList, item);
     }
   });
 }
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-  // If the tab’s url has changed, update the badge text
-  if (changeInfo.url) {
-    updateBadge(changeInfo.url, tabId);
+  // If the tab is loaded, update the badge text
+  if (tabId && changeInfo.status === 'complete' && tab.url) {
+    updateBadge(tab.url, tabId, function(onList, item) {
+      var readingItem = onList ? item[tab.url] : null;
+      var setObj = {};
+
+      // If the page is on the reading list, and doesn’t have a favIconUrl…
+      // …add the favIconUrl
+      if (readingItem && !readingItem.hasOwnProperty('favIconUrl') && tab.favIconUrl) {
+        setObj[tab.url] = readingItem;
+        setObj[tab.url].favIconUrl = tab.favIconUrl;
+
+        chrome.storage.sync.set(setObj);
+      }
+    });
   }
 });
