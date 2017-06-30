@@ -14,7 +14,7 @@
 body {
   font-family: Quasimoda, "Fira Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
-  line-height: 1.42857143;
+  line-height: 1.4;
   color: #555;
   margin: 0;
   padding-top: 80px;
@@ -85,8 +85,8 @@ h1 {
   display: block;
   width: 100%;
   color: #555;
-  padding: 10px 40px 10px 15px;
-  min-height: 40px;
+  padding: 10px 50px 10px 56px;
+  min-height: 56px;
 }
 
 .reading-item a:hover {
@@ -100,6 +100,27 @@ h1 {
 
 .reading-item a span.title {
   font-weight: bold;
+}
+
+.reading-item .favicon {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  padding: 1px;
+}
+
+.reading-item a:hover .favicon {
+  border-color: #66cc98;
+}
+
+.favicon > img {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
 }
 
 .reading-item button {

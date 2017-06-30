@@ -1,8 +1,8 @@
 /**
- * Get the current tab’s URL, title, and ID.
+ * Get the current tab’s URL, title, ID, and favIconUrl.
  *
- * @param {function(string, string, number)} callback - called when the URL, title, and ID of the current tab
- *   is found.
+ * @param {function(object, number)} callback - called when the URL, title, ID, and
+ *   favicon URL of the current tab is found.
  */
 function getCurrentTabInfo(callback) {
   // Query filter to be passed to chrome.tabs.query - see
@@ -24,12 +24,14 @@ function getCurrentTabInfo(callback) {
     // See https://developer.chrome.com/extensions/tabs#type-Tab
     var url = tab.url;
     var title = tab.title;
+    var favIconUrl = tab.favIconUrl;
     var tabId = tab.id;
     console.assert(typeof url === 'string', 'tab.url should be a string');
     console.assert(typeof title === 'string', 'tab.title should be a string');
+    console.assert(!favIconUrl || typeof favIconUrl === 'string', 'tab.favIconUrl should be falsey or a string');
     console.assert(typeof tabId === 'number', 'tab.id should be a number');
 
-    callback(url, title, tabId);
+    callback({url, title, favIconUrl}, tabId);
   });
 }
 
@@ -41,7 +43,11 @@ function getCurrentTabInfo(callback) {
  * @param {string} itemClass (optional) - a class to add to the element, used to animate
  *   incoming reading items
  */
-function addReadingItem(url, title, itemClass) {
+function addReadingItem(info, itemClass) {
+  var url = info.url;
+  var title = info.title;
+  var favIconUrl = info.favIconUrl;
+
   var item = document.createElement('div');
   item.className = 'reading-item';
 
@@ -59,8 +65,17 @@ function addReadingItem(url, title, itemClass) {
   link.appendChild(linkTitle);
 
   var linkHost = document.createElement('span');
-  linkHost.textContent = link.hostname;
+  linkHost.textContent = link.hostname || url;
   link.appendChild(linkHost);
+
+  if (favIconUrl) {
+    var favicon = document.createElement('div');
+    favicon.className = 'favicon';
+    var faviconImg = document.createElement('img');
+    faviconImg.setAttribute('src', favIconUrl);
+    favicon.appendChild(faviconImg);
+    link.appendChild(favicon);
+  }
 
   var delBtn = document.createElement('button');
   delBtn.innerHTML = '&times;';
@@ -154,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // Add each page to the reading list
       pageList.forEach(function(page) {
-        var readingItem = addReadingItem(page.url, page.title);
+        var readingItem = addReadingItem(page);
         RL.appendChild(readingItem);
       });
     });
@@ -199,19 +214,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Save the page open in the current tab to the reading list
   document.getElementById('savepage').addEventListener('click', function() {
-    // TODO: Grab the favicon url as well
-    getCurrentTabInfo(function(url, title, tabId) {
+    getCurrentTabInfo(function(tabInfo, tabId) {
       var setObj = {};
 
-      setObj[url] = {
-        url: url,
-        title: title,
+      setObj[tabInfo.url] = {
+        url: tabInfo.url,
+        title: tabInfo.title,
+        favIconUrl: tabInfo.favIconUrl,
         addedAt: Date.now()
       };
 
       chrome.storage.sync.set(setObj, function() {
         // Look for a delete button with the ID of the url
-        var currentItem = document.getElementById(url);
+        var currentItem = document.getElementById(tabInfo.url);
 
         // If it exists, remove it from the list
         // Prevents duplicates
@@ -219,17 +234,16 @@ document.addEventListener('DOMContentLoaded', function() {
           removeReadingItem(currentItem.parentNode);
         }
 
-        var readingItem = addReadingItem(url, title, 'slidein');
+        var readingItem = addReadingItem(tabInfo, 'slidein');
         RL.insertBefore(readingItem, RL.firstChild);
 
-        chrome.browserAction.setBadgeText({
-          text: '✔',
-          tabId: tabId
-        });
-
-        chrome.browserAction.getBadgeText({ tabId: tabId }, function(badgeText) {
-          console.log('Badge text:', badgeText);
-        })
+        // Add a “✔” to the badge for the tab
+        if (tabId) {
+          chrome.browserAction.setBadgeText({
+            text: '✔',
+            tabId: tabId
+          });
+        }
       });
     });
   });
