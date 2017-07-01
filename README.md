@@ -1,9 +1,11 @@
 # Reading List
 A Chrome extension for saving pages to read later. Free on the [Chrome Web Store](https://chrome.google.com/webstore/detail/lloccabjgblebdmncjndmiibianflabo).
 
-![Chrome Reading List extension](screenshot.png)
+Struggling to find what you’re looking for in a long list? Struggle no more! Reading List now features a search box—courtesy of @whitecat. Thanks, @whitecat.
 
-The latest version features nifty animations!
+![Chrome Reading List extension](search-screenshot.png)
+
+Also featuring nifty animations!
 
 ![Chrome Reading List add item animation](add-item-gif.gif)
 
@@ -33,8 +35,9 @@ Or, if you would rather do it the hard way:
 
 ## Todo
 
-  - <del>Refactor way pages are stored—store the reading list array, instead of each page as its own storage object</del>
+  - [ ] <del>Refactor way pages are stored—store the reading list array, instead of each page as its own storage object</del>
     - Turns out the whole list as an array can result in going over the storage limits for a single item and delete the whole list
-  - Save favicons and display them in the reading list
-  - Add a check to see if the user’s browser allows CSS animations, and provide backups if it does not
-  - Add a directory structure to organize reading list items (maybe)
+  - [x] Save favicon and display them in the reading list
+  - [ ] Add a check to see if the user’s browser allows CSS animations, and provide backups if it does not
+  - [ ] Handle issues with [storage limits](https://developer.chrome.com/extensions/storage)
+  - [ ] Add a directory structure to organize reading list items (maybe)
