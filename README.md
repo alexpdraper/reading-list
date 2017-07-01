@@ -1,7 +1,7 @@
 # Reading List
 A Chrome extension for saving pages to read later. Free on the [Chrome Web Store](https://chrome.google.com/webstore/detail/lloccabjgblebdmncjndmiibianflabo).
 
-Struggling to find what you’re looking for in a long list? Struggle no more! Reading List now features a search box—courtesy of @whitecat. Thanks, @whitecat.
+Struggling to find what you’re looking for in a long list? Struggle no more! Reading List now features a search box—courtesy of [@whitecat](https://github.com/whitecat). Thanks, @whitecat.
 
 ![Chrome Reading List extension](search-screenshot.png)
 
