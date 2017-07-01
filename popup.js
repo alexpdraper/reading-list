@@ -56,6 +56,7 @@ function addReadingItem(info, itemClass) {
   }
 
   var link = document.createElement('a');
+  link.className = 'item-link';
   link.href = url;
   link.setAttribute('alt', title);
 
@@ -77,9 +78,10 @@ function addReadingItem(info, itemClass) {
     link.appendChild(favicon);
   }
 
-  var delBtn = document.createElement('button');
+  var delBtn = document.createElement('a');
   delBtn.innerHTML = '&times;';
   delBtn.id = url;
+  delBtn.className = 'button delete-button';
   item.appendChild(link);
   item.appendChild(delBtn);
 
@@ -184,8 +186,11 @@ document.addEventListener('DOMContentLoaded', function() {
       target = target.parentNode;
     }
 
+    if (/(\s|^)delete-button(\s|$)/.test(target.className)) {
+      removeReadingItem(e.target.parentNode, target.id);
+    }
     // Default <a> behaviour is to load the page in the popup
-    if (target.tagName === 'A') {
+    else if (target.tagName === 'A' && /(\s|^)item-link(\s|$)/.test(target.className)) {
       e.preventDefault();
 
       // If the control key or meta key (⌘ on Mac, ⊞ on Windows) is pressed
@@ -208,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Remove the item from the reading list
     else if (target.tagName === 'BUTTON') {
       // Remove the reading list item from storage
-      removeReadingItem(e.target.parentNode, target.id);
+      // removeReadingItem(e.target.parentNode, target.id);
     }
   });
 
