@@ -48,6 +48,15 @@ header {
   background-color: #fff;
 }
 
+input {
+  font-size: 20px;
+  width: 70%;
+}
+
+label{
+  font-size: 20px;
+}
+
 #savepage {
   height: 30px;
   vertical-align: middle;

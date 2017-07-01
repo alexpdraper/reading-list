@@ -65,6 +65,7 @@ function addReadingItem(info, itemClass) {
   link.appendChild(linkTitle);
 
   var linkHost = document.createElement('span');
+  linkHost.className = 'host';
   linkHost.textContent = link.hostname || url;
   link.appendChild(linkHost);
 
@@ -140,6 +141,24 @@ function repairStorage(readingList) {
   return setObj;
 }
 
+
+function filterReadingList() {
+  var val = document.getElementById('my-search').value;
+  var readingList = document.getElementsByClassName('reading-item')
+  var reg = new RegExp(val.split('').join('\\w*').replace(/\W/, ''), 'i');
+  //Loop through reading list items to see if they match text in search box
+  for (var i=0; i< readingList.length; i++){
+    title = readingList[i].getElementsByClassName('title')[0].textContent;
+    host = readingList[i].getElementsByClassName('host')[0].textContent;
+    //If match show if no match remove from list
+    if (reg.test(title) || reg.test(host)) {
+      readingList[i].style.display = "block";
+    }else{
+      readingList[i].style.display = "none";
+    }
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   var RL = document.getElementById('reading-list');
 
@@ -211,6 +230,9 @@ document.addEventListener('DOMContentLoaded', function() {
       removeReadingItem(e.target.parentNode, target.id);
     }
   });
+
+  // Filter reading list based on search box
+  document.getElementById('my-search').addEventListener('keyup', filterReadingList);
 
   // Save the page open in the current tab to the reading list
   document.getElementById('savepage').addEventListener('click', function() {
