@@ -11,16 +11,24 @@
   box-sizing: border-box;
 }
 
-body {
+body,
+input,
+optgroup,
+select,
+textarea {
   font-family: Quasimoda, "Fira Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+body {
   font-size: 13px;
   line-height: 1.4;
   color: #555;
   margin: 0;
-  padding-top: 80px;
+  padding: 0;
 }
 
-button {
+button,
+.button {
   font-weight: bold;
   color: #fff;
   border: 1px solid #44aa76;
@@ -28,54 +36,94 @@ button {
   background-color: #66cc98;
   padding: 5px;
   border-radius: 6px;
-  width: 30px;
+  text-align: center;
 }
 
-button:hover {
+button:focus,
+.button:focus,
+button:hover,
+.button:hover {
   cursor: pointer;
   background-color: #44aa76;
   color: #fff;
+  outline: none;
 }
 
 header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-  height: 80px;
   width: 100%;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #eee;
   background-color: #fff;
+  display: flex;
+  justify-content: center;
+  padding: 30px 0 10px;
+  margin-bottom: 10px;
 }
 
 input {
-  font-size: 20px;
-  width: 70%;
+  font-size: 13px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 8px;
+  transition: all 0.3s ease;
 }
 
-label{
-  font-size: 20px;
+input:focus {
+  outline: none;
+  border-color: #ddd;
 }
 
-#savepage {
+[type="search"] {
+  -webkit-appearance: textfield;
+}
+
+[type="search"]::-webkit-search-cancel-button,
+[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+.search {
+  display: flex;
+  margin-bottom: 10px;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.search input[type="search"] {
+  width: 100%;
+}
+
+label {
+  font-size: 13px;
+  margin-right: 5px;
+}
+
+.save-button {
+  width: 30px;
   height: 30px;
-  vertical-align: middle;
+  line-height: 27px;
+  padding: 0;
+  margin: 0 10px;
 }
 
 h1 {
   margin: 0;
   padding: 0;
-  line-height: 80px;
-  text-align: center;
+  line-height: 1;
+  font-size: 22px;
+  padding: 4px 0;
 }
 
 .container {
   position: relative;
-  padding: 15px;
-  padding-top: 5px;
-  width: 400px;
+  padding: 0 15px;
+  width: 360px;
   max-width: 100%;
-  margin: 0 auto;
+  margin: 0;
+}
+
+.reading-list {
+  margin-bottom: 15px;
 }
 
 .reading-item {
@@ -85,11 +133,11 @@ h1 {
   background-color: #f7f7f7;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 2px 3px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15), 0 2px 3px rgba(0, 0, 0, 0.05);
   transition: all 0.5s ease 0s;
 }
 
-.reading-item a {
+.reading-item .item-link {
   text-decoration: none;
   display: block;
   width: 100%;
@@ -98,16 +146,17 @@ h1 {
   min-height: 56px;
 }
 
-.reading-item a:hover {
+.reading-item .item-link:focus,
+.reading-item .item-link:hover {
   color: #66cc98;
   background-color: #fff;
 }
 
-.reading-item a span {
+.reading-item .item-link span {
   display: block;
 }
 
-.reading-item a span.title {
+.reading-item .item-link span.title {
   font-weight: bold;
 }
 
@@ -122,7 +171,7 @@ h1 {
   padding: 1px;
 }
 
-.reading-item a:hover .favicon {
+.reading-item .item-link:hover .favicon {
   border-color: #66cc98;
 }
 
@@ -132,11 +181,23 @@ h1 {
   border-radius: 2px;
 }
 
-.reading-item button {
+.reading-item .delete-button {
   position: absolute;
-  top: 0;
+  top: 5px;
   right: 5px;
-  border-radius: 0 0 6px 6px;
+  border-radius: 100%;
+  padding: 0;
+  width: 25px;
+  height: 25px;
+  line-height: 25px;
+  border: 0;
+  background-color: transparent;
+  color: #ccc;
+}
+
+.reading-item .delete-button:hover {
+  background-color: #ccc;
+  color: #fff;
 }
 
 /* TODO: Prefix the animations */
@@ -144,7 +205,7 @@ h1 {
   animation: 0.2s linear slidein;
 }
 
-.slidein a {
+.slidein .item-link {
   animation: 0.8s ease-out slidein-bounce;
 }
 

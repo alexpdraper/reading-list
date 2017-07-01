@@ -56,6 +56,7 @@ function addReadingItem(info, itemClass) {
   }
 
   var link = document.createElement('a');
+  link.className = 'item-link';
   link.href = url;
   link.setAttribute('alt', title);
 
@@ -78,9 +79,10 @@ function addReadingItem(info, itemClass) {
     link.appendChild(favicon);
   }
 
-  var delBtn = document.createElement('button');
+  var delBtn = document.createElement('a');
   delBtn.innerHTML = '&times;';
   delBtn.id = url;
+  delBtn.className = 'button delete-button';
   item.appendChild(link);
   item.appendChild(delBtn);
 
@@ -146,16 +148,14 @@ function filterReadingList() {
   var val = document.getElementById('my-search').value;
   var readingList = document.getElementsByClassName('reading-item')
   var reg = new RegExp(val.split('').join('\\w*').replace(/\W/, ''), 'i');
-  //Loop through reading list items to see if they match text in search box
-  for (var i=0; i< readingList.length; i++){
+
+  // Loop through reading list items to see if they match text in search box
+  for (var i = 0; i < readingList.length; i++) {
     title = readingList[i].getElementsByClassName('title')[0].textContent;
     host = readingList[i].getElementsByClassName('host')[0].textContent;
-    //If match show if no match remove from list
-    if (reg.test(title) || reg.test(host)) {
-      readingList[i].style.display = "block";
-    }else{
-      readingList[i].style.display = "none";
-    }
+
+    // If match show, if no match remove from list
+    readingList[i].style.display = (reg.test(title) || reg.test(host)) ? '' : 'none';
   }
 }
 
@@ -203,8 +203,13 @@ document.addEventListener('DOMContentLoaded', function() {
       target = target.parentNode;
     }
 
+    // If the target is a delete button…
+    // …remove the item from the reading list
+    if (/(\s|^)delete-button(\s|$)/.test(target.className)) {
+      removeReadingItem(e.target.parentNode, target.id);
+    }
     // Default <a> behaviour is to load the page in the popup
-    if (target.tagName === 'A') {
+    else if (target.tagName === 'A' && /(\s|^)item-link(\s|$)/.test(target.className)) {
       e.preventDefault();
 
       // If the control key or meta key (⌘ on Mac, ⊞ on Windows) is pressed
@@ -222,12 +227,6 @@ document.addEventListener('DOMContentLoaded', function() {
           window.close();
         });
       }
-    }
-    // If the target is a button, it is a delete button
-    // Remove the item from the reading list
-    else if (target.tagName === 'BUTTON') {
-      // Remove the reading list item from storage
-      removeReadingItem(e.target.parentNode, target.id);
     }
   });
 

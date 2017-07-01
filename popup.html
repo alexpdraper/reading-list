@@ -2,19 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Reading List</title>
   <link rel="stylesheet" href="popup.css">
   <script src="popup.js"></script>
 </head>
 <body>
-  <header>
-    <h1>Reading List <button id="savepage">+</button></h1>
-  </header>
   <div class="container">
-    <label for="my-search">Search:</label>
-    <input type="search" id="my-search" name="search" autocomplete="off">
-    <p id='result'></p>
-    <div id="reading-list"></div>
+    <header>
+      <h1>Reading List</h1>
+      <button class="button save-button" id="savepage">+</button>
+    </header>
+
+    <div class="search">
+      <label for="my-search">Search:</label>
+      <input type="search" id="my-search" name="search" autocomplete="off">
+    </div>
+
+    <div class="reading-list" id="reading-list"></div>
   </div>
 </body>
 </html>
