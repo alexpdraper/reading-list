@@ -83,7 +83,6 @@ input:focus {
 
 .search {
   display: flex;
-  margin-bottom: 10px;
   align-items: center;
   border-bottom: 1px solid #eee;
   padding-bottom: 10px;
@@ -187,17 +186,21 @@ h1 {
   right: 5px;
   border-radius: 100%;
   padding: 0;
-  width: 25px;
-  height: 25px;
-  line-height: 25px;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
   border: 0;
   background-color: transparent;
   color: #ccc;
+  transform: rotateZ(0) scale(1);
+  transition: transform 0.3s ease, box-shadow 0.5s ease;
 }
 
 .reading-item .delete-button:hover {
   background-color: #ccc;
   color: #fff;
+  transform: rotateZ(90deg) scale(2);
+  box-shadow: 1px 0 1px rgba(0, 0, 0, 0.15);
 }
 
 /* TODO: Prefix the animations */
