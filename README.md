@@ -3,11 +3,11 @@ A Chrome extension for saving pages to read later. Free on the [Chrome Web Store
 
 Struggling to find what you’re looking for in a long list? Struggle no more! Reading List now features a search box—courtesy of [@whitecat](https://github.com/whitecat). Thanks, @whitecat.
 
-![Chrome Reading List extension](search-screenshot.png)
+![Chrome Reading List extension](images/search-screenshot.png)
 
 Also featuring nifty animations!
 
-![Chrome Reading List add item animation](add-item-gif.gif)
+![Chrome Reading List add item animation](images/add-item-gif.gif)
 
 ## Putting it to use
 
@@ -26,7 +26,7 @@ Or, if you would rather do it the hard way:
 ### Actually using the extension
 
   1. Go to a page you want to save for later
-  2. Click the reading list icon on the top right of your browser ![Chrome Reading List icon](icon32.png)
+  2. Click the reading list icon on the top right of your browser ![Chrome Reading List icon](icons/icon32.png)
   3. Click the `+` button
     - You can also right-click anywhere on the page and select “Add page to Reading List”
   4. When you want to read a page you saved, open up the extension and click the reading item you want to read
