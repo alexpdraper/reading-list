@@ -1,7 +1,15 @@
 document.addEventListener('DOMContentLoaded', function() {
   var RL = document.getElementById('reading-list');
 
-  renderReadingList(RL);
+  RL.addEventListener('animationend', function(e) {
+    var slideinRe = /(^|\s+)slidein(\s+|$)/g;
+    e.target.parentNode.className = e.target.parentNode.className.replace(slideinRe, '');
+  });
+
+  // Wait a bit before rendering the reading list
+  // Gives the popup window time to render, preventing weird resizing bugs
+  // See: https://bugs.chromium.org/p/chromium/issues/detail?id=457887
+  window.setTimeout(renderReadingList, 150, RL, true);
 
   // Listen for click events in the reading list
   RL.addEventListener('click', onReadingItemClick);

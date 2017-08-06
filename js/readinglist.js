@@ -79,23 +79,58 @@ function getReadingList(callback) {
  * Render the reading list
  *
  * @param {elementNodeReference} readingListEl - reading list DOM element
+ * @param {boolean} animateItems - animate incoming reading items?
  * @param {function()} callback - called when the list is rendered
  */
-function renderReadingList(readingListEl, callback) {
+function renderReadingList(readingListEl, animateItems, callback) {
   getReadingList(function(pageList) {
     // Sort reading list by most recent to least recent
     pageList.sort(function(a, b) {
       return b.addedAt - a.addedAt;
     });
 
-    // Create a DOM element for each reading list item
-    pageList.forEach(function(page) {
-      readingListEl.appendChild(createReadingItemEl(page));
-    });
+    var counter = 0;
+    var numItems = pageList.length;
 
-    if (typeof callback === 'function') {
-      callback();
+    // Animate up to 10 items
+    var itemsToAnimate = animateItems ? 10 : 0;
+    itemsToAnimate = (itemsToAnimate > numItems) ? numItems : itemsToAnimate;
+
+    // Wait a bit, then create a DOM element for the next reading list item,
+    // then recurse
+    function waitAndCreate(waitTime) {
+      // If we’ve rendered all the animated items
+      if (counter >= itemsToAnimate) {
+        // Render any remaining items
+        for (var i = counter; i < numItems; i++) {
+          readingListEl.appendChild(createReadingItemEl(pageList[i]));
+        }
+
+        if (typeof callback === 'function') {
+          callback();
+        }
+
+        return;
+      }
+
+      // Wait a bit, then make a reading item
+      window.setTimeout(function() {
+        var readingItemEl = createReadingItemEl(pageList[counter]);
+
+        // Add the “slidein” class for animation
+        readingItemEl.className += ' slidein';
+        readingListEl.appendChild(readingItemEl);
+
+        // Increment the counter
+        counter++;
+        waitTime = parseInt(waitTime * ((itemsToAnimate - counter) / itemsToAnimate), 10);
+
+        // Recurse!
+        waitAndCreate(waitTime);
+      }, waitTime);
     }
+
+    waitAndCreate(150);
   });
 }
 
