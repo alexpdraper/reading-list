@@ -36,7 +36,7 @@ function createReadingItemEl(info) {
   }
 
   var delBtn = document.createElement('a');
-  delBtn.innerHTML = '&times;';
+  delBtn.textContent = '×';
   delBtn.id = url;
   delBtn.className = 'button delete-button';
   item.appendChild(link);
