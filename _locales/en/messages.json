@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Reading List",
+    "description": "The title of the application, displayed in the web store and in the popup’s heading."
+  },
+  "appDesc": {
+    "message": "This extension saves a list of links to pages to read later.",
+    "description": "The description of the application, displayed in the web store."
+  },
+  "search": {
+    "message": "Search",
+    "description": "The label for the search box."
+  }
+}

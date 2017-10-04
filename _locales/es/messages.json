@@ -1,0 +1,11 @@
+{
+  "appName": {
+    "message": "Leyendo Lista"
+  },
+  "appDesc": {
+    "message": "Esta extensión de internet guarda una lista de enlaces de páginas para leer más tarde."
+  },
+  "search": {
+    "message": "Buscar"
+  }
+}

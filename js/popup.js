@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
+  // Localize!
+  document.querySelectorAll('[data-localize]').forEach(function(el) {
+    el.textContent = chrome.i18n.getMessage(el.dataset.localize);
+  });
+
   var RL = document.getElementById('reading-list');
 
   RL.addEventListener('animationend', function(e) {
