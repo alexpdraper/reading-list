@@ -2,7 +2,12 @@
   "appName": {
     "message": "Liste de Lecture"
   },
+  "appDesc": {
+    "message": "Cette extension sauvegarde une liste de liens vers des pages a lire plus ulterieurement."
+  },
   "search": {
-    "message": "Rechercher"
+    "message": "Recherche"
   }
 }
+
+

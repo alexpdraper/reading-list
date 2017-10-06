@@ -1,0 +1,11 @@
+{
+  "appName": {
+    "message": "Leseliste"
+  },
+  "appDesc": {
+    "message": "Diese Erweiterung speichert eine liste von webseiten, die später gelesen werden"
+  },
+  "search": {
+    "message": "Suchbegriff"
+  }
+}
