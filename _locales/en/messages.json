@@ -40,7 +40,7 @@
     "description": "The label for the animation option."
   },
   "context": {
-    "message": "Hide context menu:",
+    "message": "Show in context menu:",
     "description": "The label for the context option."
   },
   "save": {
