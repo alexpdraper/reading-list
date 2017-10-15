@@ -18,7 +18,7 @@ chrome.storage.sync.get(defaultSettings, function(store) {
 
   if (settings.addContextMenu) {
     chrome.management.getSelf(function(result) {
-      var menuTitle = 'Add page to Reading List';
+      var menuTitle = chrome.i18n.getMessage('addPage');
       menuTitle += (result.installType === 'development') ? ' (dev)' : '';
 
       menuItem = chrome.contextMenus.create({
@@ -62,9 +62,10 @@ function addPageToList(info, tab) {
  * @param {object} tab
  */
 function removePageFromList(info, tab) {
+  var title = chrome.i18n.getMessage('addPage');
   chrome.storage.sync.remove(tab.url, function() {
     chrome.contextMenus.update(menuItem, {
-      title: 'Add page to Reading List',
+      title,
       onclick: addPageToList
     });
   });

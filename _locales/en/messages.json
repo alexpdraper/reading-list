@@ -10,5 +10,41 @@
   "search": {
     "message": "Search",
     "description": "The label for the search box."
+  },
+  "addPage": {
+    "message": "Add page to Reading List",
+    "description": "The message in the context menu."
+  },
+  "optionsSave": {
+    "message": "Options saved.",
+    "description": "The message displayed after save is clicked in options."
+  },
+  "optionsTitle": {
+    "message": "Reading List Options",
+    "description": "The title of the application's options menu."
+  },
+  "theme": {
+    "message": "Theme:",
+    "description": "The label for the theme option."
+  },
+  "light": {
+    "message": "light",
+    "description": "The name for the light theme."
+  },
+  "dark": {
+    "message": "dark",
+    "description": "The name for the dark theme."
+  },
+  "animation": {
+    "message": "Enable animation:",
+    "description": "The label for the animation option."
+  },
+  "context": {
+    "message": "Hide context menu:",
+    "description": "The label for the context option."
+  },
+  "save": {
+    "message": "Save",
+    "description": "The label for the save button in options."
   }
 }

@@ -1,38 +1,29 @@
 <!DOCTYPE html>
 <html>
-<head><title>My Test Extension Options</title></head>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-localize="optionsTitle"></title>
+  <script src="../js/options.js"></script>
+</head>
 <body>
+  <div>
+    <label for="theme" data-localize="theme"></label>
+    <select id="theme">
+      <option value="light" data-localize="light"></option>
+      <option value="dark" data-localize="dark"></option>
+    </select>
+  </div>
 
-<div>
-<label for="theme">Choose theme:</label>
-<select id="theme">
- <option value="light">light</option>
- <option value="dark">dark</option>
-</select>
-</div>
+  <div>
+    <label for="animateItems" data-localize="animation"></label>
+    <input type="checkbox" id="animateItems">
+  </div>
 
-<div>
-<label for="animateItems">
-  Enable animation:
-  <input type="checkbox" id="animateItems">
-</label>
-</div>
+  <div>
+    <label for="addContextMenu" data-localize="context"></label>
+    <input type="checkbox" id="addContextMenu">
+  </div>
 
-<div>
-<label for="addContextMenu">
-  Hide context menu:
-  <input type="checkbox" id="addContextMenu">
-</label>
-</div>
-
-<!-- <label>
-  <input type="checkbox" id="like">
-  I like colors.
-</label> -->
-
-<div id="status"></div>
-<button id="save">Save</button>
-
-<script src="../js/options.js"></script>
 </body>
 </html>
