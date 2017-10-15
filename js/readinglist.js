@@ -63,7 +63,7 @@ function getReadingList(callback) {
     var pageList = [];
 
     for (page in pages) {
-      if (pages.hasOwnProperty(page)) {
+      if (pages.hasOwnProperty(page) && !/^setting/.test(page)) {
         pageList.push(pages[page]);
       }
     }

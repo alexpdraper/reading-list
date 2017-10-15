@@ -11,10 +11,27 @@ document.addEventListener('DOMContentLoaded', function() {
     e.target.parentNode.className = e.target.parentNode.className.replace(slideinRe, '');
   });
 
-  // Wait a bit before rendering the reading list
-  // Gives the popup window time to render, preventing weird resizing bugs
-  // See: https://bugs.chromium.org/p/chromium/issues/detail?id=457887
-  window.setTimeout(renderReadingList, 150, RL, true);
+  var defaultSettings = {
+    settings: {
+      theme: 'light',
+      addContextMenu: true,
+      animateItems: true
+    }
+  };
+
+  chrome.storage.sync.get(defaultSettings, function(store) {
+    var settings = store.settings
+    document.body.classList.add(settings.theme || 'light');
+
+    if (settings.animateItems) {
+      // Wait a bit before rendering the reading list
+      // Gives the popup window time to render, preventing weird resizing bugs
+      // See: https://bugs.chromium.org/p/chromium/issues/detail?id=457887
+      window.setTimeout(renderReadingList, 150, RL, true);
+    } else {
+      renderReadingList(RL, false)
+    }
+  });
 
   // Listen for click events in the reading list
   RL.addEventListener('click', onReadingItemClick);
