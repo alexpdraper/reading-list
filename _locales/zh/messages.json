@@ -1,0 +1,11 @@
+{
+  "appName": {
+    "message": "阅读列表"
+  },
+  "appDesc": {
+    "message": "这个扩展工具可以帮助收藏很多用于以后阅读的页面。"
+  },
+  "search": {
+    "message": "搜索"
+  }
+}
