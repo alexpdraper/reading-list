@@ -4,7 +4,7 @@
   "name": "__MSG_appName__",
   "description": "__MSG_appDesc__",
   "default_locale": "en",
-  "version": "2.3.2",
+  "version": "2.3.5",
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",
@@ -28,5 +28,6 @@
     "https://ajax.googleapis.com/",
     "contextMenus",
     "storage"
-  ]
+  ],
+  "options_page": "html/options.html"
 }

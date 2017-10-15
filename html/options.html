@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head><title>My Test Extension Options</title></head>
+<body>
+
+<div>
+<label for="theme">Choose theme:</label>
+<select id="theme">
+ <option value="light">light</option>
+ <option value="dark">dark</option>
+</select>
+</div>
+
+<div>
+<label for="animateItems">
+  Enable animation:
+  <input type="checkbox" id="animateItems">
+</label>
+</div>
+
+<div>
+<label for="addContextMenu">
+  Hide context menu:
+  <input type="checkbox" id="addContextMenu">
+</label>
+</div>
+
+<!-- <label>
+  <input type="checkbox" id="like">
+  I like colors.
+</label> -->
+
+<div id="status"></div>
+<button id="save">Save</button>
+
+<script src="../js/options.js"></script>
+</body>
+</html>
