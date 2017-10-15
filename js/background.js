@@ -5,14 +5,28 @@ chrome.browserAction.setBadgeBackgroundColor({
 
 var menuItem;
 
-chrome.management.getSelf(function(result) {
-  var menuTitle = 'Add page to Reading List';
-  menuTitle += (result.installType === 'development') ? ' (dev)' : '';
+var defaultSettings = {
+  settings: {
+    theme: 'light',
+    addContextMenu: true,
+    animateItems: true
+  }
+};
 
-  menuItem = chrome.contextMenus.create({
-    title: menuTitle,
-    onclick: addPageToList
-  });
+chrome.storage.sync.get(defaultSettings, function(store) {
+  var settings = store.settings
+
+  if (settings.addContextMenu) {
+    chrome.management.getSelf(function(result) {
+      var menuTitle = 'Add page to Reading List';
+      menuTitle += (result.installType === 'development') ? ' (dev)' : '';
+
+      menuItem = chrome.contextMenus.create({
+        title: menuTitle,
+        onclick: addPageToList
+      });
+    });
+  }
 });
 
 /**
