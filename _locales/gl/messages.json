@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Reading List",
+    "description": "Título da extensión, mostrado na web store e no cabezallo do emerxente."
+  },
+  "appDesc": {
+    "message": "Esta extensión garda unha lista de ligazóns a páxinas para ler máis tarde.",
+    "description": "Descrición da aplicación, mostrada na web store."
+  },
+  "search": {
+    "message": "Busca",
+    "description": "Etiqueta da caixa de busca."
+  }
+}
