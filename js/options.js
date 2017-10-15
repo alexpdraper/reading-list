@@ -10,6 +10,19 @@ document.addEventListener('DOMContentLoaded', function () {
     var animateItems = document.getElementById('animateItems').checked;
     var addContextMenu = document.getElementById('addContextMenu').checked;
 
+    // Remove all the context menus
+    chrome.contextMenus.removeAll(function() {
+      // If context menu is clicked, add the context menu
+      if (addContextMenu) {
+        // Create the context menu from the background page
+        // see “background.js”
+        chrome.runtime.getBackgroundPage(function(bgPage) {
+          bgPage.createContextMenu();
+        })
+      }
+    })
+
+
     chrome.storage.sync.set({
       settings: {
         theme,

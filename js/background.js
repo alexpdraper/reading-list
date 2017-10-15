@@ -14,20 +14,22 @@ var defaultSettings = {
 };
 
 chrome.storage.sync.get(defaultSettings, function(store) {
-  var settings = store.settings
-
-  if (settings.addContextMenu) {
-    chrome.management.getSelf(function(result) {
-      var menuTitle = chrome.i18n.getMessage('addPage');
-      menuTitle += (result.installType === 'development') ? ' (dev)' : '';
-
-      menuItem = chrome.contextMenus.create({
-        title: menuTitle,
-        onclick: addPageToList
-      });
-    });
+  if (store.settings.addContextMenu) {
+    createContextMenu();
   }
 });
+
+function createContextMenu () {
+  chrome.management.getSelf(function(result) {
+    var menuTitle = chrome.i18n.getMessage('addPage');
+    menuTitle += (result.installType === 'development') ? ' (dev)' : '';
+
+    menuItem = chrome.contextMenus.create({
+      title: menuTitle,
+      onclick: addPageToList
+    });
+  });
+}
 
 /**
  * Add the page to the reading list (context menu item onclick function)
