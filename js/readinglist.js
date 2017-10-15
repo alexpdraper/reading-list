@@ -30,6 +30,7 @@ function createReadingItemEl(info) {
     var favicon = document.createElement('div');
     favicon.className = 'favicon';
     var faviconImg = document.createElement('img');
+    faviconImg.onerror = function() { this.classList.add('error'); }
     faviconImg.setAttribute('src', favIconUrl);
     favicon.appendChild(faviconImg);
     link.appendChild(favicon);

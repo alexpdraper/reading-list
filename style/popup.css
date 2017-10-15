@@ -178,6 +178,10 @@ h1 {
   border-radius: 2px;
 }
 
+.favicon > img.error {
+  display: none;
+}
+
 .reading-item .delete-button {
   position: absolute;
   top: 5px;
