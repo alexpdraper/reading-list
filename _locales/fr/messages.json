@@ -7,6 +7,27 @@
   },
   "search": {
     "message": "Recherche"
+  },
+  "addPage": {
+    "message": "Ajouter la page à la liste de lecture"
+  },
+  "optionsTitle": {
+    "message": "Options de la liste de lecture"
+  },
+  "theme": {
+    "message": "Thème:"
+  },
+  "light": {
+    "message": "lumière"
+  },
+  "dark": {
+    "message": "foncé"
+  },
+  "animation": {
+    "message": "Activer l'animation:"
+  },
+  "context": {
+    "message": "Afficher dans le menu contextuel:"
   }
 }
 

@@ -7,5 +7,26 @@
   },
   "search": {
     "message": "Suchbegriff"
+  },
+  "addPage": {
+    "message": "Seite zur Leseliste hinzufügen"
+  },
+  "optionsTitle": {
+    "message": "Leselistenoptionen"
+  },
+  "theme": {
+    "message": "Theme:"
+  },
+  "light": {
+    "message": "Licht"
+  },
+  "dark": {
+    "message": "Dunkles"
+  },
+  "animation": {
+    "message": "Animation anschalten:"
+  },
+  "context": {
+    "message": "Im Kontextmenü anzeigen:"
   }
 }
