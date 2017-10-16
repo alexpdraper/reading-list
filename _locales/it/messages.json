@@ -7,5 +7,26 @@
   },
   "search": {
     "message": "Cerca"
+  },
+  "addPage": {
+    "message": "Aggiungi pagina all'Elenco Lettura"
+  },
+  "optionsTitle": {
+    "message": "Opzioni dell'Elenco Lettura"
+  },
+  "theme": {
+    "message": "Tema:"
+  },
+  "light": {
+    "message": "luce"
+  },
+  "dark": {
+    "message": "scuro"
+  },
+  "animation": {
+    "message": "Attiva l'animazione:"
+  },
+  "context": {
+    "message": "Mostra nel menu di contesto:"
   }
 }

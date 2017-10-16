@@ -15,10 +15,6 @@
     "message": "Add page to Reading List",
     "description": "The message in the context menu."
   },
-  "optionsSave": {
-    "message": "Options saved.",
-    "description": "The message displayed after save is clicked in options."
-  },
   "optionsTitle": {
     "message": "Reading List Options",
     "description": "The title of the application's options menu."
@@ -42,9 +38,5 @@
   "context": {
     "message": "Show in context menu:",
     "description": "The label for the context option."
-  },
-  "save": {
-    "message": "Save",
-    "description": "The label for the save button in options."
   }
 }
