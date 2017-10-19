@@ -25,7 +25,6 @@
   },
   "permissions": [
     "tabs",
-    "https://ajax.googleapis.com/",
     "contextMenus",
     "storage"
   ],
