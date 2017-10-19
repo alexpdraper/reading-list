@@ -38,5 +38,14 @@
   "context": {
     "message": "Show in context menu:",
     "description": "The label for the context option."
+  },
+  "backup": {
+    "message": "Backup:"
+  },
+  "export": {
+    "message": "Export"
+  },
+  "import": {
+    "message": "Import"
   }
 }

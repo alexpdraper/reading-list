@@ -28,6 +28,15 @@
   },
   "context": {
     "message": "Afficher dans le menu contextuel:"
+  },
+  "backup": {
+    "message": "Sauvegarder:"
+  },
+  "export": {
+    "message": "Exportation"
+  },
+  "import": {
+    "message": "Importer"
   }
 }
 
