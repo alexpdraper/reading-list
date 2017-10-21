@@ -28,5 +28,14 @@
   },
   "context": {
     "message": "Mostrar en el menú contextual:"
+  },
+  "backup": {
+    "message": "Copia de seguridad:"
+  },
+  "export": {
+    "message": "Exportar"
+  },
+  "import": {
+    "message": "Importar"
   }
 }
