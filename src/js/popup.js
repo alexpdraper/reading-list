@@ -1,59 +1,63 @@
-document.addEventListener('DOMContentLoaded', function() {
+/* globals chrome */
+
+import list from './readinglist'
+
+document.addEventListener('DOMContentLoaded', function () {
   // Localize!
-  document.querySelectorAll('[data-localize]').forEach(function(el) {
-    el.textContent = chrome.i18n.getMessage(el.dataset.localize);
-  });
+  document.querySelectorAll('[data-localize]').forEach(function (el) {
+    el.textContent = chrome.i18n.getMessage(el.dataset.localize)
+  })
 
-  var RL = document.getElementById('reading-list');
+  const RL = document.getElementById('reading-list')
 
-  RL.addEventListener('animationend', function(e) {
-    var slideinRe = /(^|\s+)slidein(\s+|$)/g;
-    e.target.parentNode.className = e.target.parentNode.className.replace(slideinRe, '');
-  });
+  RL.addEventListener('animationend', function (e) {
+    let slideinRe = /(^|\s+)slidein(\s+|$)/g
+    e.target.parentNode.className = e.target.parentNode.className.replace(slideinRe, '')
+  })
 
-  var defaultSettings = {
+  const defaultSettings = {
     settings: {
       theme: 'light',
       addContextMenu: true,
       animateItems: true
     }
-  };
+  }
 
-  chrome.storage.sync.get(defaultSettings, function(store) {
-    var settings = store.settings
-    document.body.classList.add(settings.theme || 'light');
+  chrome.storage.sync.get(defaultSettings, store => {
+    let settings = store.settings
+    document.body.classList.add(settings.theme || 'light')
 
     if (settings.animateItems) {
       // Wait a bit before rendering the reading list
       // Gives the popup window time to render, preventing weird resizing bugs
       // See: https://bugs.chromium.org/p/chromium/issues/detail?id=457887
-      window.setTimeout(renderReadingList, 150, RL, true);
+      window.setTimeout(list.renderReadingList, 150, RL, true)
     } else {
-      renderReadingList(RL, false)
+      list.renderReadingList(RL, false)
     }
-  });
+  })
 
   // Listen for click events in the reading list
-  RL.addEventListener('click', onReadingItemClick);
+  RL.addEventListener('click', list.onReadingItemClick)
 
-  var searchbox = document.getElementById('my-search')
+  const searchbox = document.getElementById('my-search')
 
   if (searchbox) {
     // Filter reading list based on search box
-    searchbox.addEventListener('keyup', filterReadingList);
+    searchbox.addEventListener('keyup', list.filterReadingList)
   }
 
   // The button for adding pages to the reading list
-  var savepageButton = document.getElementById('savepage');
+  const savepageButton = document.getElementById('savepage')
 
   if (savepageButton) {
     // Save the page open in the current tab to the reading list
-    savepageButton.addEventListener('click', function() {
-      var queryInfo = { active: true, currentWindow: true };
+    savepageButton.addEventListener('click', function () {
+      const queryInfo = { active: true, currentWindow: true }
 
-      chrome.tabs.query(queryInfo, function(tabs) {
-        addReadingItem(tabs[0], RL);
-      });
-    });
+      chrome.tabs.query(queryInfo, function (tabs) {
+        list.addReadingItem(tabs[0], RL)
+      })
+    })
   }
-});
+})

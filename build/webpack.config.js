@@ -19,6 +19,15 @@ const webpackConfig = {
     rules: [
       {
         test: /\.js$/,
+        loader: 'eslint-loader',
+        enforce: 'pre',
+        include: [path.resolve(__dirname, '..', 'src')],
+        options: {
+          formatter: require('eslint-friendly-formatter')
+        }
+      },
+      {
+        test: /\.js$/,
         loader: 'babel-loader',
         include: [path.resolve(__dirname, '..', 'src')]
       }
