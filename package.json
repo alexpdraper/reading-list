@@ -1,0 +1,32 @@
+{
+  "name": "reading-list",
+  "version": "2.3.5",
+  "description": "A Chrome/Firefox extension that saves a list of webpages to read later.",
+  "scripts": {
+    "build": "node build/build.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexpdraper/reading-list.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alexpdraper/reading-list/issues"
+  },
+  "homepage": "https://github.com/alexpdraper/reading-list#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "chalk": "^2.2.0",
+    "compression-webpack-plugin": "^1.0.1",
+    "html-webpack-plugin": "^2.30.1",
+    "ora": "^1.3.0",
+    "rimraf": "^2.6.2",
+    "webpack": "^3.8.1",
+    "webpack-bundle-analyzer": "^2.9.0",
+    "webpack-dev-server": "^2.9.3",
+    "webpack-merge": "^4.1.0",
+    "write-file-webpack-plugin": "^4.2.0"
+  }
+}
