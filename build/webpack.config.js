@@ -28,6 +28,11 @@ const webpackConfig = {
         }
       },
       {
+        test: /\.styl$/,
+        loader: 'style-loader!css-loader!stylus-loader',
+        include: [path.resolve(__dirname, '..', 'src', 'style')]
+      },
+      {
         test: /\.js$/,
         loader: 'babel-loader',
         include: [path.resolve(__dirname, '..', 'src')]

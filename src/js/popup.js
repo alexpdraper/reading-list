@@ -2,6 +2,8 @@
 
 import list from './readinglist'
 
+import '../style/popup.styl'
+
 document.addEventListener('DOMContentLoaded', function () {
   // Localize!
   document.querySelectorAll('[data-localize]').forEach(function (el) {
