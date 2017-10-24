@@ -3,6 +3,7 @@ const webpack = require('webpack')
 const config = require('../config')
 const path = require('path')
 const WriteFilePlugin = require('write-file-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const env = config.build.env
 
 const webpackConfig = {
@@ -44,15 +45,27 @@ const webpackConfig = {
       sourceMap: true
     }),
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, '..', 'src', 'popup.html'),
+      template: path.resolve(__dirname, '..', 'src', 'popup.html'),
       filename: 'popup.html',
       chunks: ['popup']
     }),
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, '..', 'src', 'options.html'),
+      template: path.resolve(__dirname, '..', 'src', 'options.html'),
       filename: 'options.html',
       chunks: ['options']
     }),
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, '..', 'src', '_locales'),
+        to: path.resolve(__dirname, '..', 'dist', '_locales'),
+        ignore: ['.*']
+      },
+      {
+        from: path.resolve(__dirname, '..', 'src', 'icons'),
+        to: path.resolve(__dirname, '..', 'dist', 'icons'),
+        ignore: ['.*']
+      }
+    ]),
     new WriteFilePlugin()
   ]
 }
