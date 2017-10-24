@@ -4,7 +4,6 @@
   "name": "__MSG_appName__",
   "description": "__MSG_appDesc__",
   "default_locale": "en",
-  "version": "2.3.5",
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",
@@ -12,7 +11,7 @@
     "128": "icons/icon128.png"
   },
   "browser_action": {
-    "default_popup": "html/popup.html",
+    "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png"
@@ -20,7 +19,7 @@
   },
   "background": {
     "scripts": [
-      "js/background.js"
+      "background.bundle.js"
     ]
   },
   "permissions": [
@@ -28,5 +27,5 @@
     "contextMenus",
     "storage"
   ],
-  "options_page": "html/options.html"
+  "options_page": "options.html"
 }
