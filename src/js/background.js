@@ -31,6 +31,8 @@ function createContextMenu () {
   })
 }
 
+window.createContextMenu = createContextMenu
+
 /**
  * Add the page to the reading list (context menu item onclick function)
  *
