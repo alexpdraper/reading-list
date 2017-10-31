@@ -13,14 +13,14 @@ var defaultSettings = {
   }
 }
 
-chrome.storage.sync.get(defaultSettings, function (store) {
+chrome.storage.sync.get(defaultSettings, store => {
   if (store.settings.addContextMenu) {
     createContextMenu()
   }
 })
 
 function createContextMenu () {
-  chrome.management.getSelf(function (result) {
+  chrome.management.getSelf(result => {
     var menuTitle = chrome.i18n.getMessage('addPage')
     menuTitle += (result.installType === 'development') ? ' (dev)' : ''
 
@@ -68,7 +68,7 @@ function updateBadge (url, tabId, callback) {
   }
 
   // Check the reading list for the url
-  chrome.storage.sync.get(url, function (item) {
+  chrome.storage.sync.get(url, item => {
     var onList = (item && item.hasOwnProperty(url))
 
     // If the page is on the reading list, add a “✔” to the badge,
@@ -84,10 +84,10 @@ function updateBadge (url, tabId, callback) {
   })
 }
 
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   // If the tab is loaded, update the badge text
   if (tabId && changeInfo.status === 'complete' && tab.url) {
-    updateBadge(tab.url, tabId, function (onList, item) {
+    updateBadge(tab.url, tabId, (onList, item) => {
       var readingItem = onList ? item[tab.url] : null
       var setObj = {}
 
