@@ -22,14 +22,14 @@ Or, if you would rather do it the hard way, you can build the extension from the
   1. Make sure you have Node and NPM installed
   1. Download/clone this repo
   1. Install all the dependencies:
-    ```bash
-    # From the project folder
-    npm install
-    ```
+      ```bash
+      # From the project folder
+      npm install
+      ```
   1. Run the build command:
-    ```bash
-    npm run build [chrome/firefox]
-    ```
+      ```bash
+      npm run build [chrome/firefox]
+      ```
 
 The build command assembles all the files in the `dist` folder. After it’s built, you can load it into Chrome or Firefox.
 
