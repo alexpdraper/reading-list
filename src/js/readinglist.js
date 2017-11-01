@@ -32,7 +32,7 @@ function createReadingItemEl (info) {
     var favicon = document.createElement('div')
     favicon.className = 'favicon'
     var faviconImg = document.createElement('img')
-    faviconImg.onerror = function () { this.classList.add('error') }
+    faviconImg.onerror = () => { this.classList.add('error') }
     faviconImg.setAttribute('src', favIconUrl)
     favicon.appendChild(faviconImg)
     link.appendChild(favicon)
@@ -59,7 +59,7 @@ function getReadingList (callback) {
     return
   }
 
-  chrome.storage.sync.get(null, function (pages) {
+  chrome.storage.sync.get(null, pages => {
     var pageList = []
 
     for (let page in pages) {
@@ -80,9 +80,9 @@ function getReadingList (callback) {
  * @param {function()} callback - called when the list is rendered
  */
 function renderReadingList (readingListEl, animateItems, callback) {
-  getReadingList(function (pageList) {
+  getReadingList(pageList => {
     // Sort reading list by most recent to least recent
-    pageList.sort(function (a, b) {
+    pageList.sort((a, b) => {
       return b.addedAt - a.addedAt
     })
 
@@ -111,7 +111,7 @@ function renderReadingList (readingListEl, animateItems, callback) {
       }
 
       // Wait a bit, then make a reading item
-      window.setTimeout(function () {
+      window.setTimeout(() => {
         var readingItemEl = createReadingItemEl(pageList[counter])
 
         // Add the “slidein” class for animation
@@ -155,7 +155,7 @@ function addReadingItem (info, readingListEl, callback) {
   var setObj = {}
   setObj[info.url] = info
 
-  chrome.storage.sync.set(setObj, function () {
+  chrome.storage.sync.set(setObj, () => {
     if (chrome.runtime.lastError) {
       console.error(chrome.runtime.lastError)
     }
@@ -184,7 +184,7 @@ function addReadingItem (info, readingListEl, callback) {
     // Add the “✔” to the badge for matching tabs
     var queryInfo = { url: info.url.replace(/#.*/, '') }
 
-    chrome.tabs.query(queryInfo, function (tabs) {
+    chrome.tabs.query(queryInfo, tabs => {
       for (var i = 0; i < tabs.length; i++) {
         // If the URL is identical, add the “✔” to the badge
         if (tabs[i].url === info.url && tabs[i].id) {
@@ -211,11 +211,11 @@ function addReadingItem (info, readingListEl, callback) {
 function removeReadingItem (url, element) {
   // If url is truthy, remove the item from storage
   if (url) {
-    chrome.storage.sync.remove(url, function () {
+    chrome.storage.sync.remove(url, () => {
       // Find tabs with the reading item’s url
       var queryInfo = { url: url.replace(/#.*/, '') }
 
-      chrome.tabs.query(queryInfo, function (tabs) {
+      chrome.tabs.query(queryInfo, tabs => {
         for (var i = 0; i < tabs.length; i++) {
           // If the URL is identical, remove the “✔” from the badge
           if (tabs[i].url === url) {
@@ -232,7 +232,7 @@ function removeReadingItem (url, element) {
   // If element is truthy, remove the element
   if (element) {
     // Listen for the end of an animation
-    element.addEventListener('animationend', function () {
+    element.addEventListener('animationend', () => {
       // Remove the item from the DOM when the animation is finished
       element.remove()
     })
@@ -257,7 +257,7 @@ function openLink (url, newTab) {
     chrome.tabs.query({
       active: true,
       currentWindow: true
-    }, function (tabs) {
+    }, tabs => {
       var tab = tabs[0]
 
       // Update the URL of the current tab

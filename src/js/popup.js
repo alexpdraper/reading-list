@@ -4,15 +4,15 @@ import list from './readinglist'
 
 import '../style/popup.styl'
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
   // Localize!
-  document.querySelectorAll('[data-localize]').forEach(function (el) {
+  document.querySelectorAll('[data-localize]').forEach(el => {
     el.textContent = chrome.i18n.getMessage(el.dataset.localize)
   })
 
   const RL = document.getElementById('reading-list')
 
-  RL.addEventListener('animationend', function (e) {
+  RL.addEventListener('animationend', e => {
     let slideinRe = /(^|\s+)slidein(\s+|$)/g
     e.target.parentNode.className = e.target.parentNode.className.replace(slideinRe, '')
   })
@@ -54,10 +54,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
   if (savepageButton) {
     // Save the page open in the current tab to the reading list
-    savepageButton.addEventListener('click', function () {
+    savepageButton.addEventListener('click', () => {
       const queryInfo = { active: true, currentWindow: true }
 
-      chrome.tabs.query(queryInfo, function (tabs) {
+      chrome.tabs.query(queryInfo, tabs => {
         list.addReadingItem(tabs[0], RL)
       })
     })

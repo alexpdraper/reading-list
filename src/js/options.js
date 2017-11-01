@@ -1,8 +1,8 @@
 /* globals chrome */
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
   // Localize!
-  document.querySelectorAll('[data-localize]').forEach(function (el) {
+  document.querySelectorAll('[data-localize]').forEach(el => {
     el.textContent = chrome.i18n.getMessage(el.dataset.localize)
   })
 
@@ -13,12 +13,12 @@ document.addEventListener('DOMContentLoaded', function () {
     var addContextMenu = document.getElementById('addContextMenu').checked
 
     // Remove all the context menus
-    chrome.contextMenus.removeAll(function () {
+    chrome.contextMenus.removeAll(() => {
       // If context menu is clicked, add the context menu
       if (addContextMenu) {
         // Create the context menu from the background page
         // see “background.js”
-        chrome.runtime.getBackgroundPage(function (bgPage) {
+        chrome.runtime.getBackgroundPage(bgPage => {
           bgPage.createContextMenu()
         })
       }
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
         animateItems: true,
         addContextMenu: true
       }
-    }, function (items) {
+    }, items => {
       document.getElementById('theme').value = items.settings.theme
       document.getElementById('animateItems').checked = items.settings.animateItems
       document.getElementById('addContextMenu').checked = items.settings.addContextMenu
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Exports app data to a file
   function exportFunc () {
     // Get the storage element
-    chrome.storage.sync.get(null, function (pages) {
+    chrome.storage.sync.get(null, pages => {
       let exportText = JSON.stringify(pages)
 
       // Add storage element to file
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
       document.body.appendChild(link)
 
       // wait for the link to be added to the document
-      window.requestAnimationFrame(function () {
+      window.requestAnimationFrame(() => {
         var event = new MouseEvent('click')
         link.dispatchEvent(event)
         document.body.removeChild(link)
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Un-comment this line if we want to replace the storage
     // chrome.storage.sync.clear();
     // Here the chrome storage is imported, it aggregates the reading list and replaces setting
-    chrome.storage.sync.set(myImportedData, function () {
+    chrome.storage.sync.set(myImportedData, () => {
       restoreOptions()
       if (chrome.runtime.lastError) {
         console.error(chrome.runtime.lastError)
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Import listeners
   importOrig.addEventListener('change', importFunc, false)
-  importBtn.onclick = function () { importOrig.click() }
+  importBtn.onclick = () => { importOrig.click() }
   // Export listener
   exportBtn.addEventListener('click', exportFunc, false)
   document.getElementById('theme').addEventListener('change', saveOptions)
