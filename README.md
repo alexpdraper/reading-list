@@ -1,43 +1,58 @@
 # Reading List
-A Chrome extension for saving pages to read later. Free on the [Chrome Web Store](https://chrome.google.com/webstore/detail/lloccabjgblebdmncjndmiibianflabo).
 
-Struggling to find what you’re looking for in a long list? Struggle no more! Reading List now features a search box—courtesy of [@whitecat](https://github.com/whitecat). Thanks, @whitecat.
+A Chrome and Firefox extension for saving pages to read later. Free on the [Chrome Web Store](https://chrome.google.com/webstore/detail/lloccabjgblebdmncjndmiibianflabo) and [Firefox Addons](https://addons.mozilla.org/en-US/firefox/addon/reading_list/).
 
-![Chrome Reading List extension](images/search-screenshot.png)
+![Chrome Reading List extension](src/images/search-screenshot.png)
 
-Also featuring nifty animations!
+## Features
 
-![Chrome Reading List add item animation](images/add-item-gif.gif)
+  - Nifty animations
+  - Search
+  - Syncing with Google/Mozilla accounts
+  - A light and dark theme
 
-## Putting it to use
+## Installation
 
-### Installation
+Get it from the [Chrome Web Store](https://chrome.google.com/webstore/detail/lloccabjgblebdmncjndmiibianflabo) or [Firefox Addons](https://addons.mozilla.org/en-US/firefox/addon/reading_list/) for free.
 
-Get it from the [Chrome Web Store](https://chrome.google.com/webstore/detail/lloccabjgblebdmncjndmiibianflabo) for free.
+### Building
 
-Or, if you would rather do it the hard way:
+Or, if you would rather do it the hard way, you can build the extension from the source code:
 
-  1. Download this repo
-  2. Go to [chrome://extensions/](chrome://extensions/)
-  3. Check “Developer Mode”
-  4. Click “Load unpacked extension…”
-  5. Load it up
+  1. Make sure you have Node and NPM installed
+  1. Download/clone this repo
+  1. Install all the dependencies:
+    ```bash
+    # From the project folder
+    npm install
+    ```
+  1. Run the build command:
+    ```bash
+    npm run build [chrome/firefox]
+    ```
 
-### Actually using the extension
+The build command assembles all the files in the `dist` folder. After it’s built, you can load it into Chrome or Firefox.
+
+#### Load into Chrome
+
+  1. Go to [chrome://extensions/](chrome://extensions/)
+  1. Check “Developer Mode”
+  1. Click “Load unpacked extension…”
+  1. Load up the “dist” folder
+
+#### Load into Firefox
+
+  1. Go to [about:addons](about:addons)
+  1. Select “Extensions”
+  1. Click the settings cog, and select “Install Add-on From File…”
+  1. Load up the “dist” folder
+
+## Using the extension
 
   1. Go to a page you want to save for later
-  2. Click the reading list icon on the top right of your browser ![Chrome Reading List icon](icons/icon32.png)
-  3. Click the `+` button
-    - You can also right-click anywhere on the page and select “Add page to Reading List”
-  4. When you want to read a page you saved, open up the extension and click the reading item you want to read
-    - `Control + click` or `command ⌘/windows key ⊞ + click` to open the page in a new tab
-  5. Done with a page? Click the `×` next to said page in your reading list, and it will magically vanish.
-
-## Todo
-
-  - [ ] <del>Refactor way pages are stored—store the reading list array, instead of each page as its own storage object</del>
-    - Turns out the whole list as an array can result in going over the storage limits for a single item and delete the whole list
-  - [x] Save favicon and display them in the reading list
-  - [ ] Add a check to see if the user’s browser allows CSS animations, and provide backups if it does not
-  - [ ] Handle issues with [storage limits](https://developer.chrome.com/extensions/storage)
-  - [ ] Add a directory structure to organize reading list items (maybe)
+  1. Click the reading list icon on the top right of your browser ![Chrome Reading List icon](src/icons/icon32.png)
+  1. Click the `+` button
+      - You can also right-click anywhere on the page and select “Add page to Reading List”
+  1. When you want to read a page you saved, open up the extension and click the reading item you want to read
+      - `Control + click` or `command ⌘/windows key ⊞ + click` to open the page in a new tab
+  1. Done with a page? Click the `×` next to said page in your reading list, and it will magically vanish.
