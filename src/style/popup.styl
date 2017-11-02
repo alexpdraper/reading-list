@@ -26,7 +26,6 @@ body {
   overflow-x: hidden;
 }
 
-button,
 .button {
   font-weight: bold;
   color: #fff;
@@ -38,9 +37,7 @@ button,
   text-align: center;
 }
 
-button:focus,
 .button:focus,
-button:hover,
 .button:hover {
   cursor: pointer;
   background-color: #44aa76;
@@ -100,6 +97,25 @@ label {
   line-height: 27px;
   padding: 0;
   margin: 0 10px;
+}
+
+.settings-button {
+  float: right;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 15px;
+  height: 15px;
+  line-height: 27px;
+  padding: 0;
+  margin: 10px 10px;
+  border: 0;
+  background-color: transparent;
+}
+
+.settings-button:focus,
+.settings-button:hover, {
+  outline: none;
 }
 
 h1 {

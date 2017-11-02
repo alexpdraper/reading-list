@@ -62,4 +62,15 @@ document.addEventListener('DOMContentLoaded', () => {
       })
     })
   }
+
+  // Listen for click events in the settings
+  document.getElementById('settings').addEventListener('click', () => {
+    if (chrome.runtime.openOptionsPage) {
+      // New way to open options pages, if supported (Chrome 42+).
+      chrome.runtime.openOptionsPage()
+    } else {
+      // Reasonable fallback.
+      window.open(chrome.runtime.getURL('/options.html'))
+    }
+  })
 })
