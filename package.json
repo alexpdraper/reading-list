@@ -1,6 +1,6 @@
 {
   "name": "reading-list",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "A Chrome/Firefox extension that saves a list of webpages to read later.",
   "scripts": {
     "build": "node build/build.js",
