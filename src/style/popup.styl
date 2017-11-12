@@ -1,12 +1,11 @@
-* {
-  -webkit-box-sizing: border-box;
+html {
   box-sizing: border-box;
 }
 
+*,
 *:before,
 *:after {
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
+  box-sizing: inherit;
 }
 
 body,
@@ -106,16 +105,17 @@ label {
   right: 0;
   width: 15px;
   height: 15px;
-  line-height: 27px;
   padding: 0;
-  margin: 10px 10px;
+  margin: 10px;
   border: 0;
   background-color: transparent;
-}
-
-.settings-button:focus,
-.settings-button:hover, {
-  outline: none;
+  &:hover {
+    cursor: pointer
+  }
+  &:hover,
+  &:focus {
+    outline: none
+  }
 }
 
 h1 {
@@ -205,7 +205,6 @@ h1 {
   padding: 0;
   width: 20px;
   height: 20px;
-  line-height: 20px;
   border: 0;
   background-color: transparent;
   color: #ccc;
@@ -220,7 +219,6 @@ h1 {
   box-shadow: 1px 0 1px rgba(0, 0, 0, 0.15);
 }
 
-/* TODO: Prefix the animations */
 .slidein {
   animation: 0.2s linear slidein;
 }
@@ -291,45 +289,4 @@ h1 {
   }
 }
 
-/* Dark theme */
-.dark {
-  color: #000;
-  background: #777;
-}
-
-.dark header,
-.dark .search {
-  border-color: #555;
-}
-
-.dark input {
-  background: transparent;
-  border: 1px solid #555;
-}
-
-.dark .reading-item {
-  background: #555;
-}
-
-.dark .reading-item .item-link {
-  color: #eee;
-}
-
-.dark .reading-item .item-link:hover,
-.dark .reading-item .item-link:focus {
-  background: #333;
-}
-
-.dark .reading-item .favicon {
-  border: 0;
-}
-
-.dark .save-button {
-  background: #555;
-  border-color: #333;
-}
-
-.dark .save-button:hover,
-.dark .save-button:focus {
-  background: #333;
-}
+@import './themes/dark'

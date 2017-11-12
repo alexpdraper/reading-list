@@ -4,9 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title data-localize="optionsTitle"></title>
+  <style>
+    .field { margin-bottom: 0.5em }
+    body { margin: 16px 8px }
+  </style>
 </head>
 <body>
-  <div>
+  <div class="field">
     <label for="theme" data-localize="theme"></label>
     <select id="theme">
       <option value="light" data-localize="light"></option>
@@ -14,21 +18,25 @@
     </select>
   </div>
 
-  <div>
-    <label for="animateItems" data-localize="animation"></label>
-    <input type="checkbox" id="animateItems">
+  <div class="field">
+    <label for="animateItems">
+      <span data-localize="animation"></span>
+      <input type="checkbox" id="animateItems">
+    </label>
   </div>
 
-  <div>
-    <label for="addContextMenu" data-localize="context"></label>
-    <input type="checkbox" id="addContextMenu">
+  <div class="field">
+    <label for="addContextMenu">
+      <span data-localize="context"></span>
+      <input type="checkbox" id="addContextMenu">
+    </label>
   </div>
 
-  <label data-localize="backup"></label>
-  <div>
+  <div class="field">
+    <label data-localize="backup"></label>
     <button id="exportBtn" data-localize="export"></button>
     <button id="importBtn" data-localize="import"></button>
-    <input type="file" id="importOrig" accept=".json" style="display:none"/>
+    <input type="file" id="importOrig" accept=".json" style="display:none">
   </div>
 
 </body>

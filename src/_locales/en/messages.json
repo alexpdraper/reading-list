@@ -24,11 +24,11 @@
     "description": "The label for the theme option."
   },
   "light": {
-    "message": "light",
+    "message": "Light",
     "description": "The name for the light theme."
   },
   "dark": {
-    "message": "dark",
+    "message": "Dark",
     "description": "The name for the dark theme."
   },
   "animation": {

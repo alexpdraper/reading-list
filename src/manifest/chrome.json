@@ -1,1 +1,7 @@
-{}
+{
+  "minimum_chrome_version": "20",
+  "options_page": "options.html",
+  "options_ui": {
+    "chrome_style": true
+  }
+}
