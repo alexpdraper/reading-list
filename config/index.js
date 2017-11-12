@@ -4,7 +4,7 @@ module.exports = {
   build: {
     env: require('./prod.env'),
     productionSourceMap: true,
-    productionGzip: true,
+    productionGzip: false,
     productionGzipExtensions: ['js', 'css'],
     // Run the build command with an extra argument to
     // View the bundle analyzer report after build finishes:
