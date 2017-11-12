@@ -29,8 +29,25 @@ const webpackConfig = {
       },
       {
         test: /\.styl$/,
-        loader: 'style-loader!css-loader!stylus-loader',
-        include: [path.resolve(__dirname, '..', 'src', 'style')]
+        include: [path.resolve(__dirname, '..', 'src', 'style')],
+        use: [
+          {
+            loader: 'style-loader',
+            options: { sourceMap: true }
+          },
+          {
+            loader: 'css-loader',
+            options: { sourceMap: true }
+          },
+          {
+            loader: 'postcss-loader',
+            options: { sourceMap: true }
+          },
+          {
+            loader: 'stylus-loader',
+            options: { sourceMap: true }
+          }
+        ]
       },
       {
         test: /\.js$/,
