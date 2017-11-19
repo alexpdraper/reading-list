@@ -1,0 +1,44 @@
+// Dark theme
+colorMain = #555
+colorLighter = #777
+colorLightest = #eee
+colorDarker = #333
+colorDarkest = #000
+
+.dark {
+  color: colorDarkest
+  background: colorLighter
+
+  header,
+  .search {
+    border-color: colorMain
+  }
+
+  input {
+    background: transparent
+    border: 1px solid colorMain
+  }
+
+  .reading-item {
+    background: colorMain
+    .item-link {
+      color: colorLightest
+      &:hover,
+      &:focus {
+        background: colorDarker
+      }
+    }
+    .favicon {
+      border: 0
+    }
+  }
+
+  .save-button {
+    background: colorMain
+    border-color: colorDarker
+    &:hover,
+    &:focus {
+      background: colorDarker
+    }
+  }
+}
