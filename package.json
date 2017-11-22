@@ -49,5 +49,8 @@
     "webpack-dev-server": "^2.9.3",
     "webpack-merge": "^4.1.0",
     "write-file-webpack-plugin": "^4.2.0"
+  },
+  "dependencies": {
+    "fuse.js": "^3.2.0"
   }
 }
