@@ -1,4 +1,5 @@
 /* globals chrome */
+import Fuse from 'fuse.js'
 
 /**
  * Create and return the DOM element for a reading list item.
@@ -301,20 +302,34 @@ function onReadingItemClick (e) {
  * @param {Event} e - keyup event
  */
 function filterReadingList (e) {
-  let val = this.value.replace(/\W/g, '')
-  let reg = new RegExp(val.split('').join('\\w*'), 'i')
-  let title
-  let host
-  let readingList = document.getElementsByClassName('reading-item')
-
-  // Loop through reading list items to see if they match search text
-  for (let i = 0; i < readingList.length; i++) {
-    title = readingList[i].getElementsByClassName('title')[0].textContent
-    host = readingList[i].getElementsByClassName('host')[0].textContent
-
-    // If match show, if no match remove from list
-    readingList[i].style.display = (reg.test(title) || reg.test(host)) ? '' : 'none'
+  const options = {
+    keys: ['title', 'url'],
+    tokenize: true,
+    threshold: 0.4
   }
+  let displayAll = false
+  if (!this.value) {
+    displayAll = true
+  }
+
+  getReadingList(pageList => {
+    const readingList = document.getElementsByClassName('reading-item')
+    // Sort reading list by most recent to least recent
+    const fuse = new Fuse(pageList, options)
+    const filtered = fuse.search(this.value)
+
+    // Loop through reading list items to see if they match search text
+    for (let i = 0; i < readingList.length; i++) {
+      let display = false
+      for (let j = 0; j < filtered.length; j++) {
+        let url = readingList[i].getElementsByTagName('a')[0].getAttribute('href')
+        if (url === filtered[j].url) {
+          display = true
+        }
+      }
+      readingList[i].style.display = display || displayAll ? '' : 'none'
+    }
+  })
 }
 
 export default {
