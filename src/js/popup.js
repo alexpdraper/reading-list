@@ -17,11 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
     e.target.parentNode.className = e.target.parentNode.className.replace(slideinRe, '')
   })
 
+  const isFirefox = typeof InstallTrigger !== 'undefined'
   const defaultSettings = {
     settings: {
       theme: 'light',
       addContextMenu: true,
-      animateItems: true
+      animateItems: !isFirefox
     }
   }
 

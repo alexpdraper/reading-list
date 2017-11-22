@@ -36,11 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Restores select box and checkbox state using the preferences
   // stored in chrome.storage.
   function restoreOptions () {
-    // Use default value theme = 'light' and animateItems = true.
+    // Use default value theme = 'light' and animateItems = false if on firefox true on everything else.
+    const isFirefox = typeof InstallTrigger !== 'undefined'
     chrome.storage.sync.get({
       settings: {
         theme: 'light',
-        animateItems: true,
+        animateItems: !isFirefox,
         addContextMenu: true
       }
     }, items => {
