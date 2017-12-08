@@ -1,44 +1,38 @@
 // Dark theme
-colorMain = #555
-colorLighter = #777
-colorLightest = #eee
-colorDarker = #333
-colorDarkest = #000
+darkColorMain = #555
+darkColorLighter = #777
+darkColorLightest = #eee
+darkColorDarker = #333
+darkColorDarkest = #000
 
-.dark {
-  color: colorDarkest
-  background: colorLighter
+.dark
+  color: darkColorDarkest
+  background: darkColorLighter
 
-  header,
-  .search {
-    border-color: colorMain
-  }
+  .header,
+  .search
+    border-color: darkColorMain
 
-  input {
+  input
     background: transparent
-    border: 1px solid colorMain
-  }
+    border: 1px solid darkColorMain
 
-  .reading-item {
-    background: colorMain
-    .item-link {
-      color: colorLightest
+  .reading-item
+    background: darkColorMain
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15),
+      0 1px 2px rgba(0, 0, 0, 0.05)
+    .item-link
+      color: darkColorLightest
       &:hover,
-      &:focus {
-        background: colorDarker
-      }
-    }
-    .favicon {
+      &:focus
+        background: darkColorDarker
+    .favicon
       border: 0
-    }
-  }
 
-  .save-button {
-    background: colorMain
-    border-color: colorDarker
+  .save-button
+    color: #fff
+    background: darkColorMain
+    border-color: darkColorDarker
     &:hover,
-    &:focus {
-      background: colorDarker
-    }
-  }
-}
+    &:focus
+      background: darkColorDarker

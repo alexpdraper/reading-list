@@ -1,0 +1,75 @@
+html
+  box-sizing: border-box
+
+*,
+*:before,
+*:after
+  box-sizing: inherit
+
+body
+  margin: 0
+  padding: 0
+  overflow-x: hidden
+
+.container
+  position: relative
+  padding: 0 spacer
+  width: containerWidth
+  max-width: 100%
+  margin: 0
+
+// Header
+.header
+  width: 100%
+  border-bottom: 1px solid #eee
+  display: flex
+  justify-content: center
+  align-items: center
+  padding: 30px 0 10px
+  margin-bottom: 10px
+
+// Searchbox
+.search
+  display: flex
+  align-items: center
+  border-bottom: 1px solid #eee
+  padding-bottom: 10px
+
+.search input[type="search"]
+  width: 100%
+
+// Save button
+.save-button
+  width: 30px
+  height: 30px
+  line-height: 27px
+  padding: 0
+  margin: 0 10px
+  font-weight: bold
+  border: 1px solid
+  border-width: 0 0 3px 0
+  border-radius: 6px
+  text-align: center
+  &:hover,
+  &:focus
+    cursor: pointer
+    outline: none
+
+// Settings button
+.settings-button
+  position: absolute
+  top: spacer
+  right: spacer
+  width: spacer
+  height: spacer
+  padding: 0
+  border: 0
+  background-color: transparent
+  &:hover,
+  &:focus
+    cursor: pointer
+    outline: none
+
+// Reading list
+.reading-list
+  margin-bottom: spacer

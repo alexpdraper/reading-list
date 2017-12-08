@@ -3,6 +3,17 @@
 /**
  * Create and return the DOM element for a reading list item.
  *
+ * <div class="reading-item">
+ *   <a class="item-link" href="…">
+ *     <span class="title">…</span>
+ *     <span class="host">…</span>
+ *     <div class="favicon">
+ *       <img class="favicon-img" src="…">
+ *     </div>
+ *   </a>
+ *   <a class="delete-button" id="…">×</a>
+ * </div>
+ *
  * @param {object} info - object with url, title, and favIconUrl
  */
 function createReadingItemEl (info) {
@@ -16,7 +27,6 @@ function createReadingItemEl (info) {
   var link = document.createElement('a')
   link.className = 'item-link'
   link.href = url
-  link.setAttribute('alt', title)
 
   var linkTitle = document.createElement('span')
   linkTitle.className = 'title'
@@ -32,6 +42,7 @@ function createReadingItemEl (info) {
     var favicon = document.createElement('div')
     favicon.className = 'favicon'
     var faviconImg = document.createElement('img')
+    faviconImg.className = 'favicon-img'
     faviconImg.onerror = () => faviconImg.classList.add('error')
     faviconImg.setAttribute('src', favIconUrl)
     favicon.appendChild(faviconImg)
@@ -41,7 +52,7 @@ function createReadingItemEl (info) {
   var delBtn = document.createElement('a')
   delBtn.textContent = '×'
   delBtn.id = url
-  delBtn.className = 'button delete-button'
+  delBtn.className = 'delete-button'
   item.appendChild(link)
   item.appendChild(delBtn)
 
