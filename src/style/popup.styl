@@ -37,7 +37,8 @@ body {
 }
 
 .button:focus,
-.button:hover {
+.button:hover,
+.active {
   cursor: pointer;
   background-color: #44aa76;
   color: #fff;
@@ -286,6 +287,24 @@ h1 {
   100% {
     max-height: 0px;
     transform: translateX(400px) scaleY(0);
+  }
+}
+
+.unread-only .read {
+    display: none
+}
+
+
+.filter {
+  text-align center;
+
+  .left-button {
+    border-radius: 6px 0 0 6px
+    border-left-width: 0px;
+  }
+
+  .right-button {
+    border-radius: 0 6px 6px 0
   }
 }
 
