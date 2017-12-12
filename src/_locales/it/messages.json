@@ -37,5 +37,20 @@
   },
   "import": {
     "message": "Importare"
+  },
+  "advancedOptions": {
+    "message": "Opzioni avanzate"
+  },
+  "clearData": {
+    "message": "Ripristinare Elenco Lettura"
+  },
+  "confirmMsg": {
+    "message": "Stai per eliminare tutti i contenuti della lista di lettura. Sei sicuro?"
+  },
+  "goBack": {
+    "message": "Tornare indietro"
+  },
+  "deleteAll": {
+    "message": "Eliminare tutto!"
   }
 }

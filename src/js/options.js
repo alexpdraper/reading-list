@@ -1,5 +1,7 @@
 /* globals chrome */
 
+import '../style/options.styl'
+
 document.addEventListener('DOMContentLoaded', () => {
   // Localize!
   document.querySelectorAll('[data-localize]').forEach(el => {
@@ -113,16 +115,63 @@ document.addEventListener('DOMContentLoaded', () => {
     reader.readAsText(files[0])
   }
 
+  // Deletes all settings, and items in the app
+  function confirmDelete () {
+    var popup = document.getElementById('popup')
+    popup.style.display = 'block'
+    popup.style.opacity = 1
+    document.body.insertBefore(popup, document.body.firstChild)
+    document.getElementById('ok').onclick = function () {
+      fade(popup, 10)
+      chrome.storage.sync.clear(() => {
+        restoreOptions()
+      })
+    }
+    document.getElementById('cancel').onclick = function () {
+      fade(popup, 10)
+    }
+  }
+
+  // Fades html element
+  function fade (element, time) {
+    var op = 1 // initial opacity
+    var timer = setInterval(() => {
+      if (op <= 0.1) {
+        clearInterval(timer)
+        element.style.display = 'none'
+      }
+      element.style.opacity = op
+      element.style.filter = 'alpha(opacity=' + op * 100 + ')'
+      op -= op * 0.1
+    }, time)
+  }
+
+  function accordion () {
+    this.classList.toggle('active')
+    var panel = this.nextElementSibling
+    if (panel.style.maxHeight) {
+      panel.style.maxHeight = null
+    } else {
+      panel.style.maxHeight = panel.scrollHeight + 'px'
+    }
+  }
+
   restoreOptions()
 
   const importBtn = document.getElementById('importBtn')
   const exportBtn = document.getElementById('exportBtn')
+  const resetBtn = document.getElementById('resetBtn')
 
   // Import listeners
   importOrig.addEventListener('change', importFunc, false)
   importBtn.onclick = () => { importOrig.click() }
   // Export listener
   exportBtn.addEventListener('click', exportFunc, false)
+  // Reset button listener
+  resetBtn.addEventListener('click', confirmDelete, false)
+  // Advanced settings listener, opens accordion
+  document.getElementById('advanced').addEventListener('click', accordion)
+  // Listeners to save options when changed
   document.getElementById('theme').addEventListener('change', saveOptions)
   document.getElementById('animateItems').addEventListener('click', saveOptions)
   document.getElementById('addContextMenu').addEventListener('click', saveOptions)
