@@ -79,14 +79,14 @@ function addLinkToList (info, tab) {
     info.linkUrl = (getQueryVariable(parser, 'url'))
   }
 
-  setObj[tab.url] = {
+  setObj[info.linkUrl] = {
     url: info.linkUrl,
     title: info.selectionText,
     favIconUrl: `${googleFaviconURL}${info.linkUrl}`,
     addedAt: Date.now()
   }
 
-  chrome.storage.sync.set(setObj, () => updateBadge(tab.url, tab.id))
+  chrome.storage.sync.set(setObj)
 }
 
 /**
