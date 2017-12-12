@@ -44,5 +44,20 @@
   },
   "import": {
     "message": "导入"
+  },
+  "advancedOptions": {
+    "message": "高级选项"
+  },
+  "clearData": {
+    "message": "清除阅读列表"
+  },
+  "confirmMsg": {
+    "message": "你准备删除阅读列表中的所有内容，请确认。"
+  },
+  "goBack": {
+    "message": "退回"
+  },
+  "deleteAll": {
+    "message": "删除所有!"
   }
 }

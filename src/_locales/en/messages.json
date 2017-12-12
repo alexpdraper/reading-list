@@ -47,5 +47,25 @@
   },
   "import": {
     "message": "Import"
+  },
+  "advancedOptions": {
+    "message": "Advanced options",
+    "description": "The label for the advanced options dropdown"
+  },
+  "clearData": {
+    "message": "Clear Reading List",
+    "description": "The label for the button to clear all the reading list items"
+  },
+  "confirmMsg": {
+    "message": "You are about to delete everything in the reading list. Are you sure?",
+    "description": "Message to ensure user knows they are deleting all app data"
+  },
+  "goBack": {
+    "message": "Go back",
+    "description": "Cancel message on clearning data"
+  },
+  "deleteAll": {
+    "message": "Delete everything!",
+    "description": "Confirm message on clearing data"
   }
 }
