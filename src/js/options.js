@@ -5,6 +5,16 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-localize]').forEach(el => {
     el.textContent = chrome.i18n.getMessage(el.dataset.localize)
   })
+  // Use default value theme = 'light' and animateItems = false if on firefox true on everything else.
+  const isFirefox = typeof InstallTrigger !== 'undefined'
+  const defaultSettings = {
+    settings: {
+      theme: 'light',
+      addContextMenu: true,
+      animateItems: !isFirefox,
+      viewAll: true
+    }
+  }
 
   // Saves options to chrome.storage
   function saveOptions () {
@@ -23,28 +33,21 @@ document.addEventListener('DOMContentLoaded', () => {
         })
       }
     })
-
-    chrome.storage.sync.set({
-      settings: {
-        theme,
-        animateItems,
-        addContextMenu
-      }
+    // Get updating the settings on the options page
+    chrome.storage.sync.get(defaultSettings, items => {
+      items.settings.theme = theme
+      items.settings.animateItems = animateItems
+      items.settings.addContextMenu = addContextMenu
+      chrome.storage.sync.set({
+        settings: items.settings
+      })
     })
   }
 
   // Restores select box and checkbox state using the preferences
   // stored in chrome.storage.
   function restoreOptions () {
-    // Use default value theme = 'light' and animateItems = false if on firefox true on everything else.
-    const isFirefox = typeof InstallTrigger !== 'undefined'
-    chrome.storage.sync.get({
-      settings: {
-        theme: 'light',
-        animateItems: !isFirefox,
-        addContextMenu: true
-      }
-    }, items => {
+    chrome.storage.sync.get(defaultSettings, items => {
       document.getElementById('theme').value = items.settings.theme
       document.getElementById('animateItems').checked = items.settings.animateItems
       document.getElementById('addContextMenu').checked = items.settings.addContextMenu

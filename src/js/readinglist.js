@@ -14,6 +14,12 @@ function createReadingItemEl (info) {
   var item = document.createElement('div')
   item.className = 'reading-item'
 
+  if (info.viewed) {
+    item.classList.add('read')
+  } else {
+    item.classList.add('unread')
+  }
+
   var link = document.createElement('a')
   link.className = 'item-link'
   link.href = url
@@ -80,7 +86,7 @@ function getReadingList (callback) {
  * @param {boolean} animateItems - animate incoming reading items?
  * @param {function()} callback - called when the list is rendered
  */
-function renderReadingList (readingListEl, animateItems, callback) {
+function renderReadingList (readingListEl, animateItems, viewAll, callback) {
   getReadingList(pageList => {
     // Sort reading list by most recent to least recent
     pageList.sort((a, b) => {
@@ -89,6 +95,7 @@ function renderReadingList (readingListEl, animateItems, callback) {
 
     var counter = 0
     var numItems = pageList.length
+    let itemsAnimated = 0
 
     // Animate up to 10 items
     var itemsToAnimate = animateItems ? 10 : 0
@@ -97,8 +104,13 @@ function renderReadingList (readingListEl, animateItems, callback) {
     // Wait a bit, then create a DOM element for the next reading list item,
     // then recurse
     function waitAndCreate (waitTime) {
+      // Stop if all items have been rendered.
+      if (counter >= numItems) {
+        return
+      }
+
       // If we’ve rendered all the animated items
-      if (counter >= itemsToAnimate) {
+      if (itemsAnimated >= itemsToAnimate) {
         // Render any remaining items
         for (var i = counter; i < numItems; i++) {
           readingListEl.appendChild(createReadingItemEl(pageList[i]))
@@ -115,8 +127,12 @@ function renderReadingList (readingListEl, animateItems, callback) {
       window.setTimeout(() => {
         var readingItemEl = createReadingItemEl(pageList[counter])
 
-        // Add the “slidein” class for animation
-        readingItemEl.className += ' slidein'
+        // Increment the animated counter if item is viewable
+        if (!pageList[counter].viewed || viewAll) {
+          // Add the “slidein” class for animation
+          readingItemEl.classList.add('slidein')
+          itemsAnimated++
+        }
         readingListEl.appendChild(readingItemEl)
 
         // Increment the counter
@@ -149,7 +165,8 @@ function addReadingItem (info, readingListEl, callback) {
     url: info.url,
     title: info.title,
     favIconUrl: info.favIconUrl,
-    addedAt: Date.now()
+    addedAt: Date.now(),
+    viewed: false
   }
 
   // Object for setting the storage
@@ -293,6 +310,7 @@ function onReadingItemClick (e) {
   } else if (isPopup && /(\s|^)item-link(\s|$)/.test(target.className)) {
     e.preventDefault()
     openLink(target.href, modifierDown)
+    setReadingItemViewed(target.href)
   }
 }
 
@@ -308,7 +326,8 @@ function filterReadingList (e) {
     threshold: 0.4
   }
   let displayAll = false
-  if (!this.value) {
+  // If nothing is being searched in list return.
+  if (this.value.trim().length === 0) {
     displayAll = true
   }
 
@@ -332,6 +351,59 @@ function filterReadingList (e) {
   })
 }
 
+/**
+ * Toggles the buttons, and updates the options for which reading list to view.
+ */
+function changeView () {
+  this.classList.add('active')
+  const viewAll = this.id === 'all'
+  // Updates the view setting in setting menu
+  updateOptions(viewAll)
+  // Update the button on display
+  if (this.classList.contains('right-button')) {
+    document.getElementById('all').classList.remove('active')
+    document.getElementById('reading-list').classList.add('unread-only')
+  } else {
+    document.getElementById('unread').classList.remove('active')
+    document.getElementById('reading-list').classList.remove('unread-only')
+  }
+}
+
+const isFirefox = typeof InstallTrigger !== 'undefined'
+const defaultSettings = {
+  settings: {
+    theme: 'light',
+    addContextMenu: true,
+    animateItems: !isFirefox,
+    viewAll: true
+  }
+}
+
+/**
+ *  Saves viewAll option to chrome.storage
+ * @param {boolean} viewAll The boolean value to set if all items have been viewed
+ */
+function updateOptions (viewAll) {
+  chrome.storage.sync.get(defaultSettings, items => {
+    items.settings.viewAll = viewAll
+    chrome.storage.sync.set({
+      settings: items.settings
+    })
+  })
+}
+
+/**
+ * Sets the item in the reading list to viewed.
+ *
+ * @param {string} url the url of the reading item to set to true.
+ */
+function setReadingItemViewed (url) {
+  chrome.storage.sync.get(url, page => {
+    page[url].viewed = true
+    chrome.storage.sync.set(page)
+  })
+}
+
 export default {
   createReadingItemEl,
   getReadingList,
@@ -340,5 +412,6 @@ export default {
   removeReadingItem,
   openLink,
   onReadingItemClick,
-  filterReadingList
+  filterReadingList,
+  changeView
 }

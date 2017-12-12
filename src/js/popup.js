@@ -22,7 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
     settings: {
       theme: 'light',
       addContextMenu: true,
-      animateItems: !isFirefox
+      animateItems: !isFirefox,
+      viewAll: true
     }
   }
 
@@ -30,13 +31,22 @@ document.addEventListener('DOMContentLoaded', () => {
     let settings = store.settings
     document.body.classList.add(settings.theme || 'light')
 
+    // Sets the all/unread button
+    document.getElementById(settings.viewAll ? 'all' : 'unread').classList.add('active')
+    // Sets the list of items which are shown
+    if (settings.viewAll) {
+      document.getElementById('reading-list').classList.remove('unread-only')
+    } else {
+      document.getElementById('reading-list').classList.add('unread-only')
+    }
+
     if (settings.animateItems) {
       // Wait a bit before rendering the reading list
       // Gives the popup window time to render, preventing weird resizing bugs
       // See: https://bugs.chromium.org/p/chromium/issues/detail?id=457887
-      window.setTimeout(list.renderReadingList, 150, RL, true)
+      window.setTimeout(list.renderReadingList, 150, RL, true, settings.viewAll)
     } else {
-      list.renderReadingList(RL, false)
+      list.renderReadingList(RL, false, settings.viewAll)
     }
   })
 
@@ -74,4 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
       window.open(chrome.runtime.getURL('/options.html'))
     }
   })
+
+  document.getElementById('all').addEventListener('click', list.changeView)
+  document.getElementById('unread').addEventListener('click', list.changeView)
 })
