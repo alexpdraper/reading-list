@@ -35,6 +35,10 @@
     "message": "Enable animation:",
     "description": "The label for the animation option."
   },
+  "openNewTab": {
+    "message": "Open link in new tab:",
+    "description": "Label for the option to open a new tab when a link is clicked"
+  },
   "context": {
     "message": "Show in context menu:",
     "description": "The label for the context option."

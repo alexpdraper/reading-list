@@ -13,6 +13,7 @@ const defaultSettings = {
     theme: 'light',
     addContextMenu: true,
     animateItems: !isFirefox,
+    openNewTab: false,
     viewAll: true
   }
 }

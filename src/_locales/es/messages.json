@@ -26,6 +26,9 @@
   "animation": {
     "message": "Permitir animación:"
   },
+  "openNewTab": {
+    "message": "Abrir enlace en una nueva pestaña:"
+  },
   "context": {
     "message": "Mostrar en el menú contextual:"
   },
