@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Create the context menu from the background page
         // see “background.js”
         chrome.runtime.getBackgroundPage(bgPage => {
-          bgPage.createContextMenu()
+          bgPage.createContextMenus()
         })
       }
     })
