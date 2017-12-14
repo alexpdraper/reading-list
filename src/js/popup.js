@@ -13,8 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const RL = document.getElementById('reading-list')
 
   RL.addEventListener('animationend', e => {
-    let slideinRe = /(^|\s+)slidein(\s+|$)/g
-    e.target.parentNode.className = e.target.parentNode.className.replace(slideinRe, '')
+    if (e.target.parentNode) {
+      e.target.parentNode.classList.remove('slidein')
+    }
   })
 
   const isFirefox = typeof InstallTrigger !== 'undefined'

@@ -341,7 +341,7 @@ function filterReadingList (e) {
     for (let i = 0; i < readingList.length; i++) {
       let display = false
       for (let j = 0; j < filtered.length; j++) {
-        let url = readingList[i].getElementsByTagName('a')[0].getAttribute('href')
+        let url = readingList[i].querySelector('.item-link').getAttribute('href')
         if (url === filtered[j].url) {
           display = true
         }
