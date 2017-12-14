@@ -26,6 +26,9 @@
   "animation": {
     "message": "Attiva l'animazione:"
   },
+  "openNewTab": {
+    "message": "Apri il link in una nuova scheda:"
+  },
   "context": {
     "message": "Mostra nel menu di contesto:"
   },

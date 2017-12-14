@@ -296,9 +296,6 @@ function onReadingItemClick (e) {
   var isPopup = /(\s|^)popup-page(\s|$)/.test(document.body.className)
   var target = e.target
 
-  // If the control or meta key (⌘ on Mac, ⊞ on Windows) is pressed…
-  var modifierDown = (e.ctrlKey || e.metaKey)
-
   // If the target’s parent is an <a> we pretend the <a> is the target
   if (target.parentNode.tagName === 'A') {
     target = target.parentNode
@@ -309,8 +306,12 @@ function onReadingItemClick (e) {
     removeReadingItem(target.id, target.parentNode)
   } else if (isPopup && /(\s|^)item-link(\s|$)/.test(target.className)) {
     e.preventDefault()
-    openLink(target.href, modifierDown)
-    setReadingItemViewed(target.href)
+    chrome.storage.sync.get(defaultSettings, items => {
+      // If the control or meta key (⌘ on Mac, ⊞ on Windows) is pressed or if options is selected…
+      const modifierDown = (e.ctrlKey || e.metaKey || items.settings.openNewTab)
+      openLink(target.href, modifierDown)
+      setReadingItemViewed(target.href)
+    })
   }
 }
 
@@ -375,6 +376,7 @@ const defaultSettings = {
     theme: 'light',
     addContextMenu: true,
     animateItems: !isFirefox,
+    openNewTab: false,
     viewAll: true
   }
 }

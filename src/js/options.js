@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
       theme: 'light',
       addContextMenu: true,
       animateItems: !isFirefox,
+      openNewTab: false,
       viewAll: true
     }
   }
@@ -23,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     var theme = document.getElementById('theme').value
     var animateItems = document.getElementById('animateItems').checked
     var addContextMenu = document.getElementById('addContextMenu').checked
+    var openNewTab = document.getElementById('openNewTab').checked
 
     // Remove all the context menus
     chrome.contextMenus.removeAll(() => {
@@ -40,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
       items.settings.theme = theme
       items.settings.animateItems = animateItems
       items.settings.addContextMenu = addContextMenu
+      items.settings.openNewTab = openNewTab
       chrome.storage.sync.set({
         settings: items.settings
       })
@@ -53,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('theme').value = items.settings.theme
       document.getElementById('animateItems').checked = items.settings.animateItems
       document.getElementById('addContextMenu').checked = items.settings.addContextMenu
+      document.getElementById('openNewTab').checked = items.settings.openNewTab
     })
   }
 
@@ -175,4 +179,5 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('theme').addEventListener('change', saveOptions)
   document.getElementById('animateItems').addEventListener('click', saveOptions)
   document.getElementById('addContextMenu').addEventListener('click', saveOptions)
+  document.getElementById('openNewTab').addEventListener('click', saveOptions)
 })

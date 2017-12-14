@@ -26,6 +26,9 @@
   "animation": {
     "message": "Animation anschalten:"
   },
+  "openNewTab": {
+    "message": "Link in neuem Tab öffnen:"
+  },
   "context": {
     "message": "Im Kontextmenü anzeigen:"
   },
