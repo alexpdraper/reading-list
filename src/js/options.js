@@ -1,16 +1,30 @@
 /* globals chrome */
 
+import '../style/options.styl'
+
 document.addEventListener('DOMContentLoaded', () => {
   // Localize!
   document.querySelectorAll('[data-localize]').forEach(el => {
     el.textContent = chrome.i18n.getMessage(el.dataset.localize)
   })
+  // Use default value theme = 'light' and animateItems = false if on firefox true on everything else.
+  const isFirefox = typeof InstallTrigger !== 'undefined'
+  const defaultSettings = {
+    settings: {
+      theme: 'light',
+      addContextMenu: true,
+      animateItems: !isFirefox,
+      openNewTab: false,
+      viewAll: true
+    }
+  }
 
   // Saves options to chrome.storage
   function saveOptions () {
     var theme = document.getElementById('theme').value
     var animateItems = document.getElementById('animateItems').checked
     var addContextMenu = document.getElementById('addContextMenu').checked
+    var openNewTab = document.getElementById('openNewTab').checked
 
     // Remove all the context menus
     chrome.contextMenus.removeAll(() => {
@@ -19,34 +33,30 @@ document.addEventListener('DOMContentLoaded', () => {
         // Create the context menu from the background page
         // see “background.js”
         chrome.runtime.getBackgroundPage(bgPage => {
-          bgPage.createContextMenu()
+          bgPage.createContextMenus()
         })
       }
     })
-
-    chrome.storage.sync.set({
-      settings: {
-        theme,
-        animateItems,
-        addContextMenu
-      }
+    // Get updating the settings on the options page
+    chrome.storage.sync.get(defaultSettings, items => {
+      items.settings.theme = theme
+      items.settings.animateItems = animateItems
+      items.settings.addContextMenu = addContextMenu
+      items.settings.openNewTab = openNewTab
+      chrome.storage.sync.set({
+        settings: items.settings
+      })
     })
   }
 
   // Restores select box and checkbox state using the preferences
   // stored in chrome.storage.
   function restoreOptions () {
-    // Use default value theme = 'light' and animateItems = true.
-    chrome.storage.sync.get({
-      settings: {
-        theme: 'light',
-        animateItems: true,
-        addContextMenu: true
-      }
-    }, items => {
+    chrome.storage.sync.get(defaultSettings, items => {
       document.getElementById('theme').value = items.settings.theme
       document.getElementById('animateItems').checked = items.settings.animateItems
       document.getElementById('addContextMenu').checked = items.settings.addContextMenu
+      document.getElementById('openNewTab').checked = items.settings.openNewTab
     })
   }
 
@@ -109,17 +119,65 @@ document.addEventListener('DOMContentLoaded', () => {
     reader.readAsText(files[0])
   }
 
+  // Deletes all settings, and items in the app
+  function confirmDelete () {
+    var popup = document.getElementById('popup')
+    popup.style.display = 'block'
+    popup.style.opacity = 1
+    document.body.insertBefore(popup, document.body.firstChild)
+    document.getElementById('ok').onclick = function () {
+      fade(popup, 10)
+      chrome.storage.sync.clear(() => {
+        restoreOptions()
+      })
+    }
+    document.getElementById('cancel').onclick = function () {
+      fade(popup, 10)
+    }
+  }
+
+  // Fades html element
+  function fade (element, time) {
+    var op = 1 // initial opacity
+    var timer = setInterval(() => {
+      if (op <= 0.1) {
+        clearInterval(timer)
+        element.style.display = 'none'
+      }
+      element.style.opacity = op
+      element.style.filter = 'alpha(opacity=' + op * 100 + ')'
+      op -= op * 0.1
+    }, time)
+  }
+
+  function accordion () {
+    this.classList.toggle('active')
+    var panel = this.nextElementSibling
+    if (panel.style.maxHeight) {
+      panel.style.maxHeight = null
+    } else {
+      panel.style.maxHeight = panel.scrollHeight + 'px'
+    }
+  }
+
   restoreOptions()
 
   const importBtn = document.getElementById('importBtn')
   const exportBtn = document.getElementById('exportBtn')
+  const resetBtn = document.getElementById('resetBtn')
 
   // Import listeners
   importOrig.addEventListener('change', importFunc, false)
   importBtn.onclick = () => { importOrig.click() }
   // Export listener
   exportBtn.addEventListener('click', exportFunc, false)
+  // Reset button listener
+  resetBtn.addEventListener('click', confirmDelete, false)
+  // Advanced settings listener, opens accordion
+  document.getElementById('advanced').addEventListener('click', accordion)
+  // Listeners to save options when changed
   document.getElementById('theme').addEventListener('change', saveOptions)
   document.getElementById('animateItems').addEventListener('click', saveOptions)
   document.getElementById('addContextMenu').addEventListener('click', saveOptions)
+  document.getElementById('openNewTab').addEventListener('click', saveOptions)
 })

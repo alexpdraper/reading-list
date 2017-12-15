@@ -26,6 +26,9 @@
   "animation": {
     "message": "Animation anschalten:"
   },
+  "openNewTab": {
+    "message": "Link in neuem Tab öffnen:"
+  },
   "context": {
     "message": "Im Kontextmenü anzeigen:"
   },
@@ -37,5 +40,20 @@
   },
   "import": {
     "message": "Import"
+  },
+  "advancedOptions": {
+    "message": "Erweiterte Optionen"
+  },
+  "clearData": {
+    "message": "Leseliste löschen"
+  },
+  "confirmMsg": {
+    "message": "Sie sind dabei, alles in der Leseliste zu löschen. Bist du sicher?"
+  },
+  "goBack": {
+    "message": "Zurückgehen"
+  },
+  "deleteAll": {
+    "message": "Alles löschen!"
   }
 }

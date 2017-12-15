@@ -32,6 +32,9 @@
     "message": "支持动画:",
     "description": "动画选项的标签."
   },
+  "openNewTab": {
+    "message": "在新标签页中打开链接:"
+  },
   "context": {
     "message": "展示上下文菜单:",
     "description": "上下文选项标签"
@@ -44,5 +47,20 @@
   },
   "import": {
     "message": "导入"
+  },
+  "advancedOptions": {
+    "message": "高级选项"
+  },
+  "clearData": {
+    "message": "清除阅读列表"
+  },
+  "confirmMsg": {
+    "message": "你准备删除阅读列表中的所有内容，请确认。"
+  },
+  "goBack": {
+    "message": "退回"
+  },
+  "deleteAll": {
+    "message": "删除所有!"
   }
 }

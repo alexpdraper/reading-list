@@ -1,29 +1,46 @@
 /* globals chrome */
 
+const googleFaviconURL = 'https://plus.google.com/_/favicon?domain='
+
 chrome.browserAction.setBadgeText({ text: '' })
 chrome.browserAction.setBadgeBackgroundColor({
   color: '#2ea99c'
 })
 
-var defaultSettings = {
+const isFirefox = typeof InstallTrigger !== 'undefined'
+const defaultSettings = {
   settings: {
     theme: 'light',
     addContextMenu: true,
-    animateItems: true
+    animateItems: !isFirefox,
+    openNewTab: false,
+    viewAll: true
   }
 }
 
 chrome.storage.sync.get(defaultSettings, store => {
   if (store.settings.addContextMenu) {
-    createContextMenu()
+    createContextMenus()
   }
 })
 
-function createContextMenu () {
+window.createContextMenus = createContextMenus
+
+/**
+ * Creates context menus for both link and when clicking on page.
+ */
+function createContextMenus () {
+  createPageContextMenu()
+  createLinkContextMenu()
+}
+
+/**
+ * Add option to add current tab to reading list
+ */
+function createPageContextMenu () {
   chrome.management.getSelf(result => {
     var menuTitle = chrome.i18n.getMessage('addPage')
     menuTitle += (result.installType === 'development') ? ' (dev)' : ''
-
     chrome.contextMenus.create({
       title: menuTitle,
       onclick: addPageToList
@@ -31,7 +48,64 @@ function createContextMenu () {
   })
 }
 
-window.createContextMenu = createContextMenu
+/**
+ * Add option to add link to reading list
+ */
+function createLinkContextMenu () {
+  chrome.management.getSelf(result => {
+    var menuTitle = chrome.i18n.getMessage('addPage')
+    menuTitle += (result.installType === 'development') ? ' (dev)' : ''
+
+    chrome.contextMenus.create({
+      title: menuTitle,
+      contexts: ['link'],
+      onclick: addLinkToList
+    })
+  })
+}
+
+/**
+ * Add a tab to the reading list (context menu item onclick function)
+ *
+ * @param {object} info
+ * @param {object} tab
+ */
+function addLinkToList (info, tab) {
+  const setObj = {}
+
+  var parser = document.createElement('a')
+  parser.href = info.linkUrl
+  // Removes google's strange url when it is clicked on
+  if (parser.hostname.toLowerCase().indexOf('google') !== -1 && parser.pathname === '/url') {
+    info.linkUrl = (getQueryVariable(parser, 'url'))
+  }
+
+  setObj[info.linkUrl] = {
+    url: info.linkUrl,
+    title: info.selectionText,
+    favIconUrl: `${googleFaviconURL}${info.linkUrl}`,
+    addedAt: Date.now()
+  }
+
+  chrome.storage.sync.set(setObj)
+}
+
+/**
+ * Gets a variable value from the query string of a url
+ * @param {string} url The url to parse
+ * @param {string} variable The variable desired from the query string
+ */
+function getQueryVariable (url, variable) {
+  var query = url.search.substring(1)
+  var vars = query.split('&')
+  for (var i = 0; i < vars.length; i++) {
+    var pair = vars[i].split('=')
+    if (decodeURIComponent(pair[0]) === variable) {
+      return decodeURIComponent(pair[1])
+    }
+  }
+  return url
+}
 
 /**
  * Add the page to the reading list (context menu item onclick function)
@@ -91,12 +165,15 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       var readingItem = onList ? item[tab.url] : null
       var setObj = {}
 
-      // If the page is on the reading list, and doesn’t have a favIconUrl…
+      // If the page is on the reading list, and doesn’t have a favIconUrl
+      // or favIconUrl is using google's favicon look up service…
       // …add the favIconUrl
-      if (readingItem && !readingItem.hasOwnProperty('favIconUrl') && tab.favIconUrl) {
+      if (readingItem &&
+        (!readingItem.hasOwnProperty('favIconUrl') ||
+          (readingItem.favIconUrl.indexOf(googleFaviconURL) !== -1)) &&
+        tab.favIconUrl) {
         setObj[tab.url] = readingItem
         setObj[tab.url].favIconUrl = tab.favIconUrl
-
         chrome.storage.sync.set(setObj)
       }
     })

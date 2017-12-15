@@ -2,3 +2,34 @@
 
 @import 'themes/light'
 @import 'themes/dark'
+
+.button
+  font-weight: bold
+  color: #fff
+  border: 1px solid #44aa76
+  border-width: 0 0 3px 0
+  background-color: #66cc98
+  padding: 5px
+  border-radius: 6px
+  text-align: center
+
+.button:focus,
+.button:hover,
+.active
+  cursor: pointer
+  background-color: #44aa76
+  color: #fff
+  outline: none
+
+.unread-only .read
+  display: none
+
+.filter
+  text-align: center
+
+  .left-button
+    border-radius: 6px 0 0 6px
+    border-left-width: 0px
+
+  .right-button
+    border-radius: 0 6px 6px 0

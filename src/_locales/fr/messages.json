@@ -26,6 +26,9 @@
   "animation": {
     "message": "Activer l'animation:"
   },
+  "openNewTab": {
+    "message": "Ouvrir un lien dans un nouvel onglet:"
+  },
   "context": {
     "message": "Afficher dans le menu contextuel:"
   },
@@ -37,7 +40,20 @@
   },
   "import": {
     "message": "Importer"
+  },
+  "advancedOptions": {
+    "message": "Options avancées"
+  },
+  "clearData": {
+    "message": "Effacer Liste de Lecture"
+  },
+  "confirmMsg": {
+    "message": "Vous êtes sur le point de supprimer tout le contenu de la liste de lecture. Êtes-vous sûr?"
+  },
+  "goBack": {
+    "message": "Retourner"
+  },
+  "deleteAll": {
+    "message": "Supprimer tout!"
   }
 }
-
-

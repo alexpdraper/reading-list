@@ -26,6 +26,13 @@
   </div>
 
   <div class="field">
+    <label for="openNewTab">
+      <span data-localize="openNewTab"></span>
+      <input type="checkbox" id="openNewTab">
+    </label>
+  </div>
+
+  <div class="field">
     <label for="addContextMenu">
       <span data-localize="context"></span>
       <input type="checkbox" id="addContextMenu">
@@ -38,6 +45,23 @@
     <button id="importBtn" data-localize="import"></button>
     <input type="file" id="importOrig" accept=".json" style="display:none">
   </div>
+  <div id="advanced" class="accordion" data-localize="advancedOptions"></div>
+  <div class="panel">
+    <button id="resetBtn" class="button" data-localize="clearData"></button>
+  </div>
 
+  <div id="popup" class="dialog-overlay">
+    <div class="dialog">
+      <div class="dialog-msg">
+        <p data-localize="confirmMsg"></p>
+      </div>
+      <footer>
+        <div class="controls">
+          <button id="cancel" class="button button-info cancelAction" data-localize="goBack"></button>
+          <button id="ok" class="button button-danger doAction" data-localize="deleteAll"></button>
+        </div>
+      </footer>
+    </div>
+  </div>
 </body>
 </html>
