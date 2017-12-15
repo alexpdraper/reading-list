@@ -4,6 +4,17 @@ import Fuse from 'fuse.js'
 /**
  * Create and return the DOM element for a reading list item.
  *
+ * <div class="reading-item">
+ *   <a class="item-link" href="…">
+ *     <span class="title">…</span>
+ *     <span class="host">…</span>
+ *     <div class="favicon">
+ *       <img class="favicon-img" src="…">
+ *     </div>
+ *   </a>
+ *   <a class="delete-button" id="…">×</a>
+ * </div>
+ *
  * @param {object} info - object with url, title, and favIconUrl
  */
 function createReadingItemEl (info) {
@@ -23,7 +34,6 @@ function createReadingItemEl (info) {
   var link = document.createElement('a')
   link.className = 'item-link'
   link.href = url
-  link.setAttribute('alt', title)
 
   var linkTitle = document.createElement('span')
   linkTitle.className = 'title'
@@ -31,14 +41,15 @@ function createReadingItemEl (info) {
   link.appendChild(linkTitle)
 
   var linkHost = document.createElement('span')
-  linkHost.className = 'host'
+  linkHost.classList.add('host')
   linkHost.textContent = link.hostname || url
   link.appendChild(linkHost)
 
   if (favIconUrl && /^https?:\/\//.test(favIconUrl)) {
     var favicon = document.createElement('div')
-    favicon.className = 'favicon'
+    favicon.classList.add('favicon')
     var faviconImg = document.createElement('img')
+    faviconImg.classList.add('favicon-img')
     faviconImg.onerror = () => faviconImg.classList.add('error')
     faviconImg.setAttribute('src', favIconUrl)
     favicon.appendChild(faviconImg)
@@ -48,7 +59,7 @@ function createReadingItemEl (info) {
   var delBtn = document.createElement('a')
   delBtn.textContent = '×'
   delBtn.id = url
-  delBtn.className = 'button delete-button'
+  delBtn.classList.add('delete-button')
   item.appendChild(link)
   item.appendChild(delBtn)
 
@@ -361,12 +372,12 @@ function changeView () {
   // Updates the view setting in setting menu
   updateOptions(viewAll)
   // Update the button on display
-  if (this.classList.contains('right-button')) {
-    document.getElementById('all').classList.remove('active')
-    document.getElementById('reading-list').classList.add('unread-only')
-  } else {
+  if (viewAll) {
     document.getElementById('unread').classList.remove('active')
     document.getElementById('reading-list').classList.remove('unread-only')
+  } else {
+    document.getElementById('all').classList.remove('active')
+    document.getElementById('reading-list').classList.add('unread-only')
   }
 }
 
