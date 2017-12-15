@@ -9,10 +9,6 @@ darkColorDarkest = #000
   color: darkColorDarkest
   background: darkColorLighter
 
-  .header,
-  .search
-    border-color: darkColorMain
-
   input
     background: transparent
     border: 1px solid darkColorMain
@@ -32,7 +28,14 @@ darkColorDarkest = #000
   .save-button
     color: #fff
     background: darkColorMain
-    border-color: darkColorDarker
     &:hover,
     &:focus
+      background: darkColorDarker
+
+  .button
+    background: darkColorMain
+    &:focus,
+    &:hover,
+    &.active
+      color: darkColorLightest
       background: darkColorDarker

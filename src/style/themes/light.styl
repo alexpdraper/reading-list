@@ -3,10 +3,6 @@
   color: #555
   background: #fff
 
-  .header,
-  .search
-    border-color: #eee
-
   input
     background: transparent
     border: 1px solid #eee
@@ -27,7 +23,12 @@
   .save-button
     color: #fff
     background: #66cc98
-    border-color: #44aa76
     &:hover,
     &:focus
       background: #44aa76
+
+  .button
+    &:focus,
+    &:hover,
+    &.active
+      background: #f7f7f7

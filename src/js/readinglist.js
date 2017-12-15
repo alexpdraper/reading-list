@@ -41,15 +41,15 @@ function createReadingItemEl (info) {
   link.appendChild(linkTitle)
 
   var linkHost = document.createElement('span')
-  linkHost.className = 'host'
+  linkHost.classList.add('host')
   linkHost.textContent = link.hostname || url
   link.appendChild(linkHost)
 
   if (favIconUrl && /^https?:\/\//.test(favIconUrl)) {
     var favicon = document.createElement('div')
-    favicon.className = 'favicon'
+    favicon.classList.add('favicon')
     var faviconImg = document.createElement('img')
-    faviconImg.className = 'favicon-img'
+    faviconImg.classList.add('favicon-img')
     faviconImg.onerror = () => faviconImg.classList.add('error')
     faviconImg.setAttribute('src', favIconUrl)
     favicon.appendChild(faviconImg)
@@ -59,7 +59,7 @@ function createReadingItemEl (info) {
   var delBtn = document.createElement('a')
   delBtn.textContent = '×'
   delBtn.id = url
-  delBtn.className = 'delete-button'
+  delBtn.classList.add('delete-button')
   item.appendChild(link)
   item.appendChild(delBtn)
 
@@ -372,12 +372,12 @@ function changeView () {
   // Updates the view setting in setting menu
   updateOptions(viewAll)
   // Update the button on display
-  if (this.classList.contains('right-button')) {
-    document.getElementById('all').classList.remove('active')
-    document.getElementById('reading-list').classList.add('unread-only')
-  } else {
+  if (viewAll) {
     document.getElementById('unread').classList.remove('active')
     document.getElementById('reading-list').classList.remove('unread-only')
+  } else {
+    document.getElementById('all').classList.remove('active')
+    document.getElementById('reading-list').classList.add('unread-only')
   }
 }
 
