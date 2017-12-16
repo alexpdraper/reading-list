@@ -158,12 +158,29 @@ function updateBadge (url, tabId, callback) {
   })
 }
 
+/**
+ * Sets the item in the reading list to viewed.
+ *
+ * @param {string} url the url of the reading item to set to true.
+ */
+function setReadingItemViewed (url) {
+  chrome.storage.sync.get(url, page => {
+    if (page[url]) {
+      page[url].viewed = true
+      chrome.storage.sync.set(page)
+    }
+  })
+}
+
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   // If the tab is loaded, update the badge text
   if (tabId && changeInfo.status === 'complete' && tab.url) {
     updateBadge(tab.url, tabId, (onList, item) => {
       var readingItem = onList ? item[tab.url] : null
       var setObj = {}
+      if (tab.active) {
+        setReadingItemViewed(tab.url)
+      }
 
       // If the page is on the reading list, and doesn’t have a favIconUrl
       // or favIconUrl is using google's favicon look up service…
@@ -178,4 +195,12 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       }
     })
   }
+})
+
+chrome.tabs.onActivated.addListener((tabId, windowId) => {
+  chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+    if (tabs[0].ur) {
+      setReadingItemViewed(tabs[0].url)
+    }
+  })
 })
