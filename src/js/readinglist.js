@@ -321,7 +321,6 @@ function onReadingItemClick (e) {
       // If the control or meta key (⌘ on Mac, ⊞ on Windows) is pressed or if options is selected…
       const modifierDown = (e.ctrlKey || e.metaKey || items.settings.openNewTab)
       openLink(target.href, modifierDown)
-      setReadingItemViewed(target.href)
     })
   }
 }
@@ -402,18 +401,6 @@ function updateOptions (viewAll) {
     chrome.storage.sync.set({
       settings: items.settings
     })
-  })
-}
-
-/**
- * Sets the item in the reading list to viewed.
- *
- * @param {string} url the url of the reading item to set to true.
- */
-function setReadingItemViewed (url) {
-  chrome.storage.sync.get(url, page => {
-    page[url].viewed = true
-    chrome.storage.sync.set(page)
   })
 }
 

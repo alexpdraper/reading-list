@@ -11,6 +11,9 @@
   "addPage": {
     "message": "Agregar página a la Leyendo Lista"
   },
+  "addLink": {
+    "message": "Agregar enlace a la Leyendo Lista"
+  },
   "optionsTitle": {
     "message": "Opciones para la Leyendo Lista"
   },
