@@ -80,10 +80,17 @@ function addLinkToList (info, tab) {
   if (parser.hostname.toLowerCase().indexOf('google') !== -1 && parser.pathname === '/url') {
     info.linkUrl = (getQueryVariable(parser, 'url'))
   }
+  // Firefox uses linkText, Chrome uses selectionText
+  let title
+  if (isFirefox) {
+    title = info.linkText
+  } else {
+    title = info.selectionText
+  }
 
   setObj[info.linkUrl] = {
     url: info.linkUrl,
-    title: info.linkText,
+    title,
     favIconUrl: `${googleFaviconURL}${info.linkUrl}`,
     addedAt: Date.now()
   }
