@@ -11,6 +11,9 @@
   "addPage": {
     "message": "Ajouter la page à la liste de lecture"
   },
+  "addLink": {
+    "message": "Ajouter le lien à la liste de lecture"
+  },
   "optionsTitle": {
     "message": "Options de la liste de lecture"
   },

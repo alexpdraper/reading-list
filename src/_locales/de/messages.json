@@ -11,6 +11,9 @@
   "addPage": {
     "message": "Seite zur Leseliste hinzufügen"
   },
+  "addLink": {
+    "message": "Seite zur Leseliste hinzufügen"
+  },
   "optionsTitle": {
     "message": "Leselistenoptionen"
   },

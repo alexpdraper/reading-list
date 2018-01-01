@@ -15,6 +15,10 @@
     "message": "Add page to Reading List",
     "description": "The message in the context menu."
   },
+  "addLink": {
+    "message": "Add link to Reading List",
+    "description": "The link message in the context menu."
+  },
   "optionsTitle": {
     "message": "Reading List Options",
     "description": "The title of the application's options menu."

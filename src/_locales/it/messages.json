@@ -9,7 +9,10 @@
     "message": "Cerca"
   },
   "addPage": {
-    "message": "Aggiungi pagina all'Elenco Lettura"
+    "message": "Aggiungere la pagina all'Elenco Lettura"
+  },
+  "addLink": {
+    "message": "Aggiungere il link all'Elenco Lettura"
   },
   "optionsTitle": {
     "message": "Opzioni dell'Elenco Lettura"
@@ -24,13 +27,13 @@
     "message": "scuro"
   },
   "animation": {
-    "message": "Attiva l'animazione:"
+    "message": "Attivare l'animazione:"
   },
   "openNewTab": {
-    "message": "Apri il link in una nuova scheda:"
+    "message": "Aprire il link in una nuova scheda:"
   },
   "context": {
-    "message": "Mostra nel menu di contesto:"
+    "message": "Mostrare nel menu di contesto:"
   },
   "backup": {
     "message": "Backup:"
