@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-localize="appName">Reading List</title>
+</head>
+<body class="popup-page">
+  <div class="container">
+    <header class="header">
+      <h1 data-localize="appName"></h1>
+      <button class="save-button" id="savepage">+</button>
+      <button class="settings-button" id="settings">
+        <img class="settings-img" src="/icons/cog.svg">
+      </button>
+    </header>
+
+    <div class="search">
+      <label for="my-search" data-localize="search"></label>
+      <input type="search" id="my-search" name="search" autocomplete="off">
+    </div>
+
+    <div class="filter">
+      <button class="button" id="all">all</button>
+      <button class="button" id="unread">unread</button>
+    </div>
+
+    <div class="reading-list" id="reading-list"></div>
+  </div>
+</body>
+</html>

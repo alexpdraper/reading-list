@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-localize="optionsTitle"></title>
+  <style>
+    .field { margin-bottom: 0.5em }
+    body { margin: 16px 8px }
+  </style>
+</head>
+<body>
+  <div class="field">
+    <label for="theme" data-localize="theme"></label>
+    <select id="theme">
+      <option value="light" data-localize="light"></option>
+      <option value="dark" data-localize="dark"></option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label for="animateItems">
+      <span data-localize="animation"></span>
+      <input type="checkbox" id="animateItems">
+    </label>
+  </div>
+
+  <div class="field">
+    <label for="openNewTab">
+      <span data-localize="openNewTab"></span>
+      <input type="checkbox" id="openNewTab">
+    </label>
+  </div>
+
+  <div class="field">
+    <label for="addContextMenu">
+      <span data-localize="context"></span>
+      <input type="checkbox" id="addContextMenu">
+    </label>
+  </div>
+
+  <div class="field">
+    <label data-localize="backup"></label>
+    <button id="exportBtn" data-localize="export"></button>
+    <button id="importBtn" data-localize="import"></button>
+    <input type="file" id="importOrig" accept=".json" style="display:none">
+  </div>
+  <div id="advanced" class="accordion" data-localize="advancedOptions"></div>
+  <div class="panel">
+    <button id="resetBtn" class="button" data-localize="clearData"></button>
+  </div>
+
+  <div id="popup" class="dialog-overlay">
+    <div class="dialog">
+      <div class="dialog-msg">
+        <p data-localize="confirmMsg"></p>
+      </div>
+      <footer>
+        <div class="controls">
+          <button id="cancel" class="button button-info cancelAction" data-localize="goBack"></button>
+          <button id="ok" class="button button-danger doAction" data-localize="deleteAll"></button>
+        </div>
+      </footer>
+    </div>
+  </div>
+</body>
+</html>

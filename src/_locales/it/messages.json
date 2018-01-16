@@ -1,0 +1,62 @@
+{
+  "appName": {
+    "message": "Elenco Lettura"
+  },
+  "appDesc": {
+    "message": "Questa estensione risparmia una lista di pagine web per leggere più tarde."
+  },
+  "search": {
+    "message": "Cerca"
+  },
+  "addPage": {
+    "message": "Aggiungere la pagina all'Elenco Lettura"
+  },
+  "addLink": {
+    "message": "Aggiungere il link all'Elenco Lettura"
+  },
+  "optionsTitle": {
+    "message": "Opzioni dell'Elenco Lettura"
+  },
+  "theme": {
+    "message": "Tema:"
+  },
+  "light": {
+    "message": "luce"
+  },
+  "dark": {
+    "message": "scuro"
+  },
+  "animation": {
+    "message": "Attivare l'animazione:"
+  },
+  "openNewTab": {
+    "message": "Aprire il link in una nuova scheda:"
+  },
+  "context": {
+    "message": "Mostrare nel menu di contesto:"
+  },
+  "backup": {
+    "message": "Backup:"
+  },
+  "export": {
+    "message": "Esportare"
+  },
+  "import": {
+    "message": "Importare"
+  },
+  "advancedOptions": {
+    "message": "Opzioni avanzate"
+  },
+  "clearData": {
+    "message": "Ripristinare Elenco Lettura"
+  },
+  "confirmMsg": {
+    "message": "Stai per eliminare tutti i contenuti della lista di lettura. Sei sicuro?"
+  },
+  "goBack": {
+    "message": "Tornare indietro"
+  },
+  "deleteAll": {
+    "message": "Eliminare tutto!"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "options_ui": {
+    "browser_style": true
+  },
+  "applications": {
+    "gecko": {
+      "id": "leetcat@cs.ubc.ca",
+      "strict_min_version": "53.0"
+    }
+  }
+}
