@@ -181,6 +181,8 @@ function setReadingItemViewed (url) {
 }
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  chrome.pageAction.show(tabId)
+
   // If the tab is loaded, update the badge text
   if (tabId && changeInfo.status === 'complete' && tab.url) {
     updateBadge(tab.url, tabId, (onList, item) => {
@@ -206,9 +208,26 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 })
 
 chrome.tabs.onActivated.addListener((tabId, windowId) => {
+  chrome.pageAction.show(tabId)
   chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
     if (tabs[0].url) {
       setReadingItemViewed(tabs[0].url)
+    }
+  })
+})
+
+chrome.pageAction.onClicked.addListener(() => {
+  chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+    var tab = tabs[0]
+    if (tab.url) {
+      chrome.storage.sync.get(tab.url, item => {
+        var onList = (item && item.hasOwnProperty(tab.url))
+        if (onList) {
+          chrome.storage.sync.remove(tab.url, () => updateBadge(tab.url, tab.id))
+        } else {
+          addPageToList(null, tab)
+        }
+      })
     }
   })
 })
