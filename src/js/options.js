@@ -20,6 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  if (!isFirefox) {
+    document.getElementById('addPageAction').parentElement.style.display = 'none'
+  }
+
   // Saves options to chrome.storage
   function saveOptions () {
     var theme = document.getElementById('theme').value
