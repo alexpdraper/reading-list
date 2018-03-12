@@ -182,13 +182,15 @@ function setReadingItemViewed (url) {
 }
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  chrome.storage.sync.get(defaultSettings, store => {
-    if (store.settings.addPageAction) {
-      chrome.pageAction.show(tabId)
-    } else {
-      chrome.pageAction.hide(tabId)
-    }
-  })
+  if (isFirefox) {
+    chrome.storage.sync.get(defaultSettings, store => {
+      if (store.settings.addPageAction) {
+        chrome.pageAction.show(tabId)
+      } else {
+        chrome.pageAction.hide(tabId)
+      }
+    })
+  }
 
   // If the tab is loaded, update the badge text
   if (tabId && changeInfo.status === 'complete' && tab.url) {
@@ -215,13 +217,15 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 })
 
 chrome.tabs.onActivated.addListener((tabId, windowId) => {
-  chrome.storage.sync.get(defaultSettings, store => {
-    if (store.settings.addPageAction) {
-      chrome.pageAction.show(tabId)
-    } else {
-      chrome.pageAction.hide(tabId)
-    }
-  })
+  if (isFirefox) {
+    chrome.storage.sync.get(defaultSettings, store => {
+      if (store.settings.addPageAction) {
+        chrome.pageAction.show(tabId)
+      } else {
+        chrome.pageAction.hide(tabId)
+      }
+    })
+  }
   chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
     if (tabs[0].url) {
       setReadingItemViewed(tabs[0].url)
@@ -229,18 +233,20 @@ chrome.tabs.onActivated.addListener((tabId, windowId) => {
   })
 })
 
-chrome.pageAction.onClicked.addListener(() => {
-  chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-    var tab = tabs[0]
-    if (tab.url) {
-      chrome.storage.sync.get(tab.url, item => {
-        var onList = (item && item.hasOwnProperty(tab.url))
-        if (onList) {
-          chrome.storage.sync.remove(tab.url, () => updateBadge(tab.url, tab.id))
-        } else {
-          addPageToList(null, tab)
-        }
-      })
-    }
+if (isFirefox) {
+  chrome.pageAction.onClicked.addListener(() => {
+    chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+      var tab = tabs[0]
+      if (tab.url) {
+        chrome.storage.sync.get(tab.url, item => {
+          var onList = (item && item.hasOwnProperty(tab.url))
+          if (onList) {
+            chrome.storage.sync.remove(tab.url, () => updateBadge(tab.url, tab.id))
+          } else {
+            addPageToList(null, tab)
+          }
+        })
+      }
+    })
   })
-})
+}
