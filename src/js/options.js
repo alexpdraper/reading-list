@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     settings: {
       theme: 'light',
       addContextMenu: true,
+      addPageAction: true,
       animateItems: !isFirefox,
       openNewTab: false,
       viewAll: true
@@ -24,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     var theme = document.getElementById('theme').value
     var animateItems = document.getElementById('animateItems').checked
     var addContextMenu = document.getElementById('addContextMenu').checked
+    var addPageAction = document.getElementById('addPageAction').checked
     var openNewTab = document.getElementById('openNewTab').checked
 
     // Remove all the context menus
@@ -42,9 +44,20 @@ document.addEventListener('DOMContentLoaded', () => {
       items.settings.theme = theme
       items.settings.animateItems = animateItems
       items.settings.addContextMenu = addContextMenu
+      items.settings.addPageAction = addPageAction
       items.settings.openNewTab = openNewTab
       chrome.storage.sync.set({
         settings: items.settings
+      })
+
+      chrome.tabs.query({}, tabs => {
+        for (var i = 0; i < tabs.length; i++) {
+          if (items.settings.addPageAction) {
+            chrome.pageAction.show(tabs[i].id)
+          } else {
+            chrome.pageAction.hide(tabs[i].id)
+          }
+        }
       })
     })
   }
@@ -56,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('theme').value = items.settings.theme
       document.getElementById('animateItems').checked = items.settings.animateItems
       document.getElementById('addContextMenu').checked = items.settings.addContextMenu
+      document.getElementById('addPageAction').checked = items.settings.addPageAction
       document.getElementById('openNewTab').checked = items.settings.openNewTab
     })
   }
@@ -179,5 +193,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('theme').addEventListener('change', saveOptions)
   document.getElementById('animateItems').addEventListener('click', saveOptions)
   document.getElementById('addContextMenu').addEventListener('click', saveOptions)
+  document.getElementById('addPageAction').addEventListener('click', saveOptions)
   document.getElementById('openNewTab').addEventListener('click', saveOptions)
 })

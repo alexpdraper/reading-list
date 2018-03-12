@@ -47,6 +47,9 @@
     "message": "Mostrar no menú contextual:",
     "description": "The label for the context option."
   },
+  "pageActionOption": {
+    "message": "Amosar na barra de enderezos:"
+  },
   "backup": {
     "message": "Respaldo:"
   },

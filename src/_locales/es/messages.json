@@ -35,6 +35,9 @@
   "context": {
     "message": "Mostrar en el menú contextual:"
   },
+  "pageActionOption": {
+    "message": "Mostrar en la barra de direcciones:"
+  },
   "backup": {
     "message": "Copia de seguridad:"
   },

@@ -35,6 +35,9 @@
   "context": {
     "message": "Im Kontextmenü anzeigen:"
   },
+  "pageActionOption": {
+    "message": "Weergeven in adresbalk:"
+  },
   "backup": {
     "message": "Datensicherung:"
   },

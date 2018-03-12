@@ -35,6 +35,9 @@
   "context": {
     "message": "Afficher dans le menu contextuel:"
   },
+  "pageActionOption": {
+    "message": "Afficher dans la barre d'adresse:"
+  },    
   "backup": {
     "message": "Sauvegarder:"
   },
