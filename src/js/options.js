@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Icon in address bar only for firefox does not work in chrome
   if (!isFirefox) {
     document.getElementById('addPageAction').parentElement.style.display = 'none'
   }
@@ -43,6 +44,18 @@ document.addEventListener('DOMContentLoaded', () => {
         })
       }
     })
+
+    // Shows/hides pageAction in all tabs
+    chrome.tabs.query({}, tabs => {
+      for (var i = 0; i < tabs.length; i++) {
+        if (addPageAction) {
+          chrome.pageAction.show(tabs[i].id)
+        } else {
+          chrome.pageAction.hide(tabs[i].id)
+        }
+      }
+    })
+
     // Get updating the settings on the options page
     chrome.storage.sync.get(defaultSettings, items => {
       items.settings.theme = theme
@@ -52,16 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
       items.settings.openNewTab = openNewTab
       chrome.storage.sync.set({
         settings: items.settings
-      })
-
-      chrome.tabs.query({}, tabs => {
-        for (var i = 0; i < tabs.length; i++) {
-          if (items.settings.addPageAction) {
-            chrome.pageAction.show(tabs[i].id)
-          } else {
-            chrome.pageAction.hide(tabs[i].id)
-          }
-        }
       })
     })
   }

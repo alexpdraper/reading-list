@@ -217,15 +217,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 })
 
 chrome.tabs.onActivated.addListener((tabId, windowId) => {
-  if (isFirefox) {
-    chrome.storage.sync.get(defaultSettings, store => {
-      if (store.settings.addPageAction) {
-        chrome.pageAction.show(tabId)
-      } else {
-        chrome.pageAction.hide(tabId)
-      }
-    })
-  }
   chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
     if (tabs[0].url) {
       setReadingItemViewed(tabs[0].url)
