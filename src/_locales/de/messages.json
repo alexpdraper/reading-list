@@ -35,6 +35,9 @@
   "context": {
     "message": "Im Kontextmenü anzeigen:"
   },
+  "pageActionOption": {
+    "message": "Im Adressleiste anzeigen:"
+  },
   "backup": {
     "message": "Datensicherung:"
   },

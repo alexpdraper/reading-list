@@ -35,6 +35,9 @@
   "context": {
     "message": "Mostrare nel menu di contesto:"
   },
+  "pageActionOption": {
+    "message": "Mostra nella barra degli indirizzi:"
+  },
   "backup": {
     "message": "Backup:"
   },

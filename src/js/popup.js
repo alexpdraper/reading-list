@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     settings: {
       theme: 'light',
       addContextMenu: true,
+      addPageAction: true,
       animateItems: !isFirefox,
       openNewTab: false,
       viewAll: true

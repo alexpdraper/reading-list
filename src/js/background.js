@@ -12,6 +12,7 @@ const defaultSettings = {
   settings: {
     theme: 'light',
     addContextMenu: true,
+    addPageAction: true,
     animateItems: !isFirefox,
     openNewTab: false,
     viewAll: true
@@ -181,6 +182,16 @@ function setReadingItemViewed (url) {
 }
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (isFirefox) {
+    chrome.storage.sync.get(defaultSettings, store => {
+      if (store.settings.addPageAction) {
+        chrome.pageAction.show(tabId)
+      } else {
+        chrome.pageAction.hide(tabId)
+      }
+    })
+  }
+
   // If the tab is loaded, update the badge text
   if (tabId && changeInfo.status === 'complete' && tab.url) {
     updateBadge(tab.url, tabId, (onList, item) => {
@@ -212,3 +223,21 @@ chrome.tabs.onActivated.addListener((tabId, windowId) => {
     }
   })
 })
+
+if (isFirefox) {
+  chrome.pageAction.onClicked.addListener(() => {
+    chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+      var tab = tabs[0]
+      if (tab.url) {
+        chrome.storage.sync.get(tab.url, item => {
+          var onList = (item && item.hasOwnProperty(tab.url))
+          if (onList) {
+            chrome.storage.sync.remove(tab.url, () => updateBadge(tab.url, tab.id))
+          } else {
+            addPageToList(null, tab)
+          }
+        })
+      }
+    })
+  })
+}

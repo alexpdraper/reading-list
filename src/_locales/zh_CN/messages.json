@@ -39,6 +39,9 @@
     "message": "展示上下文菜单:",
     "description": "上下文选项标签"
   },
+  "pageActionOption": {
+    "message": "在地址栏中显示:"
+  },
   "backup": {
     "message": "备份:"
   },

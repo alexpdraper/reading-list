@@ -47,6 +47,10 @@
     "message": "Show in context menu:",
     "description": "The label for the context option."
   },
+  "pageActionOption": {
+    "message": "Show in address bar:",
+    "description": "The label for the address bar option."
+  },
   "backup": {
     "message": "Backup:"
   },
