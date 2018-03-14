@@ -63,6 +63,17 @@ function createReadingItemEl (info) {
   item.appendChild(link)
   item.appendChild(delBtn)
 
+  var editBtn = document.createElement('a')
+  editBtn.value = url
+  editBtn.classList.add('edit-button')
+  item.appendChild(editBtn)
+
+  const editImg = document.createElement('img')
+  editImg.classList.add('edit-img')
+  loadSVG('/icons/pencil.svg', editImg)
+  editBtn.appendChild(editImg)
+  item.appendChild(link)
+
   return item
 }
 
@@ -304,18 +315,23 @@ function openLink (url, newTab) {
  * @param {Event} e - click event
  */
 function onReadingItemClick (e) {
-  var isPopup = /(\s|^)popup-page(\s|$)/.test(document.body.className)
-  var target = e.target
-
-  // If the target’s parent is an <a> we pretend the <a> is the target
-  if (target.parentNode.tagName === 'A') {
-    target = target.parentNode
+  const isPopup = document.body.classList.contains('popup-page')
+  let target = e.target
+  if (target.tagName === 'INPUT') {
+    e.preventDefault()
+    return
   }
 
+  // Set target to the closest a as we are using those to decide what to do
+  target = target.closest('a')
+
   // If the target is a delete button, remove the reading item
-  if (/(\s|^)delete-button(\s|$)/.test(target.className)) {
+  // Or if the target is a edit button, edit the title
+  if (target.classList.contains('delete-button')) {
     removeReadingItem(target.id, target.parentNode)
-  } else if (isPopup && /(\s|^)item-link(\s|$)/.test(target.className)) {
+  } else if (target.classList.contains('edit-button')) {
+    switchToInput(target.parentNode)
+  } else if (isPopup && target.classList.contains('item-link')) {
     e.preventDefault()
     chrome.storage.sync.get(defaultSettings, items => {
       // If the control or meta key (⌘ on Mac, ⊞ on Windows) is pressed or if options is selected…
@@ -403,6 +419,121 @@ function updateOptions (viewAll) {
       settings: items.settings
     })
   })
+}
+
+/**
+ * Update a reading list item's title
+ *
+ * @param {string} url - url of a reading list item
+ * @param {string} title - title of a reading list item
+ */
+function setReadingItemTitle (url, title) {
+  chrome.storage.sync.get(url, page => {
+    page[url].title = title
+    chrome.storage.sync.set(page)
+  })
+}
+
+/**
+ * Makes the title of the reading list item editable
+ * @param {elementNodeReference} element The reading list item being edited
+ */
+function switchToInput (element) {
+  // Show overlay
+  const overlay = document.getElementById('overlay')
+  overlay.style.display = 'block'
+
+  // Change pencil to a disk for save
+  let button = element.querySelector('.edit-button')
+  button.classList.add('store-button')
+  button.classList.remove('edit-button')
+  let image = element.querySelector('svg.edit-img')
+  loadSVG('/icons/save.svg', image)
+
+  // Replace the span with input
+  const title = element.querySelector('span.title')
+  const input = document.createElement('input')
+  input.classList.add('edit-title')
+  input.value = title.textContent
+  input.original = title.textContent
+  title.replaceWith(input)
+
+  // Event listeners for when title is changed
+  overlay.addEventListener('click', switchToSpan)
+  input.addEventListener('keydown', switchToSpan)
+  input.select()
+
+  /**
+   * Switching the editable reading list item title to a span
+   *
+   * @param {Event} e - blur/keydown event
+   */
+  function switchToSpan (e) {
+    let doSave = true
+    // If not enter or escape on key down return
+    if (e.key && e.key !== 'Enter' && e.key !== 'Escape') {
+      return
+    }
+    // If escape do not save the title
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      doSave = false
+    }
+
+    // Remove Overlay
+    document.getElementById('overlay').style.display = 'none'
+
+    // Change the button from a disk to a pencil
+    // let button = this.parentNode.parentNode.querySelector('.store-button')
+    button.classList.add('edit-button')
+    button.classList.remove('store-button')
+    let url = button.value
+    let title = doSave ? input.value : input.original
+    let image = input.parentNode.parentNode.querySelector('svg.edit-img')
+    loadSVG('/icons/pencil.svg', image)
+    image.src = '/icons/pencil.svg'
+
+    // Change the title back to a span
+    var span = document.createElement('span')
+    span.textContent = title
+    span.classList.add('title')
+    input.replaceWith(span)
+
+    // Update the reading item
+    if (doSave) {
+      setReadingItemTitle(url, title)
+    }
+  }
+}
+
+/**
+ * Loads svg to a dom element
+ * @param {string} url the url of the svg
+ * @param {elementNodeReference} element the element to be replaced with the svg
+ */
+function loadSVG (url, element) {
+  let imgClass = element.getAttribute('class')
+
+  let xhr = new XMLHttpRequest()
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4 && xhr.status === 200) {
+      var svg = xhr.responseXML.getElementsByTagName('svg')[0]
+
+      if (imgClass != null) {
+        svg.setAttribute('class', imgClass + ' replaced-svg')
+      }
+
+      svg.removeAttribute('xmlns:a')
+
+      if (!svg.hasAttribute('viewBox') && svg.hasAttribute('height') && svg.hasAttribute('width')) {
+        svg.setAttribute('viewBox', '0 0 ' + svg.getAttribute('height') + ' ' + svg.getAttribute('width'))
+      }
+      element.parentElement.replaceChild(svg, element)
+    }
+  }
+
+  xhr.open('GET', url, true)
+  xhr.send(null)
 }
 
 export default {
