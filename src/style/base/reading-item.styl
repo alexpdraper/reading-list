@@ -57,3 +57,72 @@
       color: #fff
       transform: rotateZ(90deg) scale(2)
       box-shadow: 1px 0 1px rgba(0, 0, 0, 0.15)
+
+  .edit-button
+    position: absolute
+    bottom: 10px
+    right: 10px
+    padding: 0
+    width: 10px
+    height: 10px
+    border: 0
+    background-color: transparent
+    color: #ccc
+    border-radius: 0
+    margin: 0
+    text-align: center
+    transition: all 0.5s ease
+    .edit-img
+      fill: #ccc
+    &:hover
+      cursor: pointer
+      width: 25px
+      height: 25px
+      bottom: -2px
+      right: 4px
+      background-color: #ccc
+      color: #fff
+      transform: scale(1.5)
+      border-radius: 100%
+      box-shadow: 1px 0 0px 1px rgba(0, 0, 0, 0.15)
+      .edit-img
+        fill: #fff
+
+  .edit-img
+    width: 10px
+    height: 10px
+    margin-top: 5px
+
+
+  .store-button
+    position: absolute
+    bottom: -2px
+    right: 4px
+    padding: 0
+    width: 25px
+    height: 25px
+    background-color: #ccc
+    color: #fff
+    transform: scale(1.5)
+    border-radius: 100%
+    margin: 0
+    box-shadow: 1px 0 0px 1px rgba(0, 0, 0, 0.15)
+    text-align: center
+    .edit-img
+      fill: #fff
+
+.overlay
+  top: 0
+  bottom: 0
+  right: 0
+  left: 0
+  position: absolute
+  background: rgba(0,0,0,.4)
+  z-index: 10
+  display: none
+
+.edit-title
+  background-color: #fff !important;
+  position: relative
+  z-index: 11
+
