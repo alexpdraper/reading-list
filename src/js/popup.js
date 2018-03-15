@@ -77,11 +77,29 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   }
 
+  // Listen for click events in the sidebar button
+  // Hide if not if Firefox
+  var sidebarButton = document.getElementById('open-sidebar')
+  if (sidebarButton) {
+    if (isFirefox) {
+      document.getElementById('open-sidebar').addEventListener('click', () => {
+        chrome.sidebarAction.open()
+        window.close()
+      })
+    } else {
+      sidebarButton.style.display = 'none'
+    }
+  }
+
   // Listen for click events in the settings
   document.getElementById('settings').addEventListener('click', () => {
     if (chrome.runtime.openOptionsPage) {
       // New way to open options pages, if supported (Chrome 42+).
       chrome.runtime.openOptionsPage()
+      const isPopup = document.body.classList.contains('popup-page')
+      if (isPopup) {
+        window.close()
+      }
     } else {
       // Reasonable fallback.
       window.open(chrome.runtime.getURL('/options.html'))
@@ -90,4 +108,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('all').addEventListener('click', list.changeView)
   document.getElementById('unread').addEventListener('click', list.changeView)
+
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    var currentItem = document.getElementById(request.url)
+    if (request.type === 'add') {
+      if (currentItem) {
+        list.removeReadingItem(null, currentItem.parentNode)
+      }
+
+      // Create the reading item element
+      var readingItemEl = list.createReadingItemEl(request.info)
+
+      // Add the animation class
+      readingItemEl.className += ' slidein'
+
+      // Add it to the top of the reading list
+      RL.insertBefore(readingItemEl, RL.firstChild)
+    } else if (request.type === 'remove') {
+      if (currentItem) {
+        list.removeReadingItem(null, currentItem.parentNode)
+      }
+    } else if (request.type === 'update') {
+      // If updated replace current item with a new one
+      RL.insertBefore(list.createReadingItemEl(request.info), currentItem.parentNode)
+      currentItem.parentNode.remove()
+    }
+  })
 })

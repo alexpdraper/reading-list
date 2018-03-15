@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Get updating the settings on the options page
     chrome.storage.sync.get(defaultSettings, items => {
+      var needsReload = isFirefox && items.settings.theme !== theme
       items.settings.theme = theme
       items.settings.animateItems = animateItems
       items.settings.addContextMenu = addContextMenu
@@ -65,6 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
       items.settings.openNewTab = openNewTab
       chrome.storage.sync.set({
         settings: items.settings
+      }, () => {
+        if (needsReload) {
+          chrome.runtime.reload()
+        }
       })
     })
   }
@@ -125,6 +130,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Here the chrome storage is imported, it aggregates the reading list and replaces setting
     chrome.storage.sync.set(myImportedData, () => {
       restoreOptions()
+      if (isFirefox) {
+        chrome.runtime.reload()
+      }
       if (chrome.runtime.lastError) {
         console.error(chrome.runtime.lastError)
       }

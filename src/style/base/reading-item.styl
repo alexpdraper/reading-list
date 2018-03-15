@@ -27,13 +27,19 @@
     text-decoration: none
     display: block
     width: 100%
-    padding: 10px 50px 10px 56px
-    min-height: 56px
+    padding: 10px 30px 10px 56px
+    min-height: 56px    
     .title
       display: block
       font-weight: bold
     .host
       display: block
+    span
+      overflow-wrap: break-word
+      @media screen and (max-width: 200px)
+        white-space: nowrap
+        text-overflow: ellipsis
+        overflow: hidden
 
   .delete-button
     position: absolute
@@ -92,7 +98,6 @@
     width: 10px
     height: 10px
     margin-top: 5px
-
 
   .store-button
     position: absolute

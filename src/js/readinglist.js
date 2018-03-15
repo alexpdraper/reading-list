@@ -221,6 +221,12 @@ function addReadingItem (info, readingListEl, callback) {
       readingListEl.insertBefore(readingItemEl, readingListEl.firstChild)
     }
 
+    chrome.runtime.sendMessage({
+      'type': 'add',
+      'url': info.url,
+      'info': info
+    })
+
     // Add the “✔” to the badge for matching tabs
     var queryInfo = { url: info.url.replace(/#.*/, '') }
 
@@ -267,6 +273,11 @@ function removeReadingItem (url, element) {
         }
       })
     })
+
+    chrome.runtime.sendMessage({
+      'type': 'remove',
+      'url': url
+    })
   }
 
   // If element is truthy, remove the element
@@ -304,7 +315,10 @@ function openLink (url, newTab) {
       chrome.tabs.update(tab.id, { url: url })
 
       // Close the popup
-      window.close()
+      const isPopup = document.body.classList.contains('popup-page')
+      if (isPopup) {
+        window.close()
+      }
     })
   }
 }
@@ -316,6 +330,7 @@ function openLink (url, newTab) {
  */
 function onReadingItemClick (e) {
   const isPopup = document.body.classList.contains('popup-page')
+  const isSidebar = document.body.classList.contains('sidebar-page')
   let target = e.target
   if (target.tagName === 'INPUT') {
     e.preventDefault()
@@ -331,7 +346,7 @@ function onReadingItemClick (e) {
     removeReadingItem(target.id, target.parentNode)
   } else if (target.classList.contains('edit-button')) {
     switchToInput(target.parentNode)
-  } else if (isPopup && target.classList.contains('item-link')) {
+  } else if ((isPopup || isSidebar) && target.classList.contains('item-link')) {
     e.preventDefault()
     chrome.storage.sync.get(defaultSettings, items => {
       // If the control or meta key (⌘ on Mac, ⊞ on Windows) is pressed or if options is selected…
@@ -431,6 +446,11 @@ function setReadingItemTitle (url, title) {
   chrome.storage.sync.get(url, page => {
     page[url].title = title
     chrome.storage.sync.set(page)
+    chrome.runtime.sendMessage({
+      'type': 'update',
+      'url': url,
+      'info': page[url]
+    })
   })
 }
 
