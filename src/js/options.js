@@ -158,6 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
       fade(popup, 10)
       chrome.storage.sync.clear(() => {
         restoreOptions()
+        chrome.runtime.sendMessage({
+          'type': 'listUpdated'
+        })
       })
     }
     document.getElementById('cancel').onclick = function () {
