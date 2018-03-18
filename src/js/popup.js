@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     el.textContent = chrome.i18n.getMessage(el.dataset.localize)
   })
 
+  let searchBar = document.getElementById('my-search')
+  searchBar.setAttribute('placeholder', chrome.i18n.getMessage('Search'))
+
   const RL = document.getElementById('reading-list')
 
   RL.addEventListener('animationend', e => {
@@ -91,13 +94,24 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Listen for click events in the sidebar button
-  // Hide if not if Firefox
+  // Hide if not Firefox
   var sidebarButton = document.getElementById('open-sidebar')
   if (sidebarButton) {
     if (isFirefox) {
+      var sidebarIsOpen = false
+      if (window.browser.sidebarAction.hasOwnProperty('isOpen')) {
+        window.browser.sidebarAction.isOpen({}).then(result => {
+          sidebarIsOpen = result
+        })
+      }
       document.getElementById('open-sidebar').addEventListener('click', () => {
-        chrome.sidebarAction.open()
-        window.close()
+        if (sidebarIsOpen) {
+          chrome.sidebarAction.close()
+          sidebarIsOpen = false
+        } else {
+          chrome.sidebarAction.open()
+          sidebarIsOpen = true
+        }
       })
     } else {
       sidebarButton.style.display = 'none'
