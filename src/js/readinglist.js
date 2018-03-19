@@ -1,6 +1,8 @@
 /* globals chrome */
 import Fuse from 'fuse.js'
 
+global.defaultStyle = 'expanded'
+
 /**
  * Create and return the DOM element for a reading list item.
  *
@@ -21,9 +23,15 @@ function createReadingItemEl (info) {
   var url = info.url
   var title = info.title
   var favIconUrl = info.favIconUrl
+  var style = global.defaultStyle
+  if (info.hasOwnProperty('style')) {
+    style = info.style
+  }
 
   var item = document.createElement('div')
+  item.id = url
   item.className = 'reading-item'
+  item.classList.add(style)
 
   if (info.viewed) {
     item.classList.add('read')
@@ -58,7 +66,6 @@ function createReadingItemEl (info) {
 
   var delBtn = document.createElement('a')
   delBtn.textContent = '×'
-  delBtn.id = url
   delBtn.classList.add('delete-button')
   item.appendChild(link)
   item.appendChild(delBtn)
@@ -73,6 +80,11 @@ function createReadingItemEl (info) {
   loadSVG('/icons/pencil.svg', editImg)
   editBtn.appendChild(editImg)
   item.appendChild(link)
+
+  var expandBtn = document.createElement('a')
+  expandBtn.textContent = '>'
+  expandBtn.classList.add('expand-button')
+  item.appendChild(expandBtn)
 
   return item
 }
@@ -241,7 +253,7 @@ function addReadingItem (info, readingListEl, callback) {
 
       // If it exists, remove it from the list (prevents duplicates)
       if (currentItem) {
-        removeReadingItem(null, currentItem.parentNode)
+        removeReadingItem(null, currentItem)
       }
 
       // Create the reading item element
@@ -361,6 +373,44 @@ function openLink (url, newTab) {
 }
 
 /**
+ * Toggle a reading list item style
+ *
+ * @param {string} url - URL of the page to reading list item
+ * @param {elementNodeReference} element - reading list item
+ */
+function toggleReadingItemStyle (url, element) {
+  if (element.classList.contains('compact')) {
+    expandReadingItem(url, element)
+  } else {
+    compactReadingItem(url, element)
+  }
+}
+
+/**
+ * Expand reading list item
+ *
+ * @param {string} url - URL of the page to reading list item
+ * @param {elementNodeReference} element - reading list item
+ */
+function expandReadingItem (url, element) {
+  element.classList.remove('compact')
+  element.classList.add('expanded')
+  setReadingItemStyle(url, 'expanded')
+}
+
+/**
+ * Compact reading list item
+ *
+ * @param {string} url - URL of the page to reading list item
+ * @param {elementNodeReference} element - reading list item
+ */
+function compactReadingItem (url, element) {
+  element.classList.remove('expanded')
+  element.classList.add('compact')
+  setReadingItemStyle(url, 'compact')
+}
+
+/**
  * Open or delete reading items (click event listener)
  *
  * @param {Event} e - click event
@@ -380,9 +430,11 @@ function onReadingItemClick (e) {
   // If the target is a delete button, remove the reading item
   // Or if the target is a edit button, edit the title
   if (target.classList.contains('delete-button')) {
-    removeReadingItem(target.id, target.parentNode)
+    removeReadingItem(target.parentNode.id, target.parentNode)
   } else if (target.classList.contains('edit-button')) {
     switchToInput(target.parentNode)
+  } else if (target.classList.contains('expand-button')) {
+    toggleReadingItemStyle(target.parentNode.id, target.parentNode)
   } else if ((isPopup || isSidebar) && target.classList.contains('item-link')) {
     e.preventDefault()
     chrome.storage.sync.get(defaultSettings, items => {
@@ -452,6 +504,7 @@ const isFirefox = typeof InstallTrigger !== 'undefined'
 const defaultSettings = {
   settings: {
     theme: 'light',
+    style: 'expanded',
     addContextMenu: true,
     addPageAction: true,
     animateItems: !isFirefox,
@@ -469,6 +522,24 @@ function updateOptions (viewAll) {
     items.settings.viewAll = viewAll
     chrome.storage.sync.set({
       settings: items.settings
+    })
+  })
+}
+
+/**
+ * Update a reading list item's style
+ *
+ * @param {string} url - url of a reading list item
+ * @param {string} style - style of a reading list item
+ */
+function setReadingItemStyle (url, style) {
+  chrome.storage.sync.get(url, page => {
+    page[url].style = style
+    chrome.storage.sync.set(page)
+    chrome.runtime.sendMessage({
+      'type': 'update',
+      'url': url,
+      'info': page[url]
     })
   })
 }

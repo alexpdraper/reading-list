@@ -28,7 +28,7 @@
     display: block
     width: 100%
     padding: 10px 30px 10px 56px
-    min-height: 56px    
+    min-height: 56px
     .title
       display: block
       font-weight: bold
@@ -36,10 +36,6 @@
       display: block
     span
       overflow-wrap: break-word
-      @media screen and (max-width: 200px)
-        white-space: nowrap
-        text-overflow: ellipsis
-        overflow: hidden
 
   .delete-button
     position: absolute
@@ -115,6 +111,43 @@
     text-align: center
     .edit-img
       fill: #fff
+
+  .expand-button
+    position: absolute
+    text-align: center
+    font-weight: bold
+    bottom: -2px
+    left: 0
+    border-radius: 100%
+    padding: 0
+    width: 20px
+    height: 20px
+    border: 0
+    background: transparent
+    color: #ccc
+    transform: rotateZ(0) scale(1)
+    transition: transform 0.3s ease,
+      box-shadow 0.5s ease
+    &:hover
+      cursor: pointer
+      background: #ccc
+      color: #fff      
+      box-shadow: 1px 0 1px rgba(0, 0, 0, 0.15)
+
+.reading-item.expanded
+  .expand-button
+    &:hover
+      transform: rotateZ(-90deg) scale(2)
+
+.reading-item.compact
+  .item-link
+    span
+      white-space: nowrap
+      text-overflow: ellipsis
+      overflow: hidden
+  .expand-button
+    &:hover
+      transform: rotateZ(90deg) scale(2)
 
 .overlay
   top: 0

@@ -35,6 +35,15 @@
     "message": "Oscuro",
     "description": "The name for the dark theme."
   },
+  "style": {
+    "message": "Estilo:"
+  },
+  "compact": {
+    "message": "Compacto"
+  },
+  "expanded": {
+    "message": "Ampliado"
+  },
   "animation": {
     "message": "Habilitar animación:",
     "description": "The label for the animation option."

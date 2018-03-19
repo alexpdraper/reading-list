@@ -28,6 +28,15 @@
     "message": "暗黑",
     "description": "暗黑主题名字"
   },
+  "style": {
+    "message": "样式:"
+  },
+  "compact": {
+    "message": "紧凑"
+  },
+  "expanded": {
+    "message": "扩展"
+  },
   "animation": {
     "message": "支持动画:",
     "description": "动画选项的标签."

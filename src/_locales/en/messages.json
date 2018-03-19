@@ -35,6 +35,18 @@
     "message": "Dark",
     "description": "The name for the dark theme."
   },
+  "style": {
+    "message": "Style:",
+    "description": "The label for the style option."
+  },
+  "compact": {
+    "message": "Compact",
+    "description": "The name for the compact style."
+  },
+  "expanded": {
+    "message": "Expanded",
+    "description": "The name for the expanded style."
+  },
   "animation": {
     "message": "Enable animation:",
     "description": "The label for the animation option."

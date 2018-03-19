@@ -23,6 +23,15 @@
   "dark": {
     "message": "тъмна"
   },
+  "style": {
+    "message": "стил:"
+  },
+  "compact": {
+    "message": "компактен"
+  },
+  "expanded": {
+    "message": "разширен"
+  },
   "animation": {
     "message": "Включване на анимация:"
   },

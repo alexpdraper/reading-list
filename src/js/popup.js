@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const defaultSettings = {
     settings: {
       theme: 'light',
+      style: 'expanded',
       addContextMenu: true,
       addPageAction: true,
       animateItems: !isFirefox,
@@ -36,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   chrome.storage.sync.get(defaultSettings, store => {
     let settings = store.settings
+    global.defaultStyle = settings.style
     document.body.classList.add(settings.theme || 'light')
 
     // Sets the all/unread button
@@ -144,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (request.type === 'add') {
       if (currentItem) {
-        list.removeReadingItem(null, currentItem.parentNode)
+        list.removeReadingItem(null, currentItem)
       }
 
       // Create the reading item element
@@ -157,12 +159,12 @@ document.addEventListener('DOMContentLoaded', () => {
       RL.insertBefore(readingItemEl, RL.firstChild)
     } else if (request.type === 'remove') {
       if (currentItem) {
-        list.removeReadingItem(null, currentItem.parentNode)
+        list.removeReadingItem(null, currentItem)
       }
     } else if (request.type === 'update') {
       // If updated replace current item with a new one
-      RL.insertBefore(list.createReadingItemEl(request.info), currentItem.parentNode)
-      currentItem.parentNode.remove()
+      RL.insertBefore(list.createReadingItemEl(request.info), currentItem)
+      currentItem.remove()
     } else if (request.type === 'orderChanged' || request.type === 'listUpdated') {
       while (RL.firstChild) {
         RL.removeChild(RL.firstChild)

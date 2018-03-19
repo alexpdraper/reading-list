@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const defaultSettings = {
     settings: {
       theme: 'light',
+      style: 'expanded',
       addContextMenu: true,
       addPageAction: true,
       animateItems: !isFirefox,
@@ -28,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Saves options to chrome.storage
   function saveOptions () {
     var theme = document.getElementById('theme').value
+    var style = document.getElementById('style').value
     var animateItems = document.getElementById('animateItems').checked
     var addContextMenu = document.getElementById('addContextMenu').checked
     var addPageAction = document.getElementById('addPageAction').checked
@@ -58,8 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Get updating the settings on the options page
     chrome.storage.sync.get(defaultSettings, items => {
-      var needsReload = isFirefox && items.settings.theme !== theme
+      var needsReload = isFirefox && (items.settings.theme !== theme || items.settings.style !== style)
       items.settings.theme = theme
+      items.settings.style = style
       items.settings.animateItems = animateItems
       items.settings.addContextMenu = addContextMenu
       items.settings.addPageAction = addPageAction
@@ -79,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function restoreOptions () {
     chrome.storage.sync.get(defaultSettings, items => {
       document.getElementById('theme').value = items.settings.theme
+      document.getElementById('style').value = items.settings.style
       document.getElementById('animateItems').checked = items.settings.animateItems
       document.getElementById('addContextMenu').checked = items.settings.addContextMenu
       document.getElementById('addPageAction').checked = items.settings.addPageAction
@@ -209,6 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('advanced').addEventListener('click', accordion)
   // Listeners to save options when changed
   document.getElementById('theme').addEventListener('change', saveOptions)
+  document.getElementById('style').addEventListener('change', saveOptions)
   document.getElementById('animateItems').addEventListener('click', saveOptions)
   document.getElementById('addContextMenu').addEventListener('click', saveOptions)
   document.getElementById('addPageAction').addEventListener('click', saveOptions)

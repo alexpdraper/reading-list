@@ -11,6 +11,7 @@ const isFirefox = typeof InstallTrigger !== 'undefined'
 const defaultSettings = {
   settings: {
     theme: 'light',
+    style: 'expanded',
     addContextMenu: true,
     addPageAction: true,
     animateItems: !isFirefox,

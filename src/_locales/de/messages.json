@@ -26,6 +26,15 @@
   "dark": {
     "message": "Dunkles"
   },
+  "style": {
+    "message": "Style:"
+  },
+  "compact": {
+    "message": "Kompakt"
+  },
+  "expanded": {
+    "message": "Erweitert"
+  },
   "animation": {
     "message": "Animation anschalten:"
   },
