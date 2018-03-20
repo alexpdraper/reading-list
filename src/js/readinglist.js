@@ -279,12 +279,23 @@ function addReadingItem (info, readingListEl, callback) {
 
     chrome.tabs.query(queryInfo, tabs => {
       for (var i = 0; i < tabs.length; i++) {
-        // If the URL is identical, add the “✔” to the badge
+        // If the URL is identical, change icon
         if (tabs[i].url === info.url && tabs[i].id) {
-          chrome.browserAction.setBadgeText({
-            text: '✔',
+          let icons = {
+            '16': 'icons/icon-added16.png',
+            '32': 'icons/icon-added32.png'
+          }
+          chrome.browserAction.setIcon({
+            path: icons,
             tabId: tabs[i].id
           })
+
+          if (isFirefox) {
+            chrome.pageAction.setIcon({
+              path: icons,
+              tabId: tabs[i].id
+            })
+          }
         }
       }
 
@@ -310,12 +321,19 @@ function removeReadingItem (url, element) {
 
       chrome.tabs.query(queryInfo, tabs => {
         for (var i = 0; i < tabs.length; i++) {
-          // If the URL is identical, remove the “✔” from the badge
+          // If the URL is identical, remove the read icon
           if (tabs[i].url === url) {
-            chrome.browserAction.setBadgeText({
-              text: '',
+            chrome.browserAction.setIcon({
+              path: null,
               tabId: tabs[i].id
             })
+
+            if (isFirefox) {
+              chrome.pageAction.setIcon({
+                path: null,
+                tabId: tabs[i].id
+              })
+            }
           }
         }
       })

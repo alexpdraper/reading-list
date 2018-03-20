@@ -24,6 +24,18 @@ chrome.storage.sync.get(defaultSettings, store => {
   if (store.settings.addContextMenu) {
     createContextMenus()
   }
+
+  // Update icons when loading
+  chrome.tabs.query({}, (tabs) => {
+    for (let i in tabs) {
+      if (tabs[i].url) {
+        updateBadge(tabs[i].url, tabs[i].id)
+        if (isFirefox && store.settings.addPageAction) {
+          chrome.pageAction.show(tabs[i].id)
+        }
+      }
+    }
+  })
 })
 
 window.createContextMenus = createContextMenus
@@ -97,7 +109,12 @@ function addLinkToList (info, tab) {
     addedAt: Date.now()
   }
 
-  chrome.storage.sync.set(setObj)
+  chrome.storage.sync.set(setObj, () => updateBadge())
+  chrome.runtime.sendMessage({
+    'type': 'add',
+    'url': info.linkUrl,
+    'info': setObj[info.linkUrl]
+  })
 }
 
 /**
@@ -149,28 +166,43 @@ function addPageToList (info, tab) {
  * @param {function(boolean)} callback - called when the badge text is updated
  */
 function updateBadge (url, tabId, callback) {
-  if (!tabId) {
-    chrome.browserAction.setBadgeText({ text: '' })
-    return
-  } else if (!url) {
-    return
-  }
-
-  // Check the reading list for the url
-  chrome.storage.sync.get(url, item => {
-    var onList = (item && item.hasOwnProperty(url))
-
-    // If the page is on the reading list, add a “✔” to the badge,
-    // otherwise, no badge
-    chrome.browserAction.setBadgeText({
-      text: onList ? '✔' : '',
-      tabId: tabId
-    })
-
-    if (typeof callback === 'function') {
-      callback(onList, item)
-    }
+  // Updates global badge count
+  chrome.storage.sync.get(null, items => {
+    delete items['settings']
+    delete items['index']
+    let itemCount = Object.keys(items).length
+    var badgeText = itemCount > 0 ? '' + itemCount : ''
+    chrome.browserAction.setBadgeText({ text: badgeText })
   })
+
+  if (url && tabId) {
+    // Check the reading list for the url
+    chrome.storage.sync.get(url, item => {
+      var onList = (item && item.hasOwnProperty(url))
+
+      // If the page is on the reading list, change icon
+      // otherwise, reset
+      let icons = {
+        '16': 'icons/icon-added16.png',
+        '32': 'icons/icon-added32.png'
+      }
+      chrome.browserAction.setIcon({
+        path: onList ? icons : null,
+        tabId: tabId
+      })
+
+      if (isFirefox) {
+        chrome.pageAction.setIcon({
+          path: onList ? icons : null,
+          tabId: tabId
+        })
+      }
+
+      if (typeof callback === 'function') {
+        callback(onList, item)
+      }
+    })
+  }
 }
 
 /**
@@ -199,7 +231,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 
   // If the tab is loaded, update the badge text
-  if (tabId && changeInfo.status === 'complete' && tab.url) {
+  if (changeInfo.hasOwnProperty('status') && changeInfo.status === 'complete' && tab.url) {
     updateBadge(tab.url, tabId, (onList, item) => {
       var readingItem = onList ? item[tab.url] : null
       var setObj = {}
@@ -219,7 +251,14 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         chrome.storage.sync.set(setObj)
       }
     })
+  } else if (changeInfo.hasOwnProperty('url')) {
+    // Don't wait for tab to be loaded to update badge
+    updateBadge(changeInfo.url, tabId)
   }
+})
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  updateBadge()
 })
 
 chrome.tabs.onActivated.addListener((tabId, windowId) => {

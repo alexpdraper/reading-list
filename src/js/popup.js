@@ -113,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           chrome.sidebarAction.open()
           sidebarIsOpen = true
+          window.close()
         }
       })
     } else {
