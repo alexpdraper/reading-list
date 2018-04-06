@@ -108,7 +108,7 @@ function getReadingList (callback) {
 
     // Load orphan items ordered by date
     // Orphans may happen when page is added/removed without an index update
-    // Or if there are problems with the index, this way we don't loose any page
+    // Or if there are problems with the index, this way we don't lose any page
     var orphans = []
     for (let page in pages) {
       if (pages.hasOwnProperty(page)) {
