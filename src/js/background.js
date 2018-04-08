@@ -133,6 +133,11 @@ function addPageToList (info, tab) {
   }
 
   chrome.storage.sync.set(setObj, () => updateBadge(tab.url, tab.id))
+  chrome.runtime.sendMessage({
+    'type': 'add',
+    'url': tab.url,
+    'info': setObj[tab.url]
+  })
 }
 
 /**
@@ -233,6 +238,10 @@ if (isFirefox) {
           var onList = (item && item.hasOwnProperty(tab.url))
           if (onList) {
             chrome.storage.sync.remove(tab.url, () => updateBadge(tab.url, tab.id))
+            chrome.runtime.sendMessage({
+              'type': 'remove',
+              'url': tab.url
+            })
           } else {
             addPageToList(null, tab)
           }

@@ -1,6 +1,7 @@
 /* globals chrome */
 
 import list from './readinglist'
+import nativesortable from 'nativesortable'
 
 import '../style/popup.styl'
 
@@ -9,6 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-localize]').forEach(el => {
     el.textContent = chrome.i18n.getMessage(el.dataset.localize)
   })
+
+  let searchBar = document.getElementById('my-search')
+  searchBar.setAttribute('placeholder', chrome.i18n.getMessage('Search'))
 
   const RL = document.getElementById('reading-list')
 
@@ -51,6 +55,18 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       list.renderReadingList(RL, false, settings.viewAll)
     }
+
+    nativesortable(RL, {
+      change: function (parent, elem) {
+        list.updateIndex(RL)
+        chrome.runtime.sendMessage({
+          'type': 'orderChanged'
+        })
+      },
+      childClass: 'sortable-child',
+      draggingClass: 'sortable-dragging',
+      overClass: 'sortable-over'
+    })
   })
 
   // Listen for click events in the reading list
@@ -77,11 +93,40 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   }
 
+  // Listen for click events in the sidebar button
+  // Hide if not Firefox
+  var sidebarButton = document.getElementById('open-sidebar')
+  if (sidebarButton) {
+    if (isFirefox) {
+      var sidebarIsOpen = false
+      if (window.browser.sidebarAction.hasOwnProperty('isOpen')) {
+        window.browser.sidebarAction.isOpen({}).then(result => {
+          sidebarIsOpen = result
+        })
+      }
+      document.getElementById('open-sidebar').addEventListener('click', () => {
+        if (sidebarIsOpen) {
+          chrome.sidebarAction.close()
+          sidebarIsOpen = false
+        } else {
+          chrome.sidebarAction.open()
+          sidebarIsOpen = true
+        }
+      })
+    } else {
+      sidebarButton.style.display = 'none'
+    }
+  }
+
   // Listen for click events in the settings
   document.getElementById('settings').addEventListener('click', () => {
     if (chrome.runtime.openOptionsPage) {
       // New way to open options pages, if supported (Chrome 42+).
       chrome.runtime.openOptionsPage()
+      const isPopup = document.body.classList.contains('popup-page')
+      if (isPopup) {
+        window.close()
+      }
     } else {
       // Reasonable fallback.
       window.open(chrome.runtime.getURL('/options.html'))
@@ -90,4 +135,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('all').addEventListener('click', list.changeView)
   document.getElementById('unread').addEventListener('click', list.changeView)
+
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    var currentItem = null
+    if (request.hasOwnProperty('url')) {
+      currentItem = document.getElementById(request.url)
+    }
+
+    if (request.type === 'add') {
+      if (currentItem) {
+        list.removeReadingItem(null, currentItem.parentNode)
+      }
+
+      // Create the reading item element
+      var readingItemEl = list.createReadingItemEl(request.info)
+
+      // Add the animation class
+      readingItemEl.className += ' slidein'
+
+      // Add it to the top of the reading list
+      RL.insertBefore(readingItemEl, RL.firstChild)
+    } else if (request.type === 'remove') {
+      if (currentItem) {
+        list.removeReadingItem(null, currentItem.parentNode)
+      }
+    } else if (request.type === 'update') {
+      // If updated replace current item with a new one
+      RL.insertBefore(list.createReadingItemEl(request.info), currentItem.parentNode)
+      currentItem.parentNode.remove()
+    } else if (request.type === 'orderChanged' || request.type === 'listUpdated') {
+      while (RL.firstChild) {
+        RL.removeChild(RL.firstChild)
+      }
+      list.renderReadingList(RL, false, false)
+    }
+  })
 })

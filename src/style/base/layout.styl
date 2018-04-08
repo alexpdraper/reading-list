@@ -14,9 +14,16 @@ body
 .container
   position: relative
   padding: 0 spacer
-  width: containerWidth
   max-width: 100%
   margin: 0
+
+.popup-page
+  .container
+    width: containerWidth
+
+.sidebar-page
+  .container
+    width: 100%
 
 // Header
 .header
@@ -41,7 +48,6 @@ body
   width: 30px
   height: 30px
   line-height: 30px
-  padding: 0
   margin: 0 10px
   font-weight: bold
   border: 0
@@ -57,6 +63,21 @@ body
   position: absolute
   top: spacer
   right: spacer
+  width: spacer
+  height: spacer
+  padding: 0
+  border: 0
+  background-color: transparent
+  &:hover,
+  &:focus
+    cursor: pointer
+    outline: none
+
+// Sidebar button
+.sidebar-button
+  position: absolute
+  top: spacer
+  left: spacer
   width: spacer
   height: spacer
   padding: 0
@@ -102,3 +123,17 @@ body
   &.active
     cursor: pointer
     outline: none
+
+// Dragables
+[draggable]
+  -moz-user-select: none
+  -khtml-user-select: none
+  -webkit-user-select: none
+  user-select: none
+
+[draggable] *
+  -moz-user-drag: none
+  -khtml-user-drag: none
+  -webkit-user-drag: none
+  user-drag: none
+

@@ -72,6 +72,11 @@ const webpackConfig = {
       chunks: ['popup']
     }),
     new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, '..', 'src', 'sidebar.html'),
+      filename: 'sidebar.html',
+      chunks: ['popup']
+    }),
+    new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '..', 'src', 'options.html'),
       filename: 'options.html',
       chunks: ['options']
