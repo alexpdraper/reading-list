@@ -130,20 +130,26 @@ function getReadingList (callback) {
     // Ask for a review!
     if (pageList.length >= 6 && !settings.askedForReview) {
       settings.askedForReview = true
+      let reviewUrl = isFirefox
+        ? 'https://addons.mozilla.org/en-US/firefox/addon/reading_list/'
+        : 'https://chrome.google.com/webstore/detail/reading-list/lloccabjgblebdmncjndmiibianflabo/reviews'
+
       let reviewReadingListItem = {
         title: 'Like the Reading List? Give us a review!',
-        url: 'https://chrome.google.com/webstore/detail/reading-list/lloccabjgblebdmncjndmiibianflabo/reviews',
+        url: reviewUrl,
         shiny: true,
         addedAt: Date.now(),
         favIconUrl: '/icons/icon48.png'
       }
       index.unshift(reviewReadingListItem.url)
-      chrome.storage.sync.set({
-        settings,
-        index,
-        'https://chrome.google.com/webstore/detail/reading-list/lloccabjgblebdmncjndmiibianflabo/reviews': reviewReadingListItem
-      })
       pageList.unshift(reviewReadingListItem)
+
+      let setObj = {
+        settings,
+        index
+      }
+      setObj[reviewUrl] = reviewReadingListItem
+      chrome.storage.sync.set(setObj)
     }
 
     callback(pageList)
