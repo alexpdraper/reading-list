@@ -25,6 +25,10 @@ function createReadingItemEl (info) {
   var item = document.createElement('div')
   item.className = 'reading-item'
 
+  if (info.shiny) {
+    item.className += ' shiny'
+  }
+
   if (info.viewed) {
     item.classList.add('read')
   } else {
@@ -45,7 +49,7 @@ function createReadingItemEl (info) {
   linkHost.textContent = link.hostname || url
   link.appendChild(linkHost)
 
-  if (favIconUrl && /^https?:\/\//.test(favIconUrl)) {
+  if (favIconUrl && /^(https?:\/\/|\/icons\/)/.test(favIconUrl)) {
     var favicon = document.createElement('div')
     favicon.classList.add('favicon')
     var faviconImg = document.createElement('img')
@@ -90,12 +94,13 @@ function getReadingList (callback) {
 
   chrome.storage.sync.get(null, pages => {
     var pageList = []
-
+    let settings = pages.settings
     delete pages['settings']
+    let index = []
 
     // Load reading items ordered by index
     if (pages.hasOwnProperty('index')) {
-      var index = pages['index']
+      index = pages['index']
       delete pages['index']
 
       index.forEach(i => {
@@ -121,6 +126,31 @@ function getReadingList (callback) {
     })
 
     pageList = orphans.concat(pageList)
+
+    // Ask for a review!
+    if (pageList.length >= 6 && !settings.askedForReview) {
+      settings.askedForReview = true
+      let reviewUrl = isFirefox
+        ? 'https://addons.mozilla.org/en-US/firefox/addon/reading_list/'
+        : 'https://chrome.google.com/webstore/detail/reading-list/lloccabjgblebdmncjndmiibianflabo/reviews'
+
+      let reviewReadingListItem = {
+        title: 'Like the Reading List? Give us a review!',
+        url: reviewUrl,
+        shiny: true,
+        addedAt: Date.now(),
+        favIconUrl: '/icons/icon48.png'
+      }
+      index.unshift(reviewReadingListItem.url)
+      pageList.unshift(reviewReadingListItem)
+
+      let setObj = {
+        settings,
+        index
+      }
+      setObj[reviewUrl] = reviewReadingListItem
+      chrome.storage.sync.set(setObj)
+    }
 
     callback(pageList)
   })

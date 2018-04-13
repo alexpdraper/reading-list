@@ -116,6 +116,30 @@
     .edit-img
       fill: #fff
 
+.reading-list .reading-item.shiny
+  background: linear-gradient(to right, #fa709a 0%, #fee140 100%)
+  .delete-button
+    color: #000
+    &:focus,
+    &:hover
+      background: transparent
+      color: #fa709a
+  .item-link
+    color: #000
+    &:focus,
+    &:hover
+      color: #fee140
+      background: transparent
+      .favicon
+        border-color: transparent
+  .edit-button
+    display: none
+  .favicon
+    border-color: transparent
+  &:focus,
+  &:hover
+    box-shadow: 1px 3px 17px rgb(254, 225, 64, 0.9), 0px -1px 5px rgba(254, 225, 64, 0.7)
+
 .overlay
   top: 0
   bottom: 0
@@ -130,4 +154,3 @@
   background-color: #fff !important;
   position: relative
   z-index: 11
-
