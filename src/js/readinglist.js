@@ -249,7 +249,6 @@ function addReadingItem (info, readingListEl, callback) {
   info = {
     url: info.url,
     title: info.title,
-    favIconUrl: info.favIconUrl,
     addedAt: Date.now(),
     viewed: false
   }
