@@ -20,7 +20,7 @@ import Fuse from 'fuse.js'
 function createReadingItemEl (info) {
   var url = info.url
   var title = info.title
-  var favIconUrl = info.favIconUrl
+  var favIconUrl = `https://icons.duckduckgo.com/ip2/${new URL(info.url).hostname}.ico`
 
   var item = document.createElement('div')
   item.className = 'reading-item'
@@ -249,7 +249,6 @@ function addReadingItem (info, readingListEl, callback) {
   info = {
     url: info.url,
     title: info.title,
-    favIconUrl: info.favIconUrl,
     addedAt: Date.now(),
     viewed: false
   }
