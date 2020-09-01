@@ -2,7 +2,7 @@
 
 const googleFaviconURL = 'https://plus.google.com/_/favicon?domain='
 
-chrome.browserAction.setBadgeText({ text: '' })
+chrome.browserAction.setBadgeText({text: ''})
 chrome.browserAction.setBadgeBackgroundColor({
   color: '#2ea99c'
 })
@@ -40,7 +40,7 @@ function createContextMenus () {
  */
 function createPageContextMenu () {
   chrome.management.getSelf(result => {
-    var menuTitle = chrome.i18n.getMessage('addPage')
+    let menuTitle = chrome.i18n.getMessage('addPage')
     menuTitle += (result.installType === 'development') ? ' (dev)' : ''
     chrome.contextMenus.create({
       title: menuTitle,
@@ -55,7 +55,7 @@ function createPageContextMenu () {
  */
 function createLinkContextMenu () {
   chrome.management.getSelf(result => {
-    var menuTitle = chrome.i18n.getMessage('addLink')
+    let menuTitle = chrome.i18n.getMessage('addLink')
     menuTitle += (result.installType === 'development') ? ' (dev)' : ''
 
     chrome.contextMenus.create({
@@ -75,7 +75,7 @@ function createLinkContextMenu () {
 function addLinkToList (info, tab) {
   const setObj = {}
 
-  var parser = document.createElement('a')
+  const parser = document.createElement('a')
   parser.href = info.linkUrl
   // Removes google's strange url when it is clicked on
   if (parser.hostname.toLowerCase().indexOf('google') !== -1 && parser.pathname === '/url') {
@@ -105,10 +105,10 @@ function addLinkToList (info, tab) {
  * @param {string} variable The variable desired from the query string
  */
 function getQueryVariable (url, variable) {
-  var query = url.search.substring(1)
-  var vars = query.split('&')
-  for (var i = 0; i < vars.length; i++) {
-    var pair = vars[i].split('=')
+  const query = url.search.substring(1)
+  const vars = query.split('&')
+  for (let var1 of vars) {
+    const pair = var1.split('=')
     if (decodeURIComponent(pair[0]) === variable) {
       return decodeURIComponent(pair[1])
     }
@@ -149,7 +149,7 @@ function addPageToList (info, tab) {
  */
 function updateBadge (url, tabId, callback) {
   if (!tabId) {
-    chrome.browserAction.setBadgeText({ text: '' })
+    chrome.browserAction.setBadgeText({text: ''})
     return
   } else if (!url) {
     return
@@ -157,7 +157,7 @@ function updateBadge (url, tabId, callback) {
 
   // Check the reading list for the url
   chrome.storage.sync.get(url, item => {
-    var onList = (item && item.hasOwnProperty(url))
+    const onList = (item && item.hasOwnProperty(url))
 
     // If the page is on the reading list, add a “✔” to the badge,
     // otherwise, no badge
@@ -200,8 +200,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   // If the tab is loaded, update the badge text
   if (tabId && changeInfo.status === 'complete' && tab.url) {
     updateBadge(tab.url, tabId, (onList, item) => {
-      var readingItem = onList ? item[tab.url] : null
-      var setObj = {}
+      const readingItem = onList ? item[tab.url] : null
+      const setObj = {}
       if (tab.active) {
         setReadingItemViewed(tab.url)
       }
@@ -221,8 +221,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 })
 
-chrome.tabs.onActivated.addListener((tabId, windowId) => {
-  chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+chrome.tabs.onActivated.addListener(() => {
+  chrome.tabs.query({currentWindow: true, active: true}, (tabs) => {
     if (tabs[0].url) {
       setReadingItemViewed(tabs[0].url)
     }
@@ -231,11 +231,11 @@ chrome.tabs.onActivated.addListener((tabId, windowId) => {
 
 if (isFirefox) {
   chrome.pageAction.onClicked.addListener(() => {
-    chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-      var tab = tabs[0]
+    chrome.tabs.query({currentWindow: true, active: true}, (tabs) => {
+      const tab = tabs[0]
       if (tab.url) {
         chrome.storage.sync.get(tab.url, item => {
-          var onList = (item && item.hasOwnProperty(tab.url))
+          const onList = (item && item.hasOwnProperty(tab.url))
           if (onList) {
             chrome.storage.sync.remove(tab.url, () => updateBadge(tab.url, tab.id))
             chrome.runtime.sendMessage({
