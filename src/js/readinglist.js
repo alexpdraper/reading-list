@@ -18,11 +18,10 @@ import Fuse from 'fuse.js'
  * @param {object} info - object with url, title, and favIconUrl
  */
 function createReadingItemEl (info) {
-  var url = info.url
-  var title = info.title
-  var favIconUrl = `https://icons.duckduckgo.com/ip2/${new URL(info.url).hostname}.ico`
-
-  var item = document.createElement('div')
+  const url = info.url
+  const title = info.title
+  const favIconUrl = `https://icons.duckduckgo.com/ip2/${new URL(info.url).hostname}.ico`
+  const item = document.createElement('div')
   item.className = 'reading-item'
 
   if (info.shiny) {
@@ -35,24 +34,24 @@ function createReadingItemEl (info) {
     item.classList.add('unread')
   }
 
-  var link = document.createElement('a')
+  const link = document.createElement('a')
   link.className = 'item-link'
   link.href = url
 
-  var linkTitle = document.createElement('span')
+  const linkTitle = document.createElement('span')
   linkTitle.className = 'title'
   linkTitle.textContent = title || '?'
   link.appendChild(linkTitle)
 
-  var linkHost = document.createElement('span')
+  const linkHost = document.createElement('span')
   linkHost.classList.add('host')
   linkHost.textContent = link.hostname || url
   link.appendChild(linkHost)
 
   if (favIconUrl && /^(https?:\/\/|\/icons\/)/.test(favIconUrl)) {
-    var favicon = document.createElement('div')
+    const favicon = document.createElement('div')
     favicon.classList.add('favicon')
-    var faviconImg = document.createElement('img')
+    const faviconImg = document.createElement('img')
     faviconImg.classList.add('favicon-img')
     faviconImg.onerror = () => faviconImg.classList.add('error')
     faviconImg.setAttribute('src', favIconUrl)
@@ -60,14 +59,14 @@ function createReadingItemEl (info) {
     link.appendChild(favicon)
   }
 
-  var delBtn = document.createElement('a')
+  const delBtn = document.createElement('a')
   delBtn.textContent = '×'
   delBtn.id = url
   delBtn.classList.add('delete-button')
   item.appendChild(link)
   item.appendChild(delBtn)
 
-  var editBtn = document.createElement('a')
+  const editBtn = document.createElement('a')
   editBtn.value = url
   editBtn.classList.add('edit-button')
   item.appendChild(editBtn)
@@ -93,10 +92,10 @@ function getReadingList (callback) {
   }
 
   chrome.storage.sync.get(null, pages => {
-    var pageList = []
-    let settings = pages.settings
-    delete pages['settings']
+    const settings = pages.settings
+    let pageList = []
     let index = []
+    delete pages['settings']
 
     // Load reading items ordered by index
     if (pages.hasOwnProperty('index')) {
@@ -114,27 +113,22 @@ function getReadingList (callback) {
     // Load orphan items ordered by date
     // Orphans may happen when page is added/removed without an index update
     // Or if there are problems with the index, this way we don't lose any page
-    var orphans = []
-    for (let page in pages) {
-      if (pages.hasOwnProperty(page)) {
-        orphans.push(pages[page])
-      }
-    }
-
+    const orphans = []
+    orphans.push(...pages)
     orphans.sort((a, b) => {
       return b.addedAt - a.addedAt
     })
 
-    pageList = orphans.concat(pageList)
+    pageList.push(...orphans)
 
     // Ask for a review!
     if (pageList.length >= 6 && !settings.askedForReview) {
       settings.askedForReview = true
-      let reviewUrl = isFirefox
+      const reviewUrl = isFirefox
         ? 'https://addons.mozilla.org/en-US/firefox/addon/reading_list/'
         : 'https://chrome.google.com/webstore/detail/reading-list/lloccabjgblebdmncjndmiibianflabo/reviews'
 
-      let reviewReadingListItem = {
+      const reviewReadingListItem = {
         title: 'Like the Reading List? Give us a review!',
         url: reviewUrl,
         shiny: true,
@@ -144,7 +138,7 @@ function getReadingList (callback) {
       index.unshift(reviewReadingListItem.url)
       pageList.unshift(reviewReadingListItem)
 
-      let setObj = {
+      const setObj = {
         settings,
         index
       }
@@ -159,10 +153,10 @@ function getReadingList (callback) {
 /**
  * Updates the reading list index
  *
- * @param {elementNodeReference} readingListEl - reading list DOM element
+ * @param {Element} readingListEl - reading list DOM element
  */
 function updateIndex (readingListEl) {
-  let index = []
+  const index = []
   readingListEl.querySelectorAll('.item-link').forEach(el => {
     index.push(el.getAttribute('href'))
   })
@@ -172,19 +166,20 @@ function updateIndex (readingListEl) {
 /**
  * Render the reading list
  *
- * @param {elementNodeReference} readingListEl - reading list DOM element
+ * @param {Element} readingListEl - reading list DOM element
  * @param {boolean} animateItems - animate incoming reading items?
+ * @param {boolean} viewAll - view all items or not
  * @param {function()} callback - called when the list is rendered
  */
 function renderReadingList (readingListEl, animateItems, viewAll, callback) {
   getReadingList(pageList => {
-    var counter = 0
-    var numItems = pageList.length
-    let itemsAnimated = 0
+    const numItems = pageList.length
 
     // Animate up to 10 items
-    var itemsToAnimate = animateItems ? 10 : 0
-    itemsToAnimate = (itemsToAnimate > numItems) ? numItems : itemsToAnimate
+    const animateCount = animateItems ? 10 : 0
+    const itemsToAnimate = (animateCount > numItems) ? numItems : animateCount
+    let counter = 0
+    let itemsAnimated = 0
 
     // Wait a bit, then create a DOM element for the next reading list item,
     // then recurse
@@ -197,7 +192,7 @@ function renderReadingList (readingListEl, animateItems, viewAll, callback) {
       // If we’ve rendered all the animated items
       if (itemsAnimated >= itemsToAnimate) {
         // Render any remaining items
-        for (var i = counter; i < numItems; i++) {
+        for (let i = counter; i < numItems; i++) {
           readingListEl.appendChild(createReadingItemEl(pageList[i]))
         }
 
@@ -210,7 +205,7 @@ function renderReadingList (readingListEl, animateItems, viewAll, callback) {
 
       // Wait a bit, then make a reading item
       window.setTimeout(() => {
-        var readingItemEl = createReadingItemEl(pageList[counter])
+        const readingItemEl = createReadingItemEl(pageList[counter])
 
         // Increment the animated counter if item is viewable
         if (!pageList[counter].viewed || viewAll) {
@@ -237,7 +232,7 @@ function renderReadingList (readingListEl, animateItems, viewAll, callback) {
  * Add an item to the reading list
  *
  * @param {object} info - page to add’s url, title, and favIconUrl
- * @param {elementNodeReference} readingListEl - reading list DOM element
+ * @param {Element} readingListEl - reading list DOM element
  * @param {function(object)} callback - called when the item is added
  */
 function addReadingItem (info, readingListEl, callback) {
@@ -254,7 +249,7 @@ function addReadingItem (info, readingListEl, callback) {
   }
 
   // Object for setting the storage
-  var setObj = {}
+  const setObj = {}
   setObj[info.url] = info
 
   chrome.storage.sync.set(setObj, () => {
@@ -264,9 +259,10 @@ function addReadingItem (info, readingListEl, callback) {
 
     // If the readingListEl was passed, create the DOM element for the
     // reading item
+    let readingItemEl
     if (readingListEl) {
       // Look for a delete button with the ID of the url
-      var currentItem = document.getElementById(info.url)
+      const currentItem = document.getElementById(info.url)
 
       // If it exists, remove it from the list (prevents duplicates)
       if (currentItem) {
@@ -274,7 +270,7 @@ function addReadingItem (info, readingListEl, callback) {
       }
 
       // Create the reading item element
-      var readingItemEl = createReadingItemEl(info)
+      readingItemEl = createReadingItemEl(info)
 
       // Add the animation class
       readingItemEl.className += ' slidein'
@@ -292,15 +288,15 @@ function addReadingItem (info, readingListEl, callback) {
     })
 
     // Add the “✔” to the badge for matching tabs
-    var queryInfo = { url: info.url.replace(/#.*/, '') }
+    const queryInfo = {url: info.url.replace(/#.*/, '')}
 
     chrome.tabs.query(queryInfo, tabs => {
-      for (var i = 0; i < tabs.length; i++) {
+      for (let tab of tabs) {
         // If the URL is identical, add the “✔” to the badge
-        if (tabs[i].url === info.url && tabs[i].id) {
+        if (tab.url === info.url && tab.id) {
           chrome.browserAction.setBadgeText({
             text: '✔',
-            tabId: tabs[i].id
+            tabId: tab.id
           })
         }
       }
@@ -316,22 +312,22 @@ function addReadingItem (info, readingListEl, callback) {
  * Remove a reading list item from the DOM, storage, or both
  *
  * @param {string} url (optional) - URL of the page to remove
- * @param {elementNodeReference} element - (optional) reading list item
+ * @param {Element} element - (optional) reading list item
  */
 function removeReadingItem (url, element) {
   // If url is truthy, remove the item from storage
   if (url) {
     chrome.storage.sync.remove(url, () => {
       // Find tabs with the reading item’s url
-      var queryInfo = { url: url.replace(/#.*/, '') }
+      const queryInfo = {url: url.replace(/#.*/, '')}
 
       chrome.tabs.query(queryInfo, tabs => {
-        for (var i = 0; i < tabs.length; i++) {
+        for (let tab of tabs) {
           // If the URL is identical, remove the “✔” from the badge
-          if (tabs[i].url === url) {
+          if (tab.url === url) {
             chrome.browserAction.setBadgeText({
               text: '',
-              tabId: tabs[i].id
+              tabId: tab.id
             })
           }
         }
@@ -349,7 +345,7 @@ function removeReadingItem (url, element) {
     // Listen for the end of an animation
     element.addEventListener('animationend', () => {
       // Remove the item from the DOM when the animation is finished
-      let readingListEl = element.parentNode
+      const readingListEl = element.parentNode
       element.remove()
       updateIndex(readingListEl)
     })
@@ -368,17 +364,17 @@ function removeReadingItem (url, element) {
 function openLink (url, newTab) {
   if (newTab) {
     // Create a new tab with the URL
-    chrome.tabs.create({ url: url, active: false })
+    chrome.tabs.create({url: url, active: false})
   } else {
     // Query for the active tab
     chrome.tabs.query({
       active: true,
       currentWindow: true
     }, tabs => {
-      var tab = tabs[0]
+      const tab = tabs[0]
 
       // Update the URL of the current tab
-      chrome.tabs.update(tab.id, { url: url })
+      chrome.tabs.update(tab.id, {url: url})
 
       // Close the popup
       const isPopup = document.body.classList.contains('popup-page')
@@ -522,7 +518,7 @@ function setReadingItemTitle (url, title) {
 
 /**
  * Makes the title of the reading list item editable
- * @param {elementNodeReference} element The reading list item being edited
+ * @param {Element} element The reading list item being edited
  */
 function switchToInput (element) {
   // Show overlay
@@ -530,10 +526,10 @@ function switchToInput (element) {
   overlay.style.display = 'block'
 
   // Change pencil to a disk for save
-  let button = element.querySelector('.edit-button')
+  const button = element.querySelector('.edit-button')
   button.classList.add('store-button')
   button.classList.remove('edit-button')
-  let image = element.querySelector('svg.edit-img')
+  const image = element.querySelector('svg.edit-img')
   loadSVG('/icons/save.svg', image)
 
   // Replace the span with input
@@ -545,65 +541,71 @@ function switchToInput (element) {
   title.replaceWith(input)
 
   // Event listeners for when title is changed
-  overlay.addEventListener('click', switchToSpan)
-  input.addEventListener('keydown', switchToSpan)
+  overlay.addEventListener('click', (e) => {
+    switchToSpan(e, input, button)
+  })
+  input.addEventListener('keydown', (e) => {
+    switchToSpan(e, input, button)
+  })
   input.select()
+}
 
-  /**
-   * Switching the editable reading list item title to a span
-   *
-   * @param {Event} e - blur/keydown event
-   */
-  function switchToSpan (e) {
-    let doSave = true
-    // If not enter or escape on key down return
-    if (e.key && e.key !== 'Enter' && e.key !== 'Escape') {
-      return
-    }
-    // If escape do not save the title
-    if (e.key === 'Escape') {
-      e.preventDefault()
-      doSave = false
-    }
+/**
+ * Switching the editable reading list item title to a span
+ *
+ * @param {Event} e - blur/keydown event
+ * @param {Element} input - title box
+ * @param {Element} button - button being pushed
+ */
+function switchToSpan (e, input, button) {
+  let doSave = true
+  // If not enter or escape on key down return
+  if (e.key && e.key !== 'Enter' && e.key !== 'Escape') {
+    return
+  }
+  // If escape do not save the title
+  if (e.key === 'Escape') {
+    e.preventDefault()
+    doSave = false
+  }
 
-    // Remove Overlay
-    document.getElementById('overlay').style.display = 'none'
+  // Remove Overlay
+  document.getElementById('overlay').style.display = 'none'
 
-    // Change the button from a disk to a pencil
-    // let button = this.parentNode.parentNode.querySelector('.store-button')
-    button.classList.add('edit-button')
-    button.classList.remove('store-button')
-    let url = button.value
-    let title = doSave ? input.value : input.original
-    let image = input.parentNode.parentNode.querySelector('svg.edit-img')
-    loadSVG('/icons/pencil.svg', image)
-    image.src = '/icons/pencil.svg'
+  // Change the button from a disk to a pencil
+  // let button = this.parentNode.parentNode.querySelector('.store-button')
+  button.classList.add('edit-button')
+  button.classList.remove('store-button')
+  const url = button.value
+  const title = doSave ? input.value : input.original
+  const image = input.parentNode.parentNode.querySelector('svg.edit-img')
+  loadSVG('/icons/pencil.svg', image)
+  image.src = '/icons/pencil.svg'
 
-    // Change the title back to a span
-    var span = document.createElement('span')
-    span.textContent = title
-    span.classList.add('title')
-    input.replaceWith(span)
+  // Change the title back to a span
+  const span = document.createElement('span')
+  span.textContent = title
+  span.classList.add('title')
+  input.replaceWith(span)
 
-    // Update the reading item
-    if (doSave) {
-      setReadingItemTitle(url, title)
-    }
+  // Update the reading item
+  if (doSave) {
+    setReadingItemTitle(url, title)
   }
 }
 
 /**
  * Loads svg to a dom element
  * @param {string} url the url of the svg
- * @param {elementNodeReference} element the element to be replaced with the svg
+ * @param {Element} element the element to be replaced with the svg
  */
 function loadSVG (url, element) {
-  let imgClass = element.getAttribute('class')
+  const imgClass = element.getAttribute('class')
 
-  let xhr = new XMLHttpRequest()
+  const xhr = new XMLHttpRequest()
   xhr.onreadystatechange = function () {
     if (xhr.readyState === 4 && xhr.status === 200) {
-      var svg = xhr.responseXML.getElementsByTagName('svg')[0]
+      const svg = xhr.responseXML.getElementsByTagName('svg')[0]
 
       if (imgClass != null) {
         svg.setAttribute('class', imgClass + ' replaced-svg')

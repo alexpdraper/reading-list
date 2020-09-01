@@ -12,7 +12,7 @@ const manifestOptions = {
 
 module.exports = function (browser, callback) {
   const filePath = path.resolve(__dirname, '..', 'dist', 'manifest.json')
-  let manifest = _.merge({}, base, manifestOptions[browser])
+  const manifest = _.merge({}, base, manifestOptions[browser])
 
   // generates the manifest file using the package.json version
   manifest.version = process.env.npm_package_version

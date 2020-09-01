@@ -27,11 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Saves options to chrome.storage
   function saveOptions () {
-    var theme = document.getElementById('theme').value
-    var animateItems = document.getElementById('animateItems').checked
-    var addContextMenu = document.getElementById('addContextMenu').checked
-    var addPageAction = document.getElementById('addPageAction').checked
-    var openNewTab = document.getElementById('openNewTab').checked
+    const theme = document.getElementById('theme').value
+    const animateItems = document.getElementById('animateItems').checked
+    const addContextMenu = document.getElementById('addContextMenu').checked
+    const addPageAction = document.getElementById('addPageAction').checked
+    const openNewTab = document.getElementById('openNewTab').checked
 
     // Remove all the context menus
     chrome.contextMenus.removeAll(() => {
@@ -47,18 +47,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Shows/hides pageAction in all tabs
     chrome.tabs.query({}, tabs => {
-      for (var i = 0; i < tabs.length; i++) {
+      for (let tab of tabs) {
         if (addPageAction) {
-          chrome.pageAction.show(tabs[i].id)
+          chrome.pageAction.show(tab.id)
         } else {
-          chrome.pageAction.hide(tabs[i].id)
+          chrome.pageAction.hide(tab.id)
         }
       }
     })
 
     // Get updating the settings on the options page
     chrome.storage.sync.get(defaultSettings, items => {
-      var needsReload = isFirefox && items.settings.theme !== theme
+      const needsReload = isFirefox && items.settings.theme !== theme
       items.settings.theme = theme
       items.settings.animateItems = animateItems
       items.settings.addContextMenu = addContextMenu
@@ -87,9 +87,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Helper for export function
-  var textFile = null
+  let textFile = null
+
   function makeTextFile (text) {
-    var data = new Blob([text], { type: 'text/plain' })
+    const data = new Blob([text], {type: 'text/plain'})
     // If we are replacing a previously generated file we need to
     // manually revoke the object URL to avoid memory leaks.
     if (textFile !== null) {
@@ -97,23 +98,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     textFile = window.URL.createObjectURL(data)
     return textFile
-  };
+  }
 
   // Exports app data to a file
   function exportFunc () {
     // Get the storage element
     chrome.storage.sync.get(null, pages => {
-      let exportText = JSON.stringify(pages)
+      const exportText = JSON.stringify(pages)
 
       // Add storage element to file
-      let link = document.createElement('a')
+      const link = document.createElement('a')
       link.setAttribute('download', 'readinglist.json')
       link.href = makeTextFile(exportText)
       document.body.appendChild(link)
 
       // wait for the link to be added to the document
       window.requestAnimationFrame(() => {
-        var event = new MouseEvent('click')
+        const event = new MouseEvent('click')
         link.dispatchEvent(event)
         document.body.removeChild(link)
       })
@@ -124,9 +125,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Helper for import function
   function impLoad () {
-    let myImportedData = JSON.parse(this.result)
+    const myImportedData = JSON.parse(this.result)
     // Un-comment this line if we want to replace the storage
-    // chrome.storage.sync.clear();
+    // chrome.storage.sync.clear()
     // Here the chrome storage is imported, it aggregates the reading list and replaces setting
     chrome.storage.sync.set(myImportedData, () => {
       restoreOptions()
@@ -142,15 +143,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Gets json file and imports to the app
   function importFunc (e) {
-    let files = e.target.files
-    let reader = new FileReader()
+    const files = e.target.files
+    const reader = new FileReader()
     reader.onload = impLoad
     reader.readAsText(files[0])
   }
 
   // Deletes all settings, and items in the app
   function confirmDelete () {
-    var popup = document.getElementById('popup')
+    const popup = document.getElementById('popup')
     popup.style.display = 'block'
     popup.style.opacity = 1
     document.body.insertBefore(popup, document.body.firstChild)
@@ -170,8 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Fades html element
   function fade (element, time) {
-    var op = 1 // initial opacity
-    var timer = setInterval(() => {
+    let op = 1 // initial opacity
+    const timer = setInterval(() => {
       if (op <= 0.1) {
         clearInterval(timer)
         element.style.display = 'none'
@@ -184,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function accordion () {
     this.classList.toggle('active')
-    var panel = this.nextElementSibling
+    const panel = this.nextElementSibling
     if (panel.style.maxHeight) {
       panel.style.maxHeight = null
     } else {
@@ -200,7 +201,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Import listeners
   importOrig.addEventListener('change', importFunc, false)
-  importBtn.onclick = () => { importOrig.click() }
+  importBtn.onclick = () => {
+    importOrig.click()
+  }
   // Export listener
   exportBtn.addEventListener('click', exportFunc, false)
   // Reset button listener

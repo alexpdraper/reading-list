@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     el.textContent = chrome.i18n.getMessage(el.dataset.localize)
   })
 
-  let searchBar = document.getElementById('my-search')
+  const searchBar = document.getElementById('my-search')
   searchBar.setAttribute('placeholder', chrome.i18n.getMessage('Search'))
 
   const RL = document.getElementById('reading-list')
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   chrome.storage.sync.get(defaultSettings, store => {
-    let settings = store.settings
+    const settings = store.settings
     document.body.classList.add(settings.theme || 'light')
 
     // Sets the all/unread button
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     nativesortable(RL, {
-      change: function (parent, elem) {
+      change: function () {
         list.updateIndex(RL)
         chrome.runtime.sendMessage({
           'type': 'orderChanged'
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (savepageButton) {
     // Save the page open in the current tab to the reading list
     savepageButton.addEventListener('click', () => {
-      const queryInfo = { active: true, currentWindow: true }
+      const queryInfo = {active: true, currentWindow: true}
 
       chrome.tabs.query(queryInfo, tabs => {
         list.addReadingItem(tabs[0], RL)
@@ -95,10 +95,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Listen for click events in the sidebar button
   // Hide if not Firefox
-  var sidebarButton = document.getElementById('open-sidebar')
+  const sidebarButton = document.getElementById('open-sidebar')
   if (sidebarButton) {
     if (isFirefox) {
-      var sidebarIsOpen = false
+      let sidebarIsOpen = false
       if (window.browser.sidebarAction.hasOwnProperty('isOpen')) {
         window.browser.sidebarAction.isOpen({}).then(result => {
           sidebarIsOpen = result
@@ -136,8 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('all').addEventListener('click', list.changeView)
   document.getElementById('unread').addEventListener('click', list.changeView)
 
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    var currentItem = null
+  chrome.runtime.onMessage.addListener((request) => {
+    let currentItem = null
     if (request.hasOwnProperty('url')) {
       currentItem = document.getElementById(request.url)
     }
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Create the reading item element
-      var readingItemEl = list.createReadingItemEl(request.info)
+      const readingItemEl = list.createReadingItemEl(request.info)
 
       // Add the animation class
       readingItemEl.className += ' slidein'
@@ -161,8 +161,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } else if (request.type === 'update') {
       // If updated replace current item with a new one
-      RL.insertBefore(list.createReadingItemEl(request.info), currentItem.parentNode)
-      currentItem.parentNode.remove()
+      if (currentItem) {
+        RL.insertBefore(list.createReadingItemEl(request.info), currentItem.parentNode)
+        currentItem.parentNode.remove()
+      }
     } else if (request.type === 'orderChanged' || request.type === 'listUpdated') {
       while (RL.firstChild) {
         RL.removeChild(RL.firstChild)
