@@ -19,7 +19,7 @@
   },
   "applications": {
     "gecko": {
-      "id": "casey.thompson001@gmail.com",
+      "id": "leetcat@cs.ubc.ca",
       "strict_min_version": "53.0"
     }
   }
