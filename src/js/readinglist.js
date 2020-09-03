@@ -246,6 +246,16 @@ function addReadingItem (info, readingListEl, callback) {
     return
   }
 
+  // Handles all firefox preference pages
+  if (info.url.startsWith('about')) {
+    if (info.url.includes('http')) {
+      const url = info.url.replace(/about:\w+\?url=/g, '')
+      info.url = decodeURIComponent(url)
+    } else {
+      return
+    }
+  }
+
   // Restrict info’s values
   info = {
     url: info.url,
