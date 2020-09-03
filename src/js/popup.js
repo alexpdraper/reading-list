@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('unread').addEventListener('click', list.changeView)
 
   document.getElementById('date').addEventListener('click', list.sortItems)
-  document.getElementById('name').addEventListener('click', list.sortItems)
+  document.getElementById('title').addEventListener('click', list.sortItems)
 
   chrome.runtime.onMessage.addListener((request) => {
     let currentItem = null

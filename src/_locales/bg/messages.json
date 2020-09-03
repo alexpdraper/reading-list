@@ -58,5 +58,17 @@
   },
   "deleteAll": {
     "message": "Изтриване на всичко!"
+  },
+  "allButton": {
+    "message": "всичко"
+  },
+  "dateButton": {
+    "message": "дата"
+  },
+  "titleButton": {
+    "message": "заглавие"
+  },
+  "unreadButton": {
+    "message": "непрочетен"
   }
 }

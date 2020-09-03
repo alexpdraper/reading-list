@@ -245,13 +245,13 @@ function sortReadingList (pageList, settings) {
       if (settings.sortOption === 'date') {
         return compareDate(a, b, settings.sortOrder)
       } else {
-        return compareName(a, b, settings.sortOrder)
+        return compareTitle(a, b, settings.sortOrder)
       }
     })
   }
 }
 
-function compareName (a, b, order) {
+function compareTitle (a, b, order) {
   if (order === 'up') {
     return b.title.localeCompare(a.title, undefined, {numeric: true, sensitivity: 'base'})
   } else {
@@ -577,7 +577,7 @@ function updateSort (sortOption, sortOrder) {
 function changeOppositeButton (elementId) {
   let oppositeButton
   if (elementId === 'date') {
-    oppositeButton = document.getElementById('name')
+    oppositeButton = document.getElementById('title')
   } else {
     oppositeButton = document.getElementById('date')
   }

@@ -61,5 +61,17 @@
   },
   "deleteAll": {
     "message": "Eliminar todo!"
+  },
+  "allButton": {
+    "message": "todo"
+  },
+  "dateButton": {
+    "message": "fecha"
+  },
+  "titleButton": {
+    "message": "título"
+  },
+  "unreadButton": {
+    "message": "no leído"
   }
 }
