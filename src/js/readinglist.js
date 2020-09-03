@@ -113,8 +113,12 @@ function getReadingList (callback) {
     // Load orphan items ordered by date
     // Orphans may happen when page is added/removed without an index update
     // Or if there are problems with the index, this way we don't lose any page
-    const orphans = []
-    orphans.push(...pages)
+    var orphans = []
+    for (let page in pages) {
+      if (pages.hasOwnProperty(page)) {
+        orphans.push(pages[page])
+      }
+    }
     orphans.sort((a, b) => {
       return b.addedAt - a.addedAt
     })

@@ -1,7 +1,5 @@
 /* globals chrome */
 
-const googleFaviconURL = 'https://plus.google.com/_/favicon?domain='
-
 chrome.browserAction.setBadgeText({text: ''})
 chrome.browserAction.setBadgeBackgroundColor({
   color: '#2ea99c'
@@ -94,7 +92,6 @@ function addLinkToList (info, tab) {
   setObj[info.linkUrl] = {
     url: info.linkUrl,
     title,
-    favIconUrl: `${googleFaviconURL}${info.linkUrl}`,
     addedAt: Date.now()
   }
 
@@ -130,7 +127,6 @@ function addPageToList (info, tab) {
   setObj[tab.url] = {
     url: tab.url,
     title: tab.title,
-    favIconUrl: tab.favIconUrl,
     addedAt: Date.now()
   }
 
@@ -201,23 +197,9 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
   // If the tab is loaded, update the badge text
   if (tabId && changeInfo.status === 'complete' && tab.url) {
-    updateBadge(tab.url, tabId, (onList, item) => {
-      const readingItem = onList ? item[tab.url] : null
-      const setObj = {}
+    updateBadge(tab.url, tabId, () => {
       if (tab.active) {
         setReadingItemViewed(tab.url)
-      }
-
-      // If the page is on the reading list, and doesn’t have a favIconUrl
-      // or favIconUrl is using google's favicon look up service…
-      // …add the favIconUrl
-      if (readingItem &&
-        (!readingItem.hasOwnProperty('favIconUrl') ||
-          (readingItem.favIconUrl.indexOf(googleFaviconURL) !== -1)) &&
-        tab.favIconUrl) {
-        setObj[tab.url] = readingItem
-        setObj[tab.url].favIconUrl = tab.favIconUrl
-        chrome.storage.sync.set(setObj)
       }
     })
   }
