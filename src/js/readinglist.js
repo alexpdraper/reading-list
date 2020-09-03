@@ -739,13 +739,13 @@ function loadSVG (url, element) {
 }
 
 export default {
-  addReadingItem,
-  changeView,
   createReadingItemEl,
-  filterReadingList,
-  onReadingItemClick,
-  removeReadingItem,
   renderReadingList,
-  sortItems,
-  updateIndex
+  addReadingItem,
+  removeReadingItem,
+  onReadingItemClick,
+  filterReadingList,
+  changeView,
+  updateIndex,
+  sortItems
 }
