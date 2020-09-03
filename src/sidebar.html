@@ -20,8 +20,13 @@
     </div>
 
     <div class="filter">
-      <button class="button" id="all"><span>all</span> <span class="count" id="all-count"></span></button>
-      <button class="button" id="unread"><span>unread</span> <span class="count" id="unread-count"></span></button>
+      <button class="button" id="all"><span data-localize="allButton">all</span> <span class="count" id="all-count"></span></button>
+      <button class="button" id="unread"><span data-localize="unreadButton">unread</span> <span class="count" id="unread-count"></span></button>
+    </div>
+
+    <div class="sort">
+      <button class="button" id="date"><span data-localize="dateButton">date</span> <em class="arrow down" id="date-order"></em></button>
+      <button class="button" id="name"><span data-localize="nameButton">name</span> <em id="name-order"></em></button>
     </div>
 
     <div class="reading-list" id="reading-list"></div>

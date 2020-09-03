@@ -163,6 +163,10 @@ function updateIndex (readingListEl) {
   chrome.storage.sync.set({'index': index})
 }
 
+/**
+ * Sets the counts on the all and unread buttons
+ * @param {arraay} pageList - list of reading items
+ */
 function setCount (pageList) {
   document.getElementById('all-count').textContent = `${pageList.length}`
   document.getElementById('unread-count').textContent = `${pageList.filter(page => !page.viewed).length}`
@@ -484,7 +488,7 @@ function changeView () {
   this.classList.add('active')
   const viewAll = this.id === 'all'
   // Updates the view setting in setting menu
-  updateOptions(viewAll)
+  updateViewAll(viewAll)
   // Update the button on display
   if (viewAll) {
     document.getElementById('unread').classList.remove('active')
@@ -495,14 +499,71 @@ function changeView () {
   }
 }
 
+/**
+ * Toggles the buttons, and updates the options for which reading list to view.
+ */
+function sortItems () {
+  const childClassSortOrder = this.lastElementChild.classList
+  let sortOrder
+  let sortOption = this.id
+  if (this.classList.contains('active')) {
+    if (childClassSortOrder.contains('down')) {
+      childClassSortOrder.remove('down')
+      childClassSortOrder.add('up')
+      sortOrder = 'up'
+    } else {
+      this.classList.remove('active')
+      this.lastElementChild.className = ''
+      sortOrder = null
+      sortOption = null
+    }
+  } else {
+    this.classList.add('active')
+    childClassSortOrder.add('arrow', 'down')
+    changeOppositeButton(sortOption)
+    sortOrder = 'down'
+  }
+
+  // Updates the view setting in setting menu
+  updateSort(sortOption, sortOrder)
+}
+
+/**
+ *  Saves sort option to chrome.storage
+ * @param {string} sortOption The sort function
+ * @param {string} sortOrder The sort function
+ */
+function updateSort (sortOption, sortOrder) {
+  chrome.storage.sync.get(defaultSettings, items => {
+    items.settings.sortOption = sortOption
+    items.settings.sortOrder = sortOrder
+    chrome.storage.sync.set({
+      settings: items.settings
+    })
+  })
+}
+
+function changeOppositeButton (elementId) {
+  let oppositeButton
+  if (elementId === 'date') {
+    oppositeButton = document.getElementById('name')
+  } else {
+    oppositeButton = document.getElementById('date')
+  }
+  oppositeButton.classList.remove('active')
+  oppositeButton.lastElementChild.classList.remove(...oppositeButton.lastElementChild.classList)
+}
+
 const isFirefox = typeof InstallTrigger !== 'undefined'
 const defaultSettings = {
   settings: {
-    theme: 'light',
     addContextMenu: true,
     addPageAction: true,
     animateItems: !isFirefox,
     openNewTab: false,
+    sortOption: '',
+    sortOrder: '',
+    theme: 'light',
     viewAll: true
   }
 }
@@ -511,7 +572,7 @@ const defaultSettings = {
  *  Saves viewAll option to chrome.storage
  * @param {boolean} viewAll The boolean value to set if all items have been viewed
  */
-function updateOptions (viewAll) {
+function updateViewAll (viewAll) {
   chrome.storage.sync.get(defaultSettings, items => {
     items.settings.viewAll = viewAll
     chrome.storage.sync.set({
@@ -647,14 +708,13 @@ function loadSVG (url, element) {
 }
 
 export default {
-  createReadingItemEl,
-  getReadingList,
-  renderReadingList,
   addReadingItem,
-  removeReadingItem,
-  openLink,
-  onReadingItemClick,
-  filterReadingList,
   changeView,
+  createReadingItemEl,
+  filterReadingList,
+  onReadingItemClick,
+  removeReadingItem,
+  renderReadingList,
+  sortItems,
   updateIndex
 }

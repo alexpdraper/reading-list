@@ -2,7 +2,6 @@
 
 import list from './readinglist'
 import nativesortable from 'nativesortable'
-
 import '../style/popup.styl'
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -25,11 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const isFirefox = typeof InstallTrigger !== 'undefined'
   const defaultSettings = {
     settings: {
-      theme: 'light',
       addContextMenu: true,
       addPageAction: true,
       animateItems: !isFirefox,
       openNewTab: false,
+      sortOption: '',
+      sortOrder: '',
+      theme: 'light',
       viewAll: true
     }
   }
@@ -40,6 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Sets the all/unread button
     document.getElementById(settings.viewAll ? 'all' : 'unread').classList.add('active')
+    // Set sort button
+    if (settings.sortOption) {
+      document.getElementById(settings.sortOption).classList.add('active')
+      document.getElementById(settings.sortOption).lastElementChild.classList.add('arrow', settings.sortOrder)
+    }
+
     // Sets the list of items which are shown
     if (settings.viewAll) {
       document.getElementById('reading-list').classList.remove('unread-only')
@@ -135,6 +142,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('all').addEventListener('click', list.changeView)
   document.getElementById('unread').addEventListener('click', list.changeView)
+
+  document.getElementById('date').addEventListener('click', list.sortItems)
+  document.getElementById('name').addEventListener('click', list.sortItems)
 
   chrome.runtime.onMessage.addListener((request) => {
     let currentItem = null
