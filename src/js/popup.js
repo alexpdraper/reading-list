@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // See: https://bugs.chromium.org/p/chromium/issues/detail?id=457887
       window.setTimeout(list.renderReadingList, 150, RL, true, settings.viewAll)
     } else {
-      list.renderReadingList(RL, false, settings.viewAll)
+      list.renderReadingList(RL, false, settings)
     }
 
     nativesortable(RL, {
@@ -179,7 +179,10 @@ document.addEventListener('DOMContentLoaded', () => {
       while (RL.firstChild) {
         RL.removeChild(RL.firstChild)
       }
-      list.renderReadingList(RL, false, false)
+
+      chrome.storage.sync.get(defaultSettings, store => {
+        list.renderReadingList(RL, false, store.settings)
+      })
     }
   })
 })
