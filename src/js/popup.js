@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Wait a bit before rendering the reading list
       // Gives the popup window time to render, preventing weird resizing bugs
       // See: https://bugs.chromium.org/p/chromium/issues/detail?id=457887
-      window.setTimeout(list.renderReadingList, 150, RL, true, settings.viewAll)
+      window.setTimeout(list.renderReadingList, 150, RL, true, settings)
     } else {
       list.renderReadingList(RL, false, settings)
     }

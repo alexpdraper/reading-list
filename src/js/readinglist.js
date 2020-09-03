@@ -185,6 +185,8 @@ function renderReadingList (readingListEl, animateItems, settings) {
     readingListEl.innerHTML = ''
     setCount(pageList)
     const sortedReadingList = sortReadingList(pageList, settings)
+    console.error(settings)
+    console.error(sortedReadingList)
     const numItems = sortedReadingList.length
 
     // Animate up to 10 items
