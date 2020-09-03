@@ -164,8 +164,8 @@ function updateIndex (readingListEl) {
 }
 
 function setCount (pageList) {
-  document.getElementById('all-count').innerHTML = `${pageList.length}`
-  document.getElementById('unread-count').innerHTML = `${pageList.filter(page => !page.viewed).length}`
+  document.getElementById('all-count').textContent = `${pageList.length}`
+  document.getElementById('unread-count').textContent = `${pageList.filter(page => !page.viewed).length}`
 }
 
 /**
