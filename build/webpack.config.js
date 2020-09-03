@@ -60,6 +60,12 @@ const webpackConfig = {
     new webpack.DefinePlugin({
       'process.env': env
     }),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false
+      },
+      sourceMap: true
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '..', 'src', 'popup.html'),
       filename: 'popup.html',
