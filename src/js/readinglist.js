@@ -163,6 +163,11 @@ function updateIndex (readingListEl) {
   chrome.storage.sync.set({'index': index})
 }
 
+function setCount (pageList) {
+  document.getElementById('all-count').innerHTML = `${pageList.length}`
+  document.getElementById('unread-count').innerHTML = `${pageList.filter(page => !page.viewed).length}`
+}
+
 /**
  * Render the reading list
  *
@@ -173,6 +178,7 @@ function updateIndex (readingListEl) {
  */
 function renderReadingList (readingListEl, animateItems, viewAll, callback) {
   getReadingList(pageList => {
+    setCount(pageList)
     const numItems = pageList.length
 
     // Animate up to 10 items
@@ -304,6 +310,9 @@ function addReadingItem (info, readingListEl, callback) {
       if (typeof callback === 'function') {
         callback(info, readingItemEl)
       }
+      getReadingList(pageList => {
+        setCount(pageList)
+      })
     })
   })
 }
@@ -331,6 +340,9 @@ function removeReadingItem (url, element) {
             })
           }
         }
+      })
+      getReadingList(pageList => {
+        setCount(pageList)
       })
     })
 
@@ -439,18 +451,18 @@ function filterReadingList (e) {
     const readingList = document.getElementsByClassName('reading-item')
     // Sort reading list by most recent to least recent
     const fuse = new Fuse(pageList, options)
-    const filtered = fuse.search(this.value)
+    const filterList = fuse.search(this.value)
 
     // Loop through reading list items to see if they match search text
-    for (let i = 0; i < readingList.length; i++) {
+    for (let item of readingList) {
       let display = false
-      for (let j = 0; j < filtered.length; j++) {
-        let url = readingList[i].querySelector('.item-link').getAttribute('href')
-        if (url === filtered[j].url) {
+      for (let filteredItem of filterList) {
+        const url = item.querySelector('.item-link').getAttribute('href')
+        if (url === filteredItem.url) {
           display = true
         }
       }
-      readingList[i].style.display = display || displayAll ? '' : 'none'
+      item.style.display = display || displayAll ? '' : 'none'
     }
   })
 }
@@ -607,7 +619,7 @@ function loadSVG (url, element) {
     if (xhr.readyState === 4 && xhr.status === 200) {
       const svg = xhr.responseXML.getElementsByTagName('svg')[0]
 
-      if (imgClass != null) {
+      if (imgClass) {
         svg.setAttribute('class', imgClass + ' replaced-svg')
       }
 
