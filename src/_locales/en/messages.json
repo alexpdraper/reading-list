@@ -89,8 +89,8 @@
     "description": "Button to sort by date."
   },
   "titleButton": {
-    "message": "name",
-    "description": "Button to sort by name."
+    "message": "title",
+    "description": "Button to sort by title."
   },
   "unreadButton": {
     "message": "unread",
