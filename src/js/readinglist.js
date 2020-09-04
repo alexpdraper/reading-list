@@ -263,9 +263,9 @@ function compareTitle (a, b, order) {
 
 function compareDate (a, b, order) {
   if (order === 'up') {
-    return b.addedAt - a.addedAt
-  } else {
     return a.addedAt - b.addedAt
+  } else {
+    return b.addedAt - a.addedAt
   }
 }
 
