@@ -1,7 +1,6 @@
 /* globals chrome */
 
 import list from './readinglist'
-import nativesortable from 'nativesortable'
 
 import '../style/popup.styl'
 
@@ -55,18 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       list.renderReadingList(RL, false, settings.viewAll)
     }
-
-    nativesortable(RL, {
-      change: function () {
-        list.updateIndex(RL)
-        chrome.runtime.sendMessage({
-          'type': 'orderChanged'
-        })
-      },
-      childClass: 'sortable-child',
-      draggingClass: 'sortable-dragging',
-      overClass: 'sortable-over'
-    })
   })
 
   // Listen for click events in the reading list
@@ -137,11 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('unread').addEventListener('click', list.changeView)
 
   chrome.runtime.onMessage.addListener((request) => {
-    let currentItem = null
-    if (request.hasOwnProperty('url')) {
-      currentItem = document.getElementById(request.url)
-    }
-
+    var currentItem = document.getElementById(request.url)
     if (request.type === 'add') {
       if (currentItem) {
         list.removeReadingItem(null, currentItem.parentNode)
@@ -161,15 +144,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } else if (request.type === 'update') {
       // If updated replace current item with a new one
-      if (currentItem) {
-        RL.insertBefore(list.createReadingItemEl(request.info), currentItem.parentNode)
-        currentItem.parentNode.remove()
-      }
-    } else if (request.type === 'orderChanged' || request.type === 'listUpdated') {
-      while (RL.firstChild) {
-        RL.removeChild(RL.firstChild)
-      }
-      list.renderReadingList(RL, false, false)
+      RL.insertBefore(list.createReadingItemEl(request.info), currentItem.parentNode)
+      currentItem.parentNode.remove()
     }
   })
 })

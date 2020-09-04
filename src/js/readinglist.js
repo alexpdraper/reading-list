@@ -93,13 +93,12 @@ function getReadingList (callback) {
 
   chrome.storage.sync.get(null, pages => {
     const settings = pages.settings
-    let pageList = []
-    let index = []
+    const pageList = []
     delete pages['settings']
 
     // Load reading items ordered by index
     if (pages.hasOwnProperty('index')) {
-      index = pages['index']
+      const index = pages['index']
       delete pages['index']
 
       index.forEach(i => {
@@ -110,20 +109,15 @@ function getReadingList (callback) {
       })
     }
 
-    // Load orphan items ordered by date
-    // Orphans may happen when page is added/removed without an index update
-    // Or if there are problems with the index, this way we don't lose any page
-    var orphans = []
     for (let page in pages) {
       if (pages.hasOwnProperty(page)) {
-        orphans.push(pages[page])
+        pageList.push(pages[page])
       }
     }
-    orphans.sort((a, b) => {
+
+    pageList.sort((a, b) => {
       return b.addedAt - a.addedAt
     })
-
-    pageList.push(...orphans)
 
     // Ask for a review!
     if (pageList.length >= 6 && !settings.askedForReview) {
@@ -139,12 +133,10 @@ function getReadingList (callback) {
         addedAt: Date.now(),
         favIconUrl: '/icons/icon48.png'
       }
-      index.unshift(reviewReadingListItem.url)
       pageList.unshift(reviewReadingListItem)
 
       const setObj = {
-        settings,
-        index
+        settings
       }
       setObj[reviewUrl] = reviewReadingListItem
       chrome.storage.sync.set(setObj)
@@ -152,19 +144,6 @@ function getReadingList (callback) {
 
     callback(pageList)
   })
-}
-
-/**
- * Updates the reading list index
- *
- * @param {Element} readingListEl - reading list DOM element
- */
-function updateIndex (readingListEl) {
-  const index = []
-  readingListEl.querySelectorAll('.item-link').forEach(el => {
-    index.push(el.getAttribute('href'))
-  })
-  chrome.storage.sync.set({'index': index})
 }
 
 function setCount (pageList) {
@@ -297,8 +276,6 @@ function addReadingItem (info, readingListEl, callback) {
 
       // Add it to the top of the reading list
       readingListEl.insertBefore(readingItemEl, readingListEl.firstChild)
-
-      updateIndex(readingListEl)
     }
 
     chrome.runtime.sendMessage({
@@ -371,9 +348,7 @@ function removeReadingItem (url, element) {
     // Listen for the end of an animation
     element.addEventListener('animationend', () => {
       // Remove the item from the DOM when the animation is finished
-      const readingListEl = element.parentNode
       element.remove()
-      updateIndex(readingListEl)
     })
 
     // Add the class to start the animation
@@ -659,6 +634,5 @@ export default {
   openLink,
   onReadingItemClick,
   filterReadingList,
-  changeView,
-  updateIndex
+  changeView
 }
