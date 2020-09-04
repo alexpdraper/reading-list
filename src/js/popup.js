@@ -1,7 +1,6 @@
 /* globals chrome */
 
 import list from './readinglist'
-
 import '../style/popup.styl'
 
 document.addEventListener('DOMContentLoaded', () => {
