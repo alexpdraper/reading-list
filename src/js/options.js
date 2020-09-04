@@ -15,8 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
       addPageAction: true,
       animateItems: !isFirefox,
       openNewTab: false,
-      sortOption: '',
-      sortOrder: '',
+      sortOption: 'date',
+      sortOrder: 'down',
       theme: 'light',
       viewAll: true
     }

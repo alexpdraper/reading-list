@@ -535,7 +535,7 @@ function changeView () {
  */
 function sortItems () {
   const childClassSortOrder = this.lastElementChild.classList
-  let sortOrder
+  let sortOrder = 'down'
   let sortOption = this.id
   if (this.classList.contains('active')) {
     if (childClassSortOrder.contains('down')) {
@@ -543,16 +543,13 @@ function sortItems () {
       childClassSortOrder.add('up')
       sortOrder = 'up'
     } else {
-      this.classList.remove('active')
-      this.lastElementChild.className = ''
-      sortOrder = null
-      sortOption = null
+      childClassSortOrder.remove('up')
+      childClassSortOrder.add('down')
     }
   } else {
     this.classList.add('active')
     childClassSortOrder.add('arrow', 'down')
     changeOppositeButton(sortOption)
-    sortOrder = 'down'
   }
 
   // Updates the view setting in setting menu
@@ -594,8 +591,8 @@ const defaultSettings = {
     addPageAction: true,
     animateItems: !isFirefox,
     openNewTab: false,
-    sortOption: '',
-    sortOrder: '',
+    sortOption: 'date',
+    sortOrder: 'down',
     theme: 'light',
     viewAll: true
   }
