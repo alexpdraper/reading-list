@@ -42,10 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sets the all/unread button
     document.getElementById(settings.viewAll ? 'all' : 'unread').classList.add('active')
     // Set sort button
-    if (settings.sortOption) {
-      document.getElementById(settings.sortOption).classList.add('active')
-      document.getElementById(settings.sortOption).lastElementChild.classList.add('arrow', settings.sortOrder)
-    }
+    document.getElementById(settings.sortOption).classList.add('active')
+    document.getElementById(settings.sortOption).lastElementChild.classList.add('arrow', settings.sortOrder)
 
     // Sets the list of items which are shown
     if (settings.viewAll) {
