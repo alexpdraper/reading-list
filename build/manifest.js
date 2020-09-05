@@ -1,13 +1,15 @@
 const base = require('../src/manifest/base.json')
 const chromeOptions = require('../src/manifest/chrome.json')
 const firefoxOptions = require('../src/manifest/firefox.json')
+const edgeOptions = require('../src/manifest/edge.json')
 const fs = require('fs')
 const path = require('path')
 const _ = require('lodash')
 
 const manifestOptions = {
   chrome: chromeOptions,
-  firefox: firefoxOptions
+  firefox: firefoxOptions,
+  edge: edgeOptions
 }
 
 module.exports = function (browser, callback) {
