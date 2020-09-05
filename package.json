@@ -16,7 +16,8 @@
   "homepage": "https://github.com/alexpdraper/reading-list#readme",
   "browserslist": [
     "Chrome >= 20",
-    "Firefox >= 53"
+    "Edge >= 40",
+    "Firefox >= 57"
   ],
   "devDependencies": {
     "autoprefixer": "^7.1.6",
