@@ -20,7 +20,7 @@ import Fuse from 'fuse.js'
 function createReadingItemEl (info) {
   const url = info.url
   const title = info.title
-  const favIconUrl = `https://icons.duckduckgo.com/ip2/${new URL(info.url).hostname}.ico`
+  const favIconUrl = info.favIconUrl ? info.favIconUrl : `https://icons.duckduckgo.com/ip2/${new URL(info.url).hostname}.ico`
   const item = document.createElement('div')
   item.className = 'reading-item'
 
@@ -93,38 +93,21 @@ function getReadingList (callback) {
 
   chrome.storage.sync.get(null, pages => {
     const settings = pages.settings
-    let pageList = []
-    let index = []
     delete pages['settings']
+    delete pages['index']
+    let pageList = []
 
-    // Load reading items ordered by index
-    if (pages.hasOwnProperty('index')) {
-      index = pages['index']
-      delete pages['index']
-
-      index.forEach(i => {
-        if (pages.hasOwnProperty(i)) {
-          pageList.push(pages[i])
-          delete pages[i]
-        }
-      })
-    }
-
-    // Load orphan items ordered by date
-    // Orphans may happen when page is added/removed without an index update
-    // Or if there are problems with the index, this way we don't lose any page
-    var orphans = []
     for (let page in pages) {
       if (pages.hasOwnProperty(page)) {
-        orphans.push(pages[page])
+        pageList.push(pages[page])
       }
     }
-    orphans.sort((a, b) => {
-      return b.addedAt - a.addedAt
+    pageList.sort((a, b) => {
+      if (b.index === a.index) {
+        return b.addedAt - a.addedAt
+      }
+      return a.index - b.index
     })
-
-    pageList.push(...orphans)
-
     // Ask for a review!
     if (pageList.length >= 6 && !settings.askedForReview) {
       settings.askedForReview = true
@@ -137,19 +120,17 @@ function getReadingList (callback) {
         url: reviewUrl,
         shiny: true,
         addedAt: Date.now(),
+        index: 0,
         favIconUrl: '/icons/icon48.png'
       }
-      index.unshift(reviewReadingListItem.url)
       pageList.unshift(reviewReadingListItem)
 
       const setObj = {
-        settings,
-        index
+        settings
       }
       setObj[reviewUrl] = reviewReadingListItem
       chrome.storage.sync.set(setObj)
     }
-
     callback(pageList)
   })
 }
@@ -160,11 +141,16 @@ function getReadingList (callback) {
  * @param {Element} readingListEl - reading list DOM element
  */
 function updateIndex (readingListEl) {
-  const index = []
-  readingListEl.querySelectorAll('.item-link').forEach(el => {
-    index.push(el.getAttribute('href'))
+  chrome.storage.sync.get(null, pages => {
+    readingListEl.querySelectorAll('.item-link').forEach((el, i) => {
+      pages[el.getAttribute('href')].index = i + 1
+    })
+    if (pages['index']) {
+      delete pages['index']
+      chrome.storage.sync.remove('index')
+    }
+    chrome.storage.sync.set(pages)
   })
-  chrome.storage.sync.set({'index': index})
 }
 
 /**
@@ -590,13 +576,13 @@ function changeOppositeButton (elementId) {
 const isFirefox = typeof InstallTrigger !== 'undefined'
 const defaultSettings = {
   settings: {
+    theme: 'light',
     addContextMenu: true,
     addPageAction: true,
     animateItems: !isFirefox,
     openNewTab: false,
     sortOption: '',
     sortOrder: '',
-    theme: 'light',
     viewAll: true
   }
 }
@@ -742,9 +728,11 @@ function loadSVG (url, element) {
 
 export default {
   createReadingItemEl,
+  getReadingList,
   renderReadingList,
   addReadingItem,
   removeReadingItem,
+  openLink,
   onReadingItemClick,
   filterReadingList,
   changeView,

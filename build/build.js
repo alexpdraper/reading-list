@@ -6,9 +6,9 @@ const targetBrowser = process.argv.length >= 3
 
 const chalk = require('chalk')
 
-if (!['chrome', 'firefox'].includes(targetBrowser)) {
+if (!['chrome', 'firefox', 'edge'].includes(targetBrowser)) {
   return console.log(chalk.red(
-    'Specify “chrome” or “firefox” as the target browser'))
+    'Specify “chrome”, “firefox” or “edge”  as the target browser'))
 }
 
 const ora = require('ora')
@@ -21,11 +21,11 @@ const manifestBuilder = require('./manifest')
 const spinner = ora('building for production…')
 spinner.start()
 
-rm(path.resolve(__dirname, '..', 'dist'), err => {
-  if (err) throw err
-  webpack(webpackConfig, (err, stats) => {
+rm(path.resolve(__dirname, '..', 'dist'), err1 => {
+  if (err1) throw err1
+  webpack(webpackConfig, (err2, stats) => {
     spinner.stop()
-    if (err) throw err
+    if (err1) throw err2
     process.stdout.write(stats.toString({
       colors: true,
       modules: false,
@@ -35,8 +35,8 @@ rm(path.resolve(__dirname, '..', 'dist'), err => {
     }) + '\n\n')
 
     // Build the manifest
-    manifestBuilder(targetBrowser, err => {
-      if (err) throw err
+    manifestBuilder(targetBrowser, err3 => {
+      if (err3) throw err3
       console.log(chalk.cyan('  Build complete.\n'))
     })
   })
