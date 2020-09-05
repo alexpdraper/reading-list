@@ -90,6 +90,7 @@ function addLinkToList (info, tab) {
   setObj[info.linkUrl] = {
     url: info.linkUrl,
     title,
+    index: 0,
     addedAt: Date.now()
   }
 
@@ -125,6 +126,7 @@ function addPageToList (info, tab) {
   setObj[tab.url] = {
     url: tab.url,
     title: tab.title,
+    index: 0,
     addedAt: Date.now()
   }
 
