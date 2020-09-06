@@ -237,21 +237,20 @@ function sortReadingList (pageList, settings) {
       }
     })
   }
-}
-
-function compareTitle (a, b, order) {
-  if (order === 'up') {
-    return b.title.localeCompare(a.title, undefined, {numeric: true, sensitivity: 'base'})
-  } else {
-    return a.title.localeCompare(b.title, undefined, {numeric: true, sensitivity: 'base'})
+  function compareTitle (a, b, order) {
+    if (order === 'up') {
+      return b.title.localeCompare(a.title, undefined, {numeric: true, sensitivity: 'base'})
+    } else {
+      return a.title.localeCompare(b.title, undefined, {numeric: true, sensitivity: 'base'})
+    }
   }
-}
 
-function compareDate (a, b, order) {
-  if (order === 'up') {
-    return a.addedAt - b.addedAt
-  } else {
-    return b.addedAt - a.addedAt
+  function compareDate (a, b, order) {
+    if (order === 'up') {
+      return a.addedAt - b.addedAt
+    } else {
+      return b.addedAt - a.addedAt
+    }
   }
 }
 
@@ -508,6 +507,22 @@ function changeFilter () {
 }
 
 /**
+ *  Saves viewAll option to chrome.storage
+ * @param {boolean} viewAll The boolean value to set if all items have been viewed
+ */
+function updateViewAllSetting (viewAll) {
+  chrome.storage.sync.get(defaultSettings, items => {
+    items.settings.viewAll = viewAll
+    chrome.storage.sync.set({
+      settings: items.settings
+    })
+    chrome.runtime.sendMessage({
+      'type': 'orderChanged'
+    })
+  })
+}
+
+/**
  * Updates the filter button
  * @param {boolean} viewAll - true is show all and false is show only unread
  */
@@ -599,22 +614,6 @@ const defaultSettings = {
     sortOrder: '',
     viewAll: true
   }
-}
-
-/**
- *  Saves viewAll option to chrome.storage
- * @param {boolean} viewAll The boolean value to set if all items have been viewed
- */
-function updateViewAllSetting (viewAll) {
-  chrome.storage.sync.get(defaultSettings, items => {
-    items.settings.viewAll = viewAll
-    chrome.storage.sync.set({
-      settings: items.settings
-    })
-    chrome.runtime.sendMessage({
-      'type': 'orderChanged'
-    })
-  })
 }
 
 /**
