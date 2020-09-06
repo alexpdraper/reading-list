@@ -743,17 +743,15 @@ function loadSVG (url, element) {
 }
 
 export default {
-  createReadingItemEl,
-  getReadingList,
-  renderReadingList,
   addReadingItem,
-  removeReadingItem,
-  openLink,
-  onReadingItemClick,
-  filterReadingList,
   changeFilter,
-  updateIndex,
+  createReadingItemEl,
+  filterReadingList,
+  onReadingItemClick,
+  removeReadingItem,
+  renderReadingList,
+  sortItems,
   updateFilterButton,
-  updateSortButton,
-  sortItems
+  updateIndex,
+  updateSortButton
 }

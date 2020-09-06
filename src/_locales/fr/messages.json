@@ -1,54 +1,27 @@
 {
-  "appName": {
-    "message": "Liste de Lecture"
-  },
-  "appDesc": {
-    "message": "Cette extension sauvegarde une liste de liens vers des pages a lire plus ulterieurement."
-  },
-  "search": {
-    "message": "Recherche"
+  "addLink": {
+    "message": "Ajouter le lien à la liste de lecture"
   },
   "addPage": {
     "message": "Ajouter la page à la liste de lecture"
   },
-  "addLink": {
-    "message": "Ajouter le lien à la liste de lecture"
+  "advancedOptions": {
+    "message": "Options avancées"
   },
-  "optionsTitle": {
-    "message": "Options de la liste de lecture"
-  },
-  "theme": {
-    "message": "Thème:"
-  },
-  "light": {
-    "message": "lumière"
-  },
-  "dark": {
-    "message": "foncé"
+  "allButton": {
+    "message": "tout"
   },
   "animation": {
     "message": "Activer l'animation:"
   },
-  "openNewTab": {
-    "message": "Ouvrir un lien dans un nouvel onglet:"
+  "appDesc": {
+    "message": "Cette extension sauvegarde une liste de liens vers des pages a lire plus ulterieurement."
   },
-  "context": {
-    "message": "Afficher dans le menu contextuel:"
-  },
-  "pageActionOption": {
-    "message": "Afficher dans la barre d'adresse:"
+  "appName": {
+    "message": "Liste de Lecture"
   },
   "backup": {
     "message": "Sauvegarder:"
-  },
-  "export": {
-    "message": "Exportation"
-  },
-  "import": {
-    "message": "Importer"
-  },
-  "advancedOptions": {
-    "message": "Options avancées"
   },
   "clearData": {
     "message": "Effacer Liste de Lecture"
@@ -56,17 +29,44 @@
   "confirmMsg": {
     "message": "Vous êtes sur le point de supprimer tout le contenu de la liste de lecture. Êtes-vous sûr?"
   },
-  "goBack": {
-    "message": "Retourner"
+  "context": {
+    "message": "Afficher dans le menu contextuel:"
+  },
+  "dark": {
+    "message": "foncé"
+  },
+  "dateButton": {
+    "message": "date"
   },
   "deleteAll": {
     "message": "Supprimer tout!"
   },
-  "allButton": {
-    "message": "tout"
+  "export": {
+    "message": "Exportation"
   },
-  "dateButton": {
-    "message": "date"
+  "goBack": {
+    "message": "Retourner"
+  },
+  "import": {
+    "message": "Importer"
+  },
+  "light": {
+    "message": "lumière"
+  },
+  "openNewTab": {
+    "message": "Ouvrir un lien dans un nouvel onglet:"
+  },
+  "optionsTitle": {
+    "message": "Options de la liste de lecture"
+  },
+  "pageActionOption": {
+    "message": "Afficher dans la barre d'adresse:"
+  },
+  "search": {
+    "message": "Recherche"
+  },
+  "theme": {
+    "message": "Thème:"
   },
   "titleButton": {
     "message": "titre"

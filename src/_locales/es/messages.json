@@ -1,54 +1,27 @@
 {
-  "appName": {
-    "message": "Leyendo Lista"
-  },
-  "appDesc": {
-    "message": "Esta extensión de internet guarda una lista de enlaces de páginas para leer más tarde."
-  },
-  "search": {
-    "message": "Buscar"
+  "addLink": {
+    "message": "Agregar enlace a la Leyendo Lista"
   },
   "addPage": {
     "message": "Agregar página a la Leyendo Lista"
   },
-  "addLink": {
-    "message": "Agregar enlace a la Leyendo Lista"
+  "advancedOptions": {
+    "message": "Opciones avanzadas"
   },
-  "optionsTitle": {
-    "message": "Opciones para la Leyendo Lista"
-  },
-  "theme": {
-    "message": "Tema:"
-  },
-  "light": {
-    "message": "luz"
-  },
-  "dark": {
-    "message": "oscuro"
+  "allButton": {
+    "message": "todo"
   },
   "animation": {
     "message": "Permitir animación:"
   },
-  "openNewTab": {
-    "message": "Abrir enlace en una nueva pestaña:"
+  "appDesc": {
+    "message": "Esta extensión de internet guarda una lista de enlaces de páginas para leer más tarde."
   },
-  "context": {
-    "message": "Mostrar en el menú contextual:"
-  },
-  "pageActionOption": {
-    "message": "Mostrar en la barra de direcciones:"
+  "appName": {
+    "message": "Leyendo Lista"
   },
   "backup": {
     "message": "Copia de seguridad:"
-  },
-  "export": {
-    "message": "Exportar"
-  },
-  "import": {
-    "message": "Importar"
-  },
-  "advancedOptions": {
-    "message": "Opciones avanzadas"
   },
   "clearData": {
     "message": "Borrar Leyendo Lista"
@@ -56,17 +29,44 @@
   "confirmMsg": {
     "message": "Estás a punto de eliminar todo el contenido de la Lista de lectura. ¿Estás seguro?"
   },
-  "goBack": {
-    "message": "Regresar"
+  "context": {
+    "message": "Mostrar en el menú contextual:"
+  },
+  "dark": {
+    "message": "oscuro"
+  },
+  "dateButton": {
+    "message": "fecha"
   },
   "deleteAll": {
     "message": "Eliminar todo!"
   },
-  "allButton": {
-    "message": "todo"
+  "export": {
+    "message": "Exportar"
   },
-  "dateButton": {
-    "message": "fecha"
+  "goBack": {
+    "message": "Regresar"
+  },
+  "import": {
+    "message": "Importar"
+  },
+  "light": {
+    "message": "luz"
+  },
+  "openNewTab": {
+    "message": "Abrir enlace en una nueva pestaña:"
+  },
+  "optionsTitle": {
+    "message": "Opciones para la Leyendo Lista"
+  },
+  "pageActionOption": {
+    "message": "Mostrar en la barra de direcciones:"
+  },
+  "search": {
+    "message": "Buscar"
+  },
+  "theme": {
+    "message": "Tema:"
   },
   "titleButton": {
     "message": "título"

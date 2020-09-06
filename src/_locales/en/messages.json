@@ -1,68 +1,35 @@
 {
-  "appName": {
-    "message": "Reading List",
-    "description": "The title of the application, displayed in the web store and in the popup’s heading."
-  },
-  "appDesc": {
-    "message": "This extension saves a list of links to pages to read later.",
-    "description": "The description of the application, displayed in the web store."
-  },
-  "search": {
-    "message": "Search",
-    "description": "The label for the search box."
+  "addLink": {
+    "message": "Add link to Reading List",
+    "description": "The link message in the context menu."
   },
   "addPage": {
     "message": "Add page to Reading List",
     "description": "The message in the context menu."
   },
-  "addLink": {
-    "message": "Add link to Reading List",
-    "description": "The link message in the context menu."
+  "advancedOptions": {
+    "message": "Advanced options",
+    "description": "The label for the advanced options dropdown"
   },
-  "optionsTitle": {
-    "message": "Reading List Options",
-    "description": "The title of the application's options menu."
-  },
-  "theme": {
-    "message": "Theme:",
-    "description": "The label for the theme option."
-  },
-  "light": {
-    "message": "Light",
-    "description": "The name for the light theme."
-  },
-  "dark": {
-    "message": "Dark",
-    "description": "The name for the dark theme."
+  "allButton": {
+    "message": "all",
+    "description": "Button to show all reading items"
   },
   "animation": {
     "message": "Enable animation:",
     "description": "The label for the animation option."
   },
-  "openNewTab": {
-    "message": "Open link in new tab:",
-    "description": "Label for the option to open a new tab when a link is clicked"
+  "appDesc": {
+    "message": "This extension saves a list of links to pages to read later.",
+    "description": "The description of the application, displayed in the web store."
   },
-  "context": {
-    "message": "Show in context menu:",
-    "description": "The label for the context option."
-  },
-  "pageActionOption": {
-    "message": "Show in address bar:",
-    "description": "The label for the address bar option."
+  "appName": {
+    "message": "Reading List",
+    "description": "The title of the application, displayed in the web store and in the popup’s heading."
   },
   "backup": {
-    "message": "Backup:"
-  },
-  "export": {
-    "message": "Export"
-  },
-  "import": {
-    "message": "Import"
-  },
-  "advancedOptions": {
-    "message": "Advanced options",
-    "description": "The label for the advanced options dropdown"
+    "message": "Backup:",
+    "description": "Label for import and export button."
   },
   "clearData": {
     "message": "Clear Reading List",
@@ -72,21 +39,57 @@
     "message": "You are about to delete everything in the reading list. Are you sure?",
     "description": "Message to ensure user knows they are deleting all app data"
   },
-  "goBack": {
-    "message": "Go back",
-    "description": "Cancel message on clearning data"
+  "context": {
+    "message": "Show in context menu:",
+    "description": "The label for the context option."
+  },
+  "dark": {
+    "message": "Dark",
+    "description": "The name for the dark theme."
+  },
+  "dateButton": {
+    "message": "date",
+    "description": "Button to sort by date."
   },
   "deleteAll": {
     "message": "Delete everything!",
     "description": "Confirm message on clearing data"
   },
-  "allButton": {
-    "message": "all",
-    "description": "Button to show all reading items"
+  "export": {
+    "message": "Export",
+    "description": "Button to Export reading list."
   },
-  "dateButton": {
-    "message": "date",
-    "description": "Button to sort by date."
+  "goBack": {
+    "message": "Go back",
+    "description": "Cancel message on clearning data"
+  },
+  "import": {
+    "message": "Import",
+    "description": "Button to Import reading list."
+  },
+  "light": {
+    "message": "Light",
+    "description": "The name for the light theme."
+  },
+  "openNewTab": {
+    "message": "Open link in new tab:",
+    "description": "Label for the option to open a new tab when a link is clicked"
+  },
+  "optionsTitle": {
+    "message": "Reading List Options",
+    "description": "The title of the application's options menu."
+  },
+  "pageActionOption": {
+    "message": "Show in address bar:",
+    "description": "The label for the address bar option."
+  },
+  "search": {
+    "message": "Search",
+    "description": "The label for the search box."
+  },
+  "theme": {
+    "message": "Theme:",
+    "description": "The label for the theme option."
   },
   "titleButton": {
     "message": "title",
