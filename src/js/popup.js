@@ -140,8 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   })
 
-  document.getElementById('all').addEventListener('click', list.changeView)
-  document.getElementById('unread').addEventListener('click', list.changeView)
+  document.getElementById('all').addEventListener('click', list.changeFilter)
+  document.getElementById('unread').addEventListener('click', list.changeFilter)
 
   document.getElementById('date').addEventListener('click', list.sortItems)
   document.getElementById('title').addEventListener('click', list.sortItems)

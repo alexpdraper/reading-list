@@ -501,9 +501,9 @@ function filterReadingList (e) {
 /**
  * Toggles the buttons, and updates the options for which reading list to view.
  */
-function changeView () {
+function changeFilter () {
   const viewAll = this.id === 'all'
-  updateViewAll(viewAll)
+  updateViewAllSetting(viewAll)
   updateFilterButton(viewAll)
 }
 
@@ -544,7 +544,7 @@ function sortItems () {
   } else {
     sortOrder = 'down'
   }
-  updateSort(sortOption, sortOrder)
+  updateSortSetting(sortOption, sortOrder)
   updateSortButton(sortOption, sortOrder)
 }
 
@@ -572,7 +572,7 @@ function updateSortButton (sortOption, sortOrder) {
  * @param {string} sortOption The sort function
  * @param {string} sortOrder The sort function
  */
-function updateSort (sortOption, sortOrder) {
+function updateSortSetting (sortOption, sortOrder) {
   const readingList = document.getElementById('reading-list')
   chrome.storage.sync.get(defaultSettings, store => {
     store.settings.sortOption = sortOption
@@ -605,7 +605,7 @@ const defaultSettings = {
  *  Saves viewAll option to chrome.storage
  * @param {boolean} viewAll The boolean value to set if all items have been viewed
  */
-function updateViewAll (viewAll) {
+function updateViewAllSetting (viewAll) {
   chrome.storage.sync.get(defaultSettings, items => {
     items.settings.viewAll = viewAll
     chrome.storage.sync.set({
@@ -752,7 +752,7 @@ export default {
   openLink,
   onReadingItemClick,
   filterReadingList,
-  changeView,
+  changeFilter,
   updateIndex,
   updateFilterButton,
   updateSortButton,
