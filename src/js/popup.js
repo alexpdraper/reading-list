@@ -181,6 +181,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       chrome.storage.sync.get(defaultSettings, store => {
+        list.updateFilterButton(store.settings.viewAll)
+        list.updateSortButton(store.settings.sortOption, store.settings.sortOrder)
         list.renderReadingList(RL, false, store.settings)
       })
     }

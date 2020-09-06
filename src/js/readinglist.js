@@ -502,16 +502,27 @@ function filterReadingList (e) {
  * Toggles the buttons, and updates the options for which reading list to view.
  */
 function changeView () {
-  this.classList.add('active')
   const viewAll = this.id === 'all'
-  // Updates the view setting in setting menu
   updateViewAll(viewAll)
+  updateFilterButton(viewAll)
+}
+
+/**
+ * Updates the filter button
+ * @param {boolean} viewAll - true is show all and false is show only unread
+ */
+function updateFilterButton (viewAll) {
+  // Clear existing filter
+  const filterButtons = document.querySelectorAll('div.filter button')
+  for (let button of filterButtons) {
+    button.classList.remove('active')
+  }
   // Update the button on display
   if (viewAll) {
-    document.getElementById('unread').classList.remove('active')
+    document.getElementById('all').classList.add('active')
     document.getElementById('reading-list').classList.remove('unread-only')
   } else {
-    document.getElementById('all').classList.remove('active')
+    document.getElementById('unread').classList.add('active')
     document.getElementById('reading-list').classList.add('unread-only')
   }
 }
@@ -525,24 +536,37 @@ function sortItems () {
   let sortOption = this.id
   if (this.classList.contains('active')) {
     if (childClassSortOrder.contains('down')) {
-      childClassSortOrder.remove('down')
-      childClassSortOrder.add('up')
       sortOrder = 'up'
     } else {
-      this.classList.remove('active')
-      this.lastElementChild.className = ''
       sortOrder = null
       sortOption = null
     }
   } else {
-    this.classList.add('active')
-    childClassSortOrder.add('arrow', 'down')
-    changeOppositeButton(sortOption)
     sortOrder = 'down'
   }
 
   // Updates the view setting in setting menu
   updateSort(sortOption, sortOrder)
+  updateSortButton(sortOption, sortOrder)
+}
+
+/**
+ * Updates the sort buttons
+ * @param {string} sortOption - the option date or title
+ * @param {string} sortOrder - the order up or down
+ */
+function updateSortButton (sortOption, sortOrder) {
+  // Clear existing sort
+  const sortButtons = document.querySelectorAll('div.sort button')
+  for (let button of sortButtons) {
+    button.classList.remove('active')
+    button.lastElementChild.classList.remove(...button.lastElementChild.classList)
+  }
+  // Update sort buttons
+  if (sortOption) {
+    document.getElementById(sortOption).classList.add('active')
+    document.getElementById(sortOption).lastElementChild.classList.add('arrow', sortOrder)
+  }
 }
 
 /**
@@ -558,19 +582,11 @@ function updateSort (sortOption, sortOrder) {
     chrome.storage.sync.set({
       settings: store.settings
     })
+    chrome.runtime.sendMessage({
+      'type': 'orderChanged'
+    })
     renderReadingList(readingList, false, store.settings)
   })
-}
-
-function changeOppositeButton (elementId) {
-  let oppositeButton
-  if (elementId === 'date') {
-    oppositeButton = document.getElementById('title')
-  } else {
-    oppositeButton = document.getElementById('date')
-  }
-  oppositeButton.classList.remove('active')
-  oppositeButton.lastElementChild.classList.remove(...oppositeButton.lastElementChild.classList)
 }
 
 const isFirefox = typeof InstallTrigger !== 'undefined'
@@ -596,6 +612,9 @@ function updateViewAll (viewAll) {
     items.settings.viewAll = viewAll
     chrome.storage.sync.set({
       settings: items.settings
+    })
+    chrome.runtime.sendMessage({
+      'type': 'orderChanged'
     })
   })
 }
@@ -737,5 +756,7 @@ export default {
   filterReadingList,
   changeView,
   updateIndex,
+  updateFilterButton,
+  updateSortButton,
   sortItems
 }
