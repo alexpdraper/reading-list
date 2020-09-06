@@ -11,11 +11,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const isFirefox = typeof InstallTrigger !== 'undefined'
   const defaultSettings = {
     settings: {
-      theme: 'light',
       addContextMenu: true,
       addPageAction: true,
       animateItems: !isFirefox,
       openNewTab: false,
+      sortOption: '',
+      sortOrder: '',
+      theme: 'light',
       viewAll: true
     }
   }

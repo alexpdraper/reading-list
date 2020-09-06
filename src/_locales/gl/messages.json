@@ -78,5 +78,17 @@
   "deleteAll": {
     "message": "Quita todo!",
     "description": "Confirm message on clearing data"
+  },
+  "allButton": {
+    "message": "todo"
+  },
+  "dateButton": {
+    "message": "data"
+  },
+  "titleButton": {
+    "message": "título"
+  },
+  "unreadButton": {
+    "message": "sen ler"
   }
 }

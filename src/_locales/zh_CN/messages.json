@@ -65,5 +65,17 @@
   },
   "deleteAll": {
     "message": "删除所有!"
+  },
+  "allButton": {
+    "message": "所有"
+  },
+  "dateButton": {
+    "message": "日期"
+  },
+  "titleButton": {
+    "message": "标题"
+  },
+  "unreadButton": {
+    "message": "未读"
   }
 }

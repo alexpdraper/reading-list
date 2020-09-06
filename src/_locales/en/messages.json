@@ -79,5 +79,21 @@
   "deleteAll": {
     "message": "Delete everything!",
     "description": "Confirm message on clearing data"
+  },
+  "allButton": {
+    "message": "all",
+    "description": "Button to show all reading items"
+  },
+  "dateButton": {
+    "message": "date",
+    "description": "Button to sort by date."
+  },
+  "titleButton": {
+    "message": "title",
+    "description": "Button to sort by title."
+  },
+  "unreadButton": {
+    "message": "unread",
+    "description": "Button to show unread reading items."
   }
 }

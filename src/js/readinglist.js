@@ -154,8 +154,8 @@ function updateIndex (readingListEl) {
 }
 
 /**
- *
- * @param {array} pageList - pages
+ * Sets the counts on the all and unread buttons
+ * @param {array} pageList - list of reading items
  */
 function setCount (pageList) {
   document.getElementById('all-count').textContent = `${pageList.length}`
@@ -170,10 +170,12 @@ function setCount (pageList) {
  * @param {boolean} viewAll - view all items or not
  * @param {function()} callback - called when the list is rendered
  */
-function renderReadingList (readingListEl, animateItems, viewAll, callback) {
+function renderReadingList (readingListEl, animateItems, settings) {
   getReadingList(pageList => {
+    readingListEl.innerHTML = ''
     setCount(pageList)
-    const numItems = pageList.length
+    const sortedReadingList = sortReadingList(pageList, settings)
+    const numItems = sortedReadingList.length
 
     // Animate up to 10 items
     const animateCount = animateItems ? 10 : 0
@@ -193,22 +195,17 @@ function renderReadingList (readingListEl, animateItems, viewAll, callback) {
       if (itemsAnimated >= itemsToAnimate) {
         // Render any remaining items
         for (let i = counter; i < numItems; i++) {
-          readingListEl.appendChild(createReadingItemEl(pageList[i]))
+          readingListEl.appendChild(createReadingItemEl(sortedReadingList[i]))
         }
-
-        if (typeof callback === 'function') {
-          callback()
-        }
-
         return
       }
 
       // Wait a bit, then make a reading item
       window.setTimeout(() => {
-        const readingItemEl = createReadingItemEl(pageList[counter])
+        const readingItemEl = createReadingItemEl(sortedReadingList[counter])
 
         // Increment the animated counter if item is viewable
-        if (!pageList[counter].viewed || viewAll) {
+        if (!sortedReadingList[counter].viewed || (settings && settings.viewAll)) {
           // Add the “slidein” class for animation
           readingItemEl.classList.add('slidein')
           itemsAnimated++
@@ -226,6 +223,35 @@ function renderReadingList (readingListEl, animateItems, viewAll, callback) {
 
     waitAndCreate(150)
   })
+}
+
+function sortReadingList (pageList, settings) {
+  if (!settings.sortOption) {
+    return pageList
+  } else {
+    return pageList.sort((a, b) => {
+      if (settings.sortOption === 'date') {
+        return compareDate(a, b, settings.sortOrder)
+      } else {
+        return compareTitle(a, b, settings.sortOrder)
+      }
+    })
+  }
+  function compareTitle (a, b, order) {
+    if (order === 'up') {
+      return b.title.localeCompare(a.title, undefined, {numeric: true, sensitivity: 'base'})
+    } else {
+      return a.title.localeCompare(b.title, undefined, {numeric: true, sensitivity: 'base'})
+    }
+  }
+
+  function compareDate (a, b, order) {
+    if (order === 'up') {
+      return a.addedAt - b.addedAt
+    } else {
+      return b.addedAt - a.addedAt
+    }
+  }
 }
 
 /**
@@ -474,19 +500,106 @@ function filterReadingList (e) {
 /**
  * Toggles the buttons, and updates the options for which reading list to view.
  */
-function changeView () {
-  this.classList.add('active')
+function changeFilter () {
   const viewAll = this.id === 'all'
-  // Updates the view setting in setting menu
-  updateOptions(viewAll)
+  updateViewAllSetting(viewAll)
+  updateFilterButton(viewAll)
+}
+
+/**
+ *  Saves viewAll option to chrome.storage
+ * @param {boolean} viewAll The boolean value to set if all items have been viewed
+ */
+function updateViewAllSetting (viewAll) {
+  chrome.storage.sync.get(defaultSettings, items => {
+    items.settings.viewAll = viewAll
+    chrome.storage.sync.set({
+      settings: items.settings
+    })
+    chrome.runtime.sendMessage({
+      'type': 'orderChanged'
+    })
+  })
+}
+
+/**
+ * Updates the filter button
+ * @param {boolean} viewAll - true is show all and false is show only unread
+ */
+function updateFilterButton (viewAll) {
+  // Clear existing filter
+  const filterButtons = document.querySelectorAll('div.filter button')
+  for (let button of filterButtons) {
+    button.classList.remove('active')
+  }
   // Update the button on display
   if (viewAll) {
-    document.getElementById('unread').classList.remove('active')
+    document.getElementById('all').classList.add('active')
     document.getElementById('reading-list').classList.remove('unread-only')
   } else {
-    document.getElementById('all').classList.remove('active')
+    document.getElementById('unread').classList.add('active')
     document.getElementById('reading-list').classList.add('unread-only')
   }
+}
+
+/**
+ * Toggles the buttons, and updates the options for which reading list to view.
+ */
+function sortItems () {
+  const childClassSortOrder = this.lastElementChild.classList
+  let sortOrder
+  let sortOption = this.id
+  if (this.classList.contains('active')) {
+    if (childClassSortOrder.contains('down')) {
+      sortOrder = 'up'
+    } else {
+      sortOrder = null
+      sortOption = null
+    }
+  } else {
+    sortOrder = 'down'
+  }
+  updateSortSetting(sortOption, sortOrder)
+  updateSortButton(sortOption, sortOrder)
+}
+
+/**
+ * Updates the sort buttons
+ * @param {string} sortOption - the option date or title
+ * @param {string} sortOrder - the order up or down
+ */
+function updateSortButton (sortOption, sortOrder) {
+  // Clear existing sort
+  const sortButtons = document.querySelectorAll('div.sort button')
+  for (let button of sortButtons) {
+    button.classList.remove('active')
+    button.lastElementChild.classList.remove(...button.lastElementChild.classList)
+  }
+  // Update sort buttons
+  if (sortOption) {
+    document.getElementById(sortOption).classList.add('active')
+    document.getElementById(sortOption).lastElementChild.classList.add('arrow', sortOrder)
+  }
+}
+
+/**
+ *  Saves sort option to chrome.storage
+ * @param {string} sortOption The sort function
+ * @param {string} sortOrder The sort function
+ */
+function updateSortSetting (sortOption, sortOrder) {
+  const readingList = document.getElementById('reading-list')
+  chrome.storage.sync.get(defaultSettings, store => {
+    store.settings.sortOption = sortOption
+    store.settings.sortOrder = sortOrder
+    chrome.storage.sync.set({
+      settings: store.settings
+    })
+    chrome.runtime.sendMessage({
+      'type': 'orderChanged'
+    })
+    renderReadingList(readingList, false, store.settings)
+  })
 }
 
 const isFirefox = typeof InstallTrigger !== 'undefined'
@@ -497,21 +610,10 @@ const defaultSettings = {
     addPageAction: true,
     animateItems: !isFirefox,
     openNewTab: false,
+    sortOption: '',
+    sortOrder: '',
     viewAll: true
   }
-}
-
-/**
- *  Saves viewAll option to chrome.storage
- * @param {boolean} viewAll The boolean value to set if all items have been viewed
- */
-function updateOptions (viewAll) {
-  chrome.storage.sync.get(defaultSettings, items => {
-    items.settings.viewAll = viewAll
-    chrome.storage.sync.set({
-      settings: items.settings
-    })
-  })
 }
 
 /**
@@ -649,6 +751,9 @@ export default {
   openLink,
   onReadingItemClick,
   filterReadingList,
-  changeView,
-  updateIndex
+  changeFilter,
+  updateIndex,
+  updateFilterButton,
+  updateSortButton,
+  sortItems
 }

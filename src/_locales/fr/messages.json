@@ -37,7 +37,7 @@
   },
   "pageActionOption": {
     "message": "Afficher dans la barre d'adresse:"
-  },    
+  },
   "backup": {
     "message": "Sauvegarder:"
   },
@@ -61,5 +61,17 @@
   },
   "deleteAll": {
     "message": "Supprimer tout!"
+  },
+  "allButton": {
+    "message": "tout"
+  },
+  "dateButton": {
+    "message": "date"
+  },
+  "titleButton": {
+    "message": "titre"
+  },
+  "unreadButton": {
+    "message": "non lu"
   }
 }
