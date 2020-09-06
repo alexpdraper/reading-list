@@ -544,8 +544,6 @@ function sortItems () {
   } else {
     sortOrder = 'down'
   }
-
-  // Updates the view setting in setting menu
   updateSort(sortOption, sortOrder)
   updateSortButton(sortOption, sortOrder)
 }
