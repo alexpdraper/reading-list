@@ -1,51 +1,27 @@
 {
-  "appName": {
-    "message": "Списък за четене"
-  },
-  "appDesc": {
-    "message": "Това разширение запазва списък от връзки към страници за по-късно четене."
-  },
-  "search": {
-    "message": "Търсене"
+  "addLink": {
+    "message": "Добавете тази връзка към вашия „Списък за четене“"
   },
   "addPage": {
     "message": "Добавяне на страницата към „Списък за четене“"
   },
-  "optionsTitle": {
-    "message": "Настройки на „Списък за четене“"
+  "advancedOptions": {
+    "message": "Разширени настройки"
   },
-  "theme": {
-    "message": "Тема:"
-  },
-  "light": {
-    "message": "светла"
-  },
-  "dark": {
-    "message": "тъмна"
+  "allButton": {
+    "message": "всичко"
   },
   "animation": {
     "message": "Включване на анимация:"
   },
-  "openNewTab": {
-    "message": "Отваряне на връзка в нов раздел:"
+  "appDesc": {
+    "message": "Това разширение запазва списък от връзки към страници за по-късно четене."
   },
-  "context": {
-    "message": "Показване в контекстното меню:"
-  },
-  "pageActionOption": {
-    "message": "Показване в адресната лента:"
+  "appName": {
+    "message": "Списък за четене"
   },
   "backup": {
     "message": "Резервно копие:"
-  },
-  "export": {
-    "message": "Изнасяне"
-  },
-  "import": {
-    "message": "Внасяне"
-  },
-  "advancedOptions": {
-    "message": "Разширени настройки"
   },
   "clearData": {
     "message": "Изчистване на „Списък за четене“"
@@ -53,17 +29,44 @@
   "confirmMsg": {
     "message": "На път сте да изтриете всичко от списъка за четене. Сигурни ли сте?"
   },
-  "goBack": {
-    "message": "Връщане назад"
+  "context": {
+    "message": "Показване в контекстното меню:"
+  },
+  "dark": {
+    "message": "тъмна"
+  },
+  "dateButton": {
+    "message": "дата"
   },
   "deleteAll": {
     "message": "Изтриване на всичко!"
   },
-  "allButton": {
-    "message": "всичко"
+  "export": {
+    "message": "Изнасяне"
   },
-  "dateButton": {
-    "message": "дата"
+  "goBack": {
+    "message": "Връщане назад"
+  },
+  "import": {
+    "message": "Внасяне"
+  },
+  "light": {
+    "message": "светла"
+  },
+  "openNewTab": {
+    "message": "Отваряне на връзка в нов раздел:"
+  },
+  "optionsTitle": {
+    "message": "Настройки на „Списък за четене“"
+  },
+  "pageActionOption": {
+    "message": "Показване в адресната лента:"
+  },
+  "search": {
+    "message": "Търсене"
+  },
+  "theme": {
+    "message": "Тема:"
   },
   "titleButton": {
     "message": "заглавие"

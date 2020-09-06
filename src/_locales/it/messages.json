@@ -1,54 +1,27 @@
 {
-  "appName": {
-    "message": "Elenco Lettura"
-  },
-  "appDesc": {
-    "message": "Questa estensione risparmia una lista di pagine web per leggere più tarde."
-  },
-  "search": {
-    "message": "Cerca"
+  "addLink": {
+    "message": "Aggiungere il link all'Elenco Lettura"
   },
   "addPage": {
     "message": "Aggiungere la pagina all'Elenco Lettura"
   },
-  "addLink": {
-    "message": "Aggiungere il link all'Elenco Lettura"
+  "advancedOptions": {
+    "message": "Opzioni avanzate"
   },
-  "optionsTitle": {
-    "message": "Opzioni dell'Elenco Lettura"
-  },
-  "theme": {
-    "message": "Tema:"
-  },
-  "light": {
-    "message": "luce"
-  },
-  "dark": {
-    "message": "scuro"
+  "allButton": {
+    "message": "tutto"
   },
   "animation": {
     "message": "Attivare l'animazione:"
   },
-  "openNewTab": {
-    "message": "Aprire il link in una nuova scheda:"
+  "appDesc": {
+    "message": "Questa estensione risparmia una lista di pagine web per leggere più tarde."
   },
-  "context": {
-    "message": "Mostrare nel menu di contesto:"
-  },
-  "pageActionOption": {
-    "message": "Mostra nella barra degli indirizzi:"
+  "appName": {
+    "message": "Elenco Lettura"
   },
   "backup": {
     "message": "Backup:"
-  },
-  "export": {
-    "message": "Esportare"
-  },
-  "import": {
-    "message": "Importare"
-  },
-  "advancedOptions": {
-    "message": "Opzioni avanzate"
   },
   "clearData": {
     "message": "Ripristinare Elenco Lettura"
@@ -56,17 +29,44 @@
   "confirmMsg": {
     "message": "Stai per eliminare tutti i contenuti della lista di lettura. Sei sicuro?"
   },
-  "goBack": {
-    "message": "Tornare indietro"
+  "context": {
+    "message": "Mostrare nel menu di contesto:"
+  },
+  "dark": {
+    "message": "scuro"
+  },
+  "dateButton": {
+    "message": "data"
   },
   "deleteAll": {
     "message": "Eliminare tutto!"
   },
-  "allButton": {
-    "message": "tutto"
+  "export": {
+    "message": "Esportare"
   },
-  "dateButton": {
-    "message": "data"
+  "goBack": {
+    "message": "Tornare indietro"
+  },
+  "import": {
+    "message": "Importare"
+  },
+  "light": {
+    "message": "luce"
+  },
+  "openNewTab": {
+    "message": "Aprire il link in una nuova scheda:"
+  },
+  "optionsTitle": {
+    "message": "Opzioni dell'Elenco Lettura"
+  },
+  "pageActionOption": {
+    "message": "Mostra nella barra degli indirizzi:"
+  },
+  "search": {
+    "message": "Cerca"
+  },
+  "theme": {
+    "message": "Tema:"
   },
   "titleButton": {
     "message": "titulo"

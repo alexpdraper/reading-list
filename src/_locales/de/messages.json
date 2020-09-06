@@ -1,54 +1,27 @@
 {
-  "appName": {
-    "message": "Leseliste"
-  },
-  "appDesc": {
-    "message": "Diese Erweiterung speichert eine liste von webseiten, die später gelesen werden."
-  },
-  "search": {
-    "message": "Suchbegriff"
+  "addLink": {
+    "message": "Seite zur Leseliste hinzufügen"
   },
   "addPage": {
     "message": "Seite zur Leseliste hinzufügen"
   },
-  "addLink": {
-    "message": "Seite zur Leseliste hinzufügen"
+  "advancedOptions": {
+    "message": "Erweiterte Optionen"
   },
-  "optionsTitle": {
-    "message": "Leselistenoptionen"
-  },
-  "theme": {
-    "message": "Theme:"
-  },
-  "light": {
-    "message": "Licht"
-  },
-  "dark": {
-    "message": "Dunkles"
+  "allButton": {
+    "message": "alles"
   },
   "animation": {
     "message": "Animation anschalten:"
   },
-  "openNewTab": {
-    "message": "Link in neuem Tab öffnen:"
+  "appDesc": {
+    "message": "Diese Erweiterung speichert eine liste von webseiten, die später gelesen werden."
   },
-  "context": {
-    "message": "Im Kontextmenü anzeigen:"
-  },
-  "pageActionOption": {
-    "message": "Im Adressleiste anzeigen:"
+  "appName": {
+    "message": "Leseliste"
   },
   "backup": {
     "message": "Datensicherung:"
-  },
-  "export": {
-    "message": "Export"
-  },
-  "import": {
-    "message": "Import"
-  },
-  "advancedOptions": {
-    "message": "Erweiterte Optionen"
   },
   "clearData": {
     "message": "Leseliste löschen"
@@ -56,17 +29,44 @@
   "confirmMsg": {
     "message": "Sie sind dabei, alles in der Leseliste zu löschen. Bist du sicher?"
   },
-  "goBack": {
-    "message": "Zurückgehen"
+  "context": {
+    "message": "Im Kontextmenü anzeigen:"
+  },
+  "dark": {
+    "message": "Dunkles"
+  },
+  "dateButton": {
+    "message": "Datum"
   },
   "deleteAll": {
     "message": "Alles löschen!"
   },
-  "allButton": {
-    "message": "alles"
+  "export": {
+    "message": "Export"
   },
-  "dateButton": {
-    "message": "Datum"
+  "goBack": {
+    "message": "Zurückgehen"
+  },
+  "import": {
+    "message": "Import"
+  },
+  "light": {
+    "message": "Licht"
+  },
+  "openNewTab": {
+    "message": "Link in neuem Tab öffnen:"
+  },
+  "optionsTitle": {
+    "message": "Leselistenoptionen"
+  },
+  "pageActionOption": {
+    "message": "Im Adressleiste anzeigen:"
+  },
+  "search": {
+    "message": "Suchbegriff"
+  },
+  "theme": {
+    "message": "Theme:"
   },
   "titleButton": {
     "message": "Titel"

@@ -1,58 +1,27 @@
 {
-  "appName": {
-    "message": "阅读列表"
+  "addLink": {
+    "message": "将链接添加到阅读列表"
+  },
+  "addPage": {
+    "message": "增加页面到阅读列表"
+  },
+  "advancedOptions": {
+    "message": "高级选项"
+  },
+  "allButton": {
+    "message": "所有"
+  },
+  "animation": {
+    "message": "支持动画:"
   },
   "appDesc": {
     "message": "这个扩展工具可以帮助收藏很多用于以后阅读的页面。"
   },
-  "search": {
-    "message": "搜索"
-  },
-  "addPage": {
-    "message": "增加页面到阅读列表",
-    "description": "在上下文菜单显示的消息"
-  },
-  "optionsTitle": {
-    "message": "阅读列表选项",
-    "description": "该应用的选项菜单题目"
-  },
-  "theme": {
-    "message": "主题:",
-    "description": "主题选项标签"
-  },
-  "light": {
-    "message": "明亮主题",
-    "description": "明亮主题的名字"
-  },
-  "dark": {
-    "message": "暗黑",
-    "description": "暗黑主题名字"
-  },
-  "animation": {
-    "message": "支持动画:",
-    "description": "动画选项的标签."
-  },
-  "openNewTab": {
-    "message": "在新标签页中打开链接:"
-  },
-  "context": {
-    "message": "展示上下文菜单:",
-    "description": "上下文选项标签"
-  },
-  "pageActionOption": {
-    "message": "在地址栏中显示:"
+  "appName": {
+    "message": "阅读列表"
   },
   "backup": {
     "message": "备份:"
-  },
-  "export": {
-    "message": "导出"
-  },
-  "import": {
-    "message": "导入"
-  },
-  "advancedOptions": {
-    "message": "高级选项"
   },
   "clearData": {
     "message": "清除阅读列表"
@@ -60,17 +29,44 @@
   "confirmMsg": {
     "message": "你准备删除阅读列表中的所有内容，请确认。"
   },
-  "goBack": {
-    "message": "退回"
+  "context": {
+    "message": "展示上下文菜单:"
+  },
+  "dark": {
+    "message": "暗黑"
+  },
+  "dateButton": {
+    "message": "日期"
   },
   "deleteAll": {
     "message": "删除所有!"
   },
-  "allButton": {
-    "message": "所有"
+  "export": {
+    "message": "导出"
   },
-  "dateButton": {
-    "message": "日期"
+  "goBack": {
+    "message": "退回"
+  },
+  "import": {
+    "message": "导入"
+  },
+  "light": {
+    "message": "明亮主题"
+  },
+  "openNewTab": {
+    "message": "在新标签页中打开链接:"
+  },
+  "optionsTitle": {
+    "message": "阅读列表选项"
+  },
+  "pageActionOption": {
+    "message": "在地址栏中显示:"
+  },
+  "search": {
+    "message": "搜索"
+  },
+  "theme": {
+    "message": "主题:"
   },
   "titleButton": {
     "message": "标题"

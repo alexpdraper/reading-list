@@ -1,89 +1,72 @@
 {
-  "appName": {
-    "message": "Reading List",
-    "description": "O título da extensión, mostrado na web store e no cabezallo do emerxente."
-  },
-  "appDesc": {
-    "message": "Esta extensión garda unha lista das ligazóns a páxinas para ler máis tarde.",
-    "description": "A descrición da aplicación, mostrada na web store."
-  },
-  "search": {
-    "message": "Busca",
-    "description": "A etiqueta da caixa de busca."
+  "addLink": {
+    "message": "Engadir unha ligazón a Reading List"
   },
   "addPage": {
-    "message": "Engadir unha páxina a Reading List",
-    "description": "The message in the context menu."
-  },
-  "addLink": {
-    "message": "Engadir unha ligazón a Reading List",
-    "description": "The link message in the context menu."
-  },
-  "optionsTitle": {
-    "message": "Axustes de Reading List",
-    "description": "The title of the application's options menu."
-  },
-  "theme": {
-    "message": "Decorado:",
-    "description": "The label for the theme option."
-  },
-  "light": {
-    "message": "Claro",
-    "description": "The name for the light theme."
-  },
-  "dark": {
-    "message": "Oscuro",
-    "description": "The name for the dark theme."
-  },
-  "animation": {
-    "message": "Habilitar animación:",
-    "description": "The label for the animation option."
-  },
-  "openNewTab": {
-    "message": "Abrir ligazón en nova lapela:",
-    "description": "Label for the option to open a new tab when a link is clicked"
-  },
-  "context": {
-    "message": "Mostrar no menú contextual:",
-    "description": "The label for the context option."
-  },
-  "pageActionOption": {
-    "message": "Amosar na barra de enderezos:"
-  },
-  "backup": {
-    "message": "Respaldo:"
-  },
-  "export": {
-    "message": "Exportar"
-  },
-  "import": {
-    "message": "Importar"
+    "message": "Engadir unha páxina a Reading List"
   },
   "advancedOptions": {
-    "message": "Axustes avanazados",
-    "description": "The label for the advanced options dropdown"
-  },
-  "clearData": {
-    "message": "Limpar Reading List",
-    "description": "The label for the button to clear all the reading list items"
-  },
-  "confirmMsg": {
-    "message": "Vai borrar todo o contido la lista de lectura. Está seguro?",
-    "description": "Message to ensure user knows they are deleting all app data"
-  },
-  "goBack": {
-    "message": "Atrás",
-    "description": "Cancel message on clearning data"
-  },
-  "deleteAll": {
-    "message": "Quita todo!",
-    "description": "Confirm message on clearing data"
+    "message": "Axustes avanazados"
   },
   "allButton": {
     "message": "todo"
   },
+  "animation": {
+    "message": "Habilitar animación:"
+  },
+  "appDesc": {
+    "message": "Esta extensión garda unha lista das ligazóns a páxinas para ler máis tarde."
+  },
+  "appName": {
+    "message": "Reading List"
+  },
+  "backup": {
+    "message": "Respaldo:"
+  },
+  "clearData": {
+    "message": "Limpar Reading List"
+  },
+  "confirmMsg": {
+    "message": "Vai borrar todo o contido la lista de lectura. Está seguro?"
+  },
+  "context": {
+    "message": "Mostrar no menú contextual:"
+  },
+  "dark": {
+    "message": "Oscuro"
+  },
   "dateButton": {
     "message": "data"
+  },
+  "deleteAll": {
+    "message": "Quita todo!"
+  },
+  "export": {
+    "message": "Exportar"
+  },
+  "goBack": {
+    "message": "Atrás"
+  },
+  "import": {
+    "message": "Importar"
+  },
+  "light": {
+    "message": "Claro"
+  },
+  "openNewTab": {
+    "message": "Abrir ligazón en nova lapela:"
+  },
+  "optionsTitle": {
+    "message": "Axustes de Reading List"
+  },
+  "pageActionOption": {
+    "message": "Amosar na barra de enderezos:"
+  },
+  "search": {
+    "message": "Busca"
+  },
+  "theme": {
+    "message": "Decorado:"
   },
   "titleButton": {
     "message": "título"
