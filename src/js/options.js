@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Helper for import function
   function impLoad () {
-    const myImportedData = JSON.parse(this.result)
+    const myImportedData = removeAllFavIcons(JSON.parse(this.result))
     // Un-comment this line if we want to replace the storage
     // chrome.storage.sync.clear()
     // Here the chrome storage is imported, it aggregates the reading list and replaces setting
@@ -141,6 +141,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     })
     importOrig.value = '' // make sure to clear input value after every import
+  }
+
+  // Remove favIcons from importList
+  function removeAllFavIcons (importData) {
+    for (let index in importData) {
+      if (importData[index].favIconUrl) {
+        delete importData[index]['favIconUrl']
+      }
+    }
+    return importData
   }
 
   // Gets json file and imports to the app
