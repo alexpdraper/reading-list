@@ -20,8 +20,7 @@ import Fuse from 'fuse.js'
 function createReadingItemEl (info) {
   const url = info.url
   const title = info.title
-  const urlObject = new URL(info.url)
-  const favIconUrl = `https://icons.duckduckgo.com/ip2/${urlObject.hostname}${urlObject.pathname}.ico`
+  const favIconUrl = `https://icons.duckduckgo.com/ip2/${new URL(info.url).hostname}.ico`
   const item = document.createElement('div')
   item.className = 'reading-item'
 
