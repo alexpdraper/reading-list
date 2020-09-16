@@ -20,9 +20,14 @@ import Fuse from 'fuse.js'
 function createReadingItemEl (info) {
   const url = info.url
   const title = info.title
-  const favIconUrl = info.favIconUrl ? info.favIconUrl : `https://icons.duckduckgo.com/ip2/${new URL(info.url).hostname}.ico`
+  const urlObject = new URL(info.url)
+  const favIconUrl = `https://icons.duckduckgo.com/ip2/${urlObject.hostname}${urlObject.pathname}.ico`
   const item = document.createElement('div')
   item.className = 'reading-item'
+
+  if (info.favIconUrl) {
+    removeAllFavIcons()
+  }
 
   if (info.shiny) {
     item.className += ' shiny'
@@ -78,6 +83,20 @@ function createReadingItemEl (info) {
   item.appendChild(link)
 
   return item
+}
+
+/**
+ * Temporary remove after version 5
+ */
+function removeAllFavIcons () {
+  chrome.storage.sync.get(null, pages => {
+    for (let index in pages) {
+      if (pages[index].favIconUrl) {
+        delete pages[index]['favIconUrl']
+      }
+    }
+    chrome.storage.sync.set(pages)
+  })
 }
 
 /**
@@ -237,6 +256,7 @@ function sortReadingList (pageList, settings) {
       }
     })
   }
+
   function compareTitle (a, b, order) {
     if (order === 'up') {
       return b.title.localeCompare(a.title, undefined, {numeric: true, sensitivity: 'base'})
