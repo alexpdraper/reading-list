@@ -38,7 +38,7 @@ function createReadingItemEl (info) {
   const item = document.createElement('div')
   item.className = 'reading-item'
 
-  if (info.favIconUrl && isFirefox) {
+  if (isFirefox && info.favIconUrl) {
     removeAllFavIcons()
   }
 
