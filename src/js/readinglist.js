@@ -34,7 +34,7 @@ const defaultSettings = {
 function createReadingItemEl (info) {
   const url = info.url
   const title = info.title
-  const favIconUrl = isFirefox ? `https://icons.duckduckgo.com/ip2/${new URL(info.url).hostname}.ico` : info.favIconUrl
+  const favIconUrl = isFirefox || !info.favIconUrl ? `https://icons.duckduckgo.com/ip2/${new URL(info.url).hostname}.ico` : info.favIconUrl
   const item = document.createElement('div')
   item.className = 'reading-item'
 
