@@ -1,9 +1,9 @@
 {
   "addLink": {
-    "message": "Agregar enlace a la Leyendo Lista"
+    "message": "Agregar enlace a la lista de lectura"
   },
   "addPage": {
-    "message": "Agregar página a la Leyendo Lista"
+    "message": "Agregar página a la lista de lectura"
   },
   "advancedOptions": {
     "message": "Opciones avanzadas"
@@ -18,16 +18,16 @@
     "message": "Esta extensión de internet guarda una lista de enlaces de páginas para leer más tarde."
   },
   "appName": {
-    "message": "Leyendo Lista"
+    "message": "Lista de lectura"
   },
   "backup": {
     "message": "Copia de seguridad:"
   },
   "clearData": {
-    "message": "Borrar Leyendo Lista"
+    "message": "Borrar la lista de lectura"
   },
   "confirmMsg": {
-    "message": "Estás a punto de eliminar todo el contenido de la Lista de lectura. ¿Estás seguro?"
+    "message": "Estás a punto de eliminar todo el contenido de la lista de lectura. ¿Estás seguro?"
   },
   "context": {
     "message": "Mostrar en el menú contextual:"
@@ -51,13 +51,13 @@
     "message": "Importar"
   },
   "light": {
-    "message": "luz"
+    "message": "claro"
   },
   "openNewTab": {
     "message": "Abrir enlace en una nueva pestaña:"
   },
   "optionsTitle": {
-    "message": "Opciones para la Leyendo Lista"
+    "message": "Opciones para la lista de lectura"
   },
   "pageActionOption": {
     "message": "Mostrar en la barra de direcciones:"
