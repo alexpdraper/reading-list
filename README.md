@@ -1,6 +1,6 @@
 # Reading List
 
-A Chrome and Firefox extension for saving pages to read later. Free on the [Chrome Web Store](https://chrome.google.com/webstore/detail/lloccabjgblebdmncjndmiibianflabo) and [Firefox Addons](https://addons.mozilla.org/en-US/firefox/addon/reading_list/).
+A Chrome and Firefox extension for saving pages to read later. Free on the [Chrome Web Store](https://chrome.google.com/webstore/detail/lloccabjgblebdmncjndmiibianflabo) and [Firefox Addons](https://addons.mozilla.org/firefox/addon/reading_list/).
 
 ![Chrome Reading List extension](src/images/search-screenshot.png)
 
@@ -13,7 +13,7 @@ A Chrome and Firefox extension for saving pages to read later. Free on the [Chro
 
 ## Installation
 
-Get it from the [Chrome Web Store](https://chrome.google.com/webstore/detail/lloccabjgblebdmncjndmiibianflabo) or [Firefox Addons](https://addons.mozilla.org/en-US/firefox/addon/reading_list/) for free.
+Get it from the [Chrome Web Store](https://chrome.google.com/webstore/detail/lloccabjgblebdmncjndmiibianflabo) or [Firefox Addons](https://addons.mozilla.org/firefox/addon/reading_list/) for free.
 
 ### Building
 
