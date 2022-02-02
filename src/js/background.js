@@ -128,8 +128,13 @@ function addPageToList (info, tab) {
   setObj[tab.url] = {
     url: tab.url,
     title: tab.title,
+    favIconUrl: tab.favIconUrl,
     index: 0,
     addedAt: Date.now()
+  }
+
+  if (isFirefox) {
+    delete info['favIconUrl']
   }
 
   chrome.storage.sync.set(setObj, () => updateBadge(tab.url, tab.id))

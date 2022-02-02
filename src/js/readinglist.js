@@ -1,6 +1,20 @@
 /* globals chrome */
 import Fuse from 'fuse.js'
 
+const isFirefox = typeof InstallTrigger !== 'undefined'
+const defaultSettings = {
+  settings: {
+    theme: 'light',
+    addContextMenu: true,
+    addPageAction: true,
+    animateItems: !isFirefox,
+    openNewTab: false,
+    sortOption: '',
+    sortOrder: '',
+    viewAll: true
+  }
+}
+
 /**
  * Create and return the DOM element for a reading list item.
  *
@@ -20,11 +34,11 @@ import Fuse from 'fuse.js'
 function createReadingItemEl (info) {
   const url = info.url
   const title = info.title
-  const favIconUrl = `https://icons.duckduckgo.com/ip2/${new URL(info.url).hostname}.ico`
+  const favIconUrl = isFirefox || !info.favIconUrl ? `https://icons.duckduckgo.com/ip2/${new URL(info.url).hostname}.ico` : info.favIconUrl
   const item = document.createElement('div')
   item.className = 'reading-item'
 
-  if (info.favIconUrl) {
+  if (isFirefox && info.favIconUrl) {
     removeAllFavIcons()
   }
 
@@ -299,8 +313,13 @@ function addReadingItem (info, readingListEl, callback) {
   info = {
     url: info.url,
     title: info.title,
+    favIconUrl: info.favIconUrl,
     addedAt: Date.now(),
     viewed: false
+  }
+
+  if (isFirefox) {
+    delete info['favIconUrl']
   }
 
   // Object for setting the storage
@@ -619,20 +638,6 @@ function updateSortSetting (sortOption, sortOrder) {
     })
     renderReadingList(readingList, false, store.settings)
   })
-}
-
-const isFirefox = typeof InstallTrigger !== 'undefined'
-const defaultSettings = {
-  settings: {
-    theme: 'light',
-    addContextMenu: true,
-    addPageAction: true,
-    animateItems: !isFirefox,
-    openNewTab: false,
-    sortOption: '',
-    sortOrder: '',
-    viewAll: true
-  }
 }
 
 /**
