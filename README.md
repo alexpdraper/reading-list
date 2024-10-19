@@ -6,13 +6,13 @@ A Chrome and Firefox extension for saving pages to read later. Free on the [Chro
 
 ## Features
 
-- [] Nifty animations
-- [] Search
-- [] Syncing with Google/Mozilla accounts
-- [] A light and dark theme
-- [] Context menu
-- [] Open in new tab option
-- [] Import/export
+- [ ] Nifty animations
+- [ ] Search
+- [ ] Syncing with Google/Mozilla accounts
+- [ ] A light and dark theme
+- [ ] Context menu
+- [ ] Open in new tab option
+- [ ] Import/export
 
 ## Installation
 
