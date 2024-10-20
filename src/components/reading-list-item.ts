@@ -16,6 +16,7 @@ export class ReadingListItemElement extends LitElement {
       --rl-link-color: #555;
       --rl-link-hover-bg: #fff;
       --primary-color: #66cc98;
+      --rl-item-gap: 0.5rem;
 
       font-family: var(--base-font);
       font-size: var(--base-font-size);
@@ -28,10 +29,14 @@ export class ReadingListItemElement extends LitElement {
       box-sizing: border-box;
     }
 
+    :focus-visible {
+      outline: 3px solid lightblue;
+    }
+
     .reading-list-item {
       border-radius: 3px;
       padding: 0;
-      margin: 10px 0 0 0;
+      margin: 0;
       position: relative;
       overflow: hidden;
       transition: all 0.5s ease 0s;
@@ -42,11 +47,11 @@ export class ReadingListItemElement extends LitElement {
 
     .favicon {
       position: absolute;
-      top: 10px;
-      left: 10px;
+      top: var(--rl-item-gap);
+      left: var(--rl-item-gap);
       width: 36px;
       height: 36px;
-      border-radius: 4px;
+      border-radius: 0.25rem;
       border: 1px solid #ccc;
       padding: 1px;
     }
@@ -96,6 +101,7 @@ export class ReadingListItemElement extends LitElement {
       display: block;
       font-weight: bold;
       text-decoration: none;
+      border-radius: 0.25rem;
     }
 
     .title::after {
@@ -116,28 +122,46 @@ export class ReadingListItemElement extends LitElement {
       position: absolute;
       text-align: center;
       font-weight: bold;
-      top: 5px;
-      right: 5px;
-      border-radius: 100%;
+      top: 0;
+      right: 0;
       padding: 0;
-      width: 20px;
-      height: 20px;
+      border-radius: 0;
+      width: 1.5rem;
+      height: 1.5rem;
       border: 0;
       background: transparent;
-      color: #ccc;
-      transform: rotateZ(0) scale(1);
-      transition:
-        transform 0.3s ease,
-        box-shadow 0.5s ease;
       z-index: 2;
     }
 
-    .delete-button:hover {
-      cursor: pointer;
-      background: #ccc;
+    .delete-button-content {
+      color: #ccc;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      transform: rotateZ(0) scale(1);
+      background: transparent;
+      transition:
+        transform 0.3s ease,
+        box-shadow 0.5s ease;
+    }
+
+    .delete-button:focus-visible {
+      outline: none;
+    }
+
+    .delete-button:focus-visible .delete-button-content {
+      outline: 3px solid lightblue;
+    }
+
+    .delete-button:focus-visible .delete-button-content,
+    .delete-button:hover .delete-button-content {
       color: #fff;
       transform: rotateZ(90deg) scale(2);
       box-shadow: 1px 0 1px rgba(0, 0, 0, 0.15);
+      background: #ccc;
     }
   `;
 
@@ -175,9 +199,6 @@ export class ReadingListItemElement extends LitElement {
   override render() {
     return html`
       <div class="reading-list-item">
-        <button class="delete-button" @click=${this._onDeleteClick}>
-          &times;
-        </button>
         <div class="item-content">
           <a class="title" href=${this.href} @click=${this._onLinkClick}
             >${this.name}</a
@@ -193,6 +214,9 @@ export class ReadingListItemElement extends LitElement {
               : ''}
           </div>
         </div>
+        <button class="delete-button" @click=${this._onDeleteClick}>
+          <span class="delete-button-content">&times;</span>
+        </button>
       </div>
     `;
   }

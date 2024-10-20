@@ -1,8 +1,7 @@
 {
-  "name": "rl3",
-  "version": "1.0.0",
+  "name": "reading-list-extension",
+  "version": "3.0.1",
   "description": "Reading List extension with manifest v3",
-  "main": "index.js",
   "scripts": {
     "build": "tsc && rollup -c",
     "format": "prettier --write src",

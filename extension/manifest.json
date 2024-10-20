@@ -15,5 +15,5 @@
   },
   "permissions": ["tabs", "storage"],
   "minimum_chrome_version": "88",
-  "version": "3.0.0"
+  "version": "3.0.1"
 }

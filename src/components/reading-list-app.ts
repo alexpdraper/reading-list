@@ -30,8 +30,29 @@ export class ReadingListAppElement extends LitElement {
       box-sizing: border-box;
     }
 
+    :focus-visible {
+      outline: 3px solid lightblue;
+    }
+
+    .visually-hidden:not(caption) {
+      position: absolute !important;
+    }
+
+    .visually-hidden {
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+
     h1 {
       margin: 0;
+      font-size: 1.6rem;
+      line-height: 1.25;
     }
 
     header {
@@ -40,18 +61,20 @@ export class ReadingListAppElement extends LitElement {
       align-items: center;
       width: 100%;
       gap: 1rem;
+      padding-bottom: 0.5rem;
     }
 
     .save-button {
+      --button-size: 2rem;
+
       color: #fff;
       background: var(--primary-color);
-      width: 30px;
-      height: 30px;
-      line-height: 30px;
-      margin: 0 10px;
+      width: var(--button-size);
+      height: var(--button-size);
+      line-height: var(--button-size);
       font-weight: bold;
       border: 0;
-      border-radius: 50%;
+      border-radius: 9999px;
       text-align: center;
     }
 
@@ -62,6 +85,50 @@ export class ReadingListAppElement extends LitElement {
 
     .save-button:focus {
       outline: 3px solid lightblue;
+    }
+
+    search {
+      margin: 0;
+      padding-bottom: 0.5rem;
+    }
+
+    /* label {
+      display: block;
+      margin-top: 0;
+      margin-bottom: 0.125rem;
+      padding: 0;
+      font-size: inherit;
+    } */
+
+    input {
+      font-size: inherit;
+      border: 1px solid #eee;
+      border-radius: 0.25rem;
+      padding: 0.5rem;
+      background: transparent;
+      width: 100%;
+      margin: 0;
+    }
+
+    input:focus {
+      outline: 3px solid lightblue;
+      border-color: var(--primary-color);
+    }
+
+    [type='search'] {
+      -webkit-appearance: textfield;
+    }
+    [type='search']::-webkit-search-cancel-button,
+    [type='search']::-webkit-search-decoration {
+      -webkit-appearance: none;
+    }
+
+    reading-list-item {
+      display: block;
+    }
+
+    reading-list-item:not(:first-child) {
+      margin-top: 0.5rem;
     }
   `;
 
@@ -80,6 +147,9 @@ export class ReadingListAppElement extends LitElement {
   @state()
   _listItems: ListItemData[] | null = null;
 
+  @state()
+  searchQuery = '';
+
   override render() {
     return html`
       <header>
@@ -94,17 +164,43 @@ export class ReadingListAppElement extends LitElement {
         </button>
       </header>
 
-      ${repeat(
-        this._listItems ?? [],
-        (item) => item.url,
-        (listItem) =>
-          html`<reading-list-item
-            .name=${listItem.title}
-            .href=${listItem.url}
-            @delete-item=${this._onDeleteItemClicked}
-          ></reading-list-item>`,
-      )}
+      <search class="search">
+        <label class="visually-hidden" for="list-search"
+          >${i18n.getMessage('search', 'Search')}</label
+        >
+        <input
+          type="search"
+          id="list-search"
+          name="search"
+          placeholder=${i18n.getMessage('search', 'Search')}
+          autocomplete="off"
+          @input=${this._onSearchInput}
+        />
+      </search>
+
+      <div class="reading-list">
+        ${repeat(
+          this._listItems?.filter(
+            (item) =>
+              !this.searchQuery ||
+              item.url.toLocaleUpperCase().includes(this.searchQuery) ||
+              item.title.toLocaleUpperCase().includes(this.searchQuery),
+          ) ?? [],
+          (item) => item.url,
+          (listItem) =>
+            html`<reading-list-item
+              .name=${listItem.title}
+              .href=${listItem.url}
+              @delete-item=${this._onDeleteItemClicked}
+            ></reading-list-item>`,
+        )}
+      </div>
     `;
+  }
+
+  private _onSearchInput(event: InputEvent) {
+    const input = event.target as HTMLInputElement;
+    this.searchQuery = input.value.trim().toLocaleUpperCase();
   }
 
   private async _onDeleteItemClicked(event: Event) {
