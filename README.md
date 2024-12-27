@@ -56,3 +56,6 @@ The build command assembles all the files in the `dist` folder. After it’s bui
   1. When you want to read a page you saved, open up the extension and click the reading item you want to read
       - `Control + click` or `command ⌘/windows key ⊞ + click` to open the page in a new tab
   1. Done with a page? Click the `×` next to said page in your reading list, and it will magically vanish.
+
+#### Firefox verification
+1a74cd646f4e4485b271d4cfe035bdf7
