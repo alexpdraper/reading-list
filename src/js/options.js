@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Helper for import function
   function impLoad () {
-    const myImportedData = removeAllFavIcons(JSON.parse(this.result))
+    const myImportedData = isFirefox ? removeAllFavIcons(JSON.parse(this.result)) : JSON.parse(this.result)
     // Un-comment this line if we want to replace the storage
     // chrome.storage.sync.clear()
     // Here the chrome storage is imported, it aggregates the reading list and replaces setting
