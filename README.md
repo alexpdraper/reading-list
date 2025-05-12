@@ -7,7 +7,7 @@ A Chrome and Firefox extension for saving pages to read later. Free on the [Chro
 ## Features
 
 - [ ] Nifty animations
-- [ ] Search
+- [x] Search
 - [ ] Syncing with Google/Mozilla accounts
 - [ ] A light and dark theme
 - [ ] Context menu
