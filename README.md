@@ -10,7 +10,7 @@ A Chrome and Firefox extension for saving pages to read later. Free on the [Chro
 - [x] Search
 - [ ] Syncing with Google/Mozilla accounts
 - [ ] A light and dark theme
-- [ ] Context menu
+- [x] Context menu
 - [ ] Open in new tab option
 - [ ] Import/export
 
