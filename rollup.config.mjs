@@ -6,6 +6,9 @@ import minifyHTML from 'rollup-plugin-minify-html-literals';
 import summary from 'rollup-plugin-summary';
 
 export default {
+  input: {
+    'background': 'extension/scripts/components/background.js',
+  },
   plugins: [
     // Entry point for application build; can specify a glob to build multiple
     // HTML files for non-SPA app
