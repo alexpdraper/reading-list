@@ -1,5 +1,5 @@
-import { ListItemData, rl } from '../lib/rl';
-import { i18n } from '../lib/i18n';
+import { ListItemData, rl } from './lib/rl';
+import { i18n } from './lib/i18n';
 
 // Register the context menu on install
 chrome.runtime.onInstalled.addListener(() => {

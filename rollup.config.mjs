@@ -7,7 +7,7 @@ import summary from 'rollup-plugin-summary';
 
 export default {
   input: {
-    'background': 'extension/scripts/components/background.js',
+    'background': 'extension/scripts/background.js',
   },
   plugins: [
     // Entry point for application build; can specify a glob to build multiple
