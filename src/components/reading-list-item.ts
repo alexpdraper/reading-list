@@ -6,7 +6,7 @@ export class ReadingListItemElement extends LitElement {
   static override styles = css`
     :host {
       --base-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-        Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+      Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
       --base-font-size: 13px;
       --base-line-height: 1.4;
       --container-width: 360px;
@@ -143,9 +143,8 @@ export class ReadingListItemElement extends LitElement {
       height: 100%;
       transform: rotateZ(0) scale(1);
       background: transparent;
-      transition:
-        transform 0.3s ease,
-        box-shadow 0.5s ease;
+      transition: transform 0.3s ease,
+      box-shadow 0.5s ease;
     }
 
     .delete-button:focus-visible {
@@ -162,6 +161,46 @@ export class ReadingListItemElement extends LitElement {
       transform: rotateZ(90deg) scale(2);
       box-shadow: 1px 0 1px rgba(0, 0, 0, 0.15);
       background: #ccc;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :host {
+        --rl-bg-color: #23272e;
+        --rl-shadow: 0 1px 1px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+        --rl-link-color: #e0e0e0;
+        --rl-link-hover-bg: #2c313a;
+        --primary-color: #66cc98;
+      }
+
+      .reading-list-item {
+        background-color: var(--rl-bg-color);
+        color: var(--rl-link-color);
+        box-shadow: var(--rl-shadow);
+      }
+
+      .item-content {
+        color: var(--rl-link-color);
+      }
+
+      .item-content:hover,
+      .item-content:focus {
+        background-color: var(--rl-link-hover-bg);
+        color: var(--primary-color);
+      }
+
+      .favicon {
+        border-color: #444;
+      }
+
+      .delete-button-content {
+        color: #888;
+      }
+
+      .delete-button:focus-visible .delete-button-content,
+      .delete-button:hover .delete-button-content {
+        background: #444;
+        color: #fff;
+      }
     }
   `;
 

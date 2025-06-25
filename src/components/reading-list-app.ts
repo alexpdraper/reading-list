@@ -130,6 +130,30 @@ export class ReadingListAppElement extends LitElement {
     reading-list-item:not(:first-child) {
       margin-top: 0.5rem;
     }
+
+    @media (prefers-color-scheme: dark) {
+      :host {
+        --rl-bg-color: #23272e;
+        --rl-shadow: 0 1px 1px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+        --rl-link-color: #e0e0e0;
+        --rl-link-hover-bg: #2c313a;
+        --primary-color: #66cc98;
+        --primary-color-focus: #44aa76;
+      }
+      input {
+        background: #181a20;
+        color: #e0e0e0;
+        border-color: #444;
+      }
+      input:focus {
+        border-color: var(--primary-color);
+      }
+      body,
+      main {
+        background: #181a20;
+        color: #e0e0e0;
+      }
+    }
   `;
 
   constructor() {
