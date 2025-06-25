@@ -16,7 +16,17 @@
   "permissions": ["tabs", "storage", "contextMenus"],
   "background": {
     "service_worker": "background.js",
+    "scripts": ["background.js"],
     "type": "module"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; script-src-attr 'unsafe-hashes' 'sha256-1yqAQLUTuQHw6lKtvky9RrCMQjXOIVpFjDLSAh4ib5Y='; object-src 'none'"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "casey.thompson001@gmail.com",
+      "strict_min_version": "109.0"
+    }
   },
   "minimum_chrome_version": "88",
   "version": "3.0.1"

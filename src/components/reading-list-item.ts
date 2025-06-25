@@ -227,9 +227,10 @@ export class ReadingListItemElement extends LitElement {
    * The src for the favicon image.
    */
   private get favicon() {
-    return this.url
-      ? `https://icons.duckduckgo.com/ip2/${this.url.hostname}.ico`
-      : null;
+    if (!this.url || !this.url.hostname) {
+      return null;
+    }
+    return `https://icons.duckduckgo.com/ip2/${this.url.hostname}.ico`;
   }
 
   @state()
@@ -239,9 +240,7 @@ export class ReadingListItemElement extends LitElement {
     return html`
       <div class="reading-list-item">
         <div class="item-content">
-          <a class="title" href=${this.href} @click=${this._onLinkClick}
-            >${this.name}</a
-          >
+          <a class="title" href=${this.href} @click=${this._onLinkClick}>${this.name}</a>
           <div class="host">${this.url?.hostname ?? this.href}</div>
           <div class="favicon">
             ${this.favicon && !this.faviconError

@@ -25,7 +25,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 async function addToReadingList(url: string, title: string) {
-  console.log(`Adding link to Reading List: ${url}`);
   const newItem: ListItemData = {url, title, addedAt: Date.now()};
   await rl.addReadingItem(newItem);
 }
