@@ -13,7 +13,11 @@
     "default_popup": "popup.html",
     "default_icon": { "16": "icons/icon16.png", "32": "icons/icon32.png" }
   },
-  "permissions": ["tabs", "storage"],
+  "permissions": ["tabs", "storage", "contextMenus"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
   "minimum_chrome_version": "88",
   "version": "3.0.1"
 }
