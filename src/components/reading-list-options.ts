@@ -22,7 +22,35 @@ export class ReadingListOptions extends LitElement {
     return html`
       <h2>Reading List Options</h2>
       <button @click=${this.exportList}>Export Reading List</button>
+      <input id="importInput" type="file" accept="application/json" style="display:none" @change=${this.importList} />
+      <button @click=${this.openImportDialog}>Import Reading List</button>
     `;
+  }
+
+  openImportDialog() {
+    const input = (this.renderRoot as ShadowRoot)?.getElementById('importInput') as HTMLInputElement;
+    if (input) input.click();
+  }
+
+  async importList(e: Event) {
+    const input = e.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    try {
+      const text = await file.text();
+      const items = JSON.parse(text);
+      if (Array.isArray(items)) {
+        for (const item of items) {
+          await rl.addReadingItem(item);
+        }
+        alert('Import complete!');
+      } else {
+        alert('Invalid file format.');
+      }
+    } catch (err) {
+      alert('Failed to import: ' + err);
+    }
+    input.value = '';
   }
 
   async exportList() {
@@ -42,4 +70,3 @@ export class ReadingListOptions extends LitElement {
 }
 
 customElements.define('reading-list-options', ReadingListOptions);
-
