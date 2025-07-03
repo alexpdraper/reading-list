@@ -19,5 +19,9 @@
     "type": "module"
   },
   "minimum_chrome_version": "88",
-  "version": "3.0.1"
+  "version": "3.0.1",
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  }
 }
