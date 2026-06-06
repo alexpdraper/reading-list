@@ -143,8 +143,7 @@ export class ReadingListItemElement extends LitElement {
       height: 100%;
       transform: rotateZ(0) scale(1);
       background: transparent;
-      transition: transform 0.3s ease,
-      box-shadow 0.5s ease;
+      transition: transform 0.3s ease, box-shadow 0.5s ease;
     }
 
     .delete-button:focus-visible {
@@ -216,9 +215,6 @@ export class ReadingListItemElement extends LitElement {
   @property({ type: String })
   href = '';
 
-  @property({ type: Boolean })
-  newtab = false;
-
   private get url() {
     return this.href ? new URL(this.href) : null;
   }
@@ -260,11 +256,13 @@ export class ReadingListItemElement extends LitElement {
     `;
   }
 
-  private _onLinkClick(event: MouseEvent) {
+  private async _onLinkClick(event: MouseEvent) {
     if (this.href) {
       event.preventDefault();
-      // If the control or meta key (⌘ on Mac, ⊞ on Windows) is pressed or if options is selected…
-      const modifierDown = event.ctrlKey || event.metaKey || this.newtab;
+      // Check global setting for open in new tab default
+      const settings = await chrome.storage.sync.get('settings');
+      const openNewTab = settings.settings?.openNewTab ?? false;
+      const modifierDown = event.ctrlKey || event.metaKey || openNewTab;
       openLink(this.href, modifierDown);
     }
   }

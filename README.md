@@ -11,7 +11,7 @@ A Chrome and Firefox extension for saving pages to read later. Free on the [Chro
 - [x] Syncing with Google/Mozilla accounts
 - [ ] A light and dark theme
 - [x] Context menu
-- [ ] Open in new tab option
+- [x] Open in new tab option
 - [x] Import/export
 
 ## Installation

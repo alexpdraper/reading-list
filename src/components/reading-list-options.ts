@@ -11,20 +11,97 @@ export class ReadingListOptions extends LitElement {
       font-family: sans-serif;
     }
 
+    .section {
+      margin-bottom: 2em;
+    }
+
+    .option {
+      margin-bottom: 1.5em;
+      display: flex;
+      align-items: center;
+      gap: 1em;
+    }
+
+    input[type="checkbox"] {
+      width: 1.2em;
+      height: 1.2em;
+      cursor: pointer;
+    }
+
+    label {
+      cursor: pointer;
+      font-size: 1em;
+    }
+
     button {
       padding: 0.5em 1em;
       font-size: 1em;
       margin-top: 1em;
+      background: #66cc98;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #44aa76;
     }
   `;
+
+  globalOpenNewTab = false;
+
+  override connectedCallback() {
+    super.connectedCallback();
+    void this._loadSettings();
+  }
 
   override render() {
     return html`
       <h2>Reading List Options</h2>
-      <button @click=${this.exportList}>Export Reading List</button>
-      <input id="importInput" type="file" accept="application/json" style="display:none" @change=${this.importList} />
-      <button @click=${this.openImportDialog}>Import Reading List</button>
+
+      <div class="section">
+        <h3>Default Behavior</h3>
+        <div class="option">
+          <input
+            type="checkbox"
+            id="openNewTab"
+            ?checked=${this.globalOpenNewTab}
+            @change=${this._onOpenNewTabChange}
+          />
+          <label for="openNewTab">Open items in new tab by default</label>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Backup & Restore</h3>
+        <button @click=${this.exportList}>Export Reading List</button>
+        <input id="importInput" type="file" accept="application/json" style="display:none" @change=${this.importList} />
+        <button @click=${this.openImportDialog}>Import Reading List</button>
+      </div>
     `;
+  }
+
+  private async _loadSettings() {
+    const settings = await chrome.storage.sync.get('settings');
+    if (settings.settings) {
+      this.globalOpenNewTab = settings.settings.openNewTab ?? false;
+    }
+  }
+
+  private async _onOpenNewTabChange(e: Event) {
+    const input = e.target as HTMLInputElement;
+    this.globalOpenNewTab = input.checked;
+
+    const settings = await chrome.storage.sync.get('settings');
+    const currentSettings = settings.settings || {};
+
+    await chrome.storage.sync.set({
+      settings: {
+        ...currentSettings,
+        openNewTab: this.globalOpenNewTab,
+      },
+    });
   }
 
   openImportDialog() {
