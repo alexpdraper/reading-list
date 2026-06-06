@@ -30,7 +30,7 @@ export default {
     // Optional: copy any static assets to build directory
     copy({
       rootDir: 'extension',
-      patterns: ['icons/**/*', 'manifest.json', '_locales/**/*'],
+      patterns: ['icons/**/*', 'manifest.json', '_locales/**/*', 'options.html'],
     }),
   ],
   output: {
