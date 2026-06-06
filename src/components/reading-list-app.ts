@@ -262,7 +262,10 @@ export class ReadingListAppElement extends LitElement {
 
   private async _onSaveButtonClick() {
     const tab = await this._getActiveTab();
-    if (tab && tab.url && tab.title && this._listItems) {
+    if (tab && tab.url && tab.title) {
+      if (!this._listItems) {
+        this._listItems = await rl.getListItems();
+      }
       return this._addReadingItem(tab.url, tab.title);
     }
   }
