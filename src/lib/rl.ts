@@ -2,6 +2,7 @@ export interface ListItemData {
   addedAt: number;
   title: string;
   url: string;
+  openNewTab?: boolean;
 }
 
 // const storageItems = {
@@ -54,6 +55,16 @@ class RL {
     if (!this.initialized) return;
     await chrome?.storage.sync.remove(url);
     this.list = this.list.filter((item) => item.url !== url);
+  }
+
+  async updateReadingItem(url: string, updates: Partial<ListItemData>) {
+    if (!this.initialized) return;
+    const item = this.list.find((item) => item.url === url);
+    if (item) {
+      const updatedItem = { ...item, ...updates };
+      await chrome?.storage.sync.set({ [url]: updatedItem });
+      Object.assign(item, updates);
+    }
   }
 }
 

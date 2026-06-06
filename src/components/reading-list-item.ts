@@ -118,12 +118,20 @@ export class ReadingListItemElement extends LitElement {
       display: block;
     }
 
-    .delete-button {
+    .action-buttons {
       position: absolute;
-      text-align: center;
-      font-weight: bold;
+      display: flex;
       top: 0;
       right: 0;
+      z-index: 2;
+      height: 1.5rem;
+    }
+
+    .delete-button,
+    .new-tab-button {
+      position: relative;
+      text-align: center;
+      font-weight: bold;
       padding: 0;
       border-radius: 0;
       width: 1.5rem;
@@ -133,7 +141,9 @@ export class ReadingListItemElement extends LitElement {
       z-index: 2;
     }
 
-    .delete-button-content {
+
+    .delete-button-content,
+    .new-tab-button-content {
       color: #ccc;
       border-radius: 9999px;
       display: flex;
@@ -143,15 +153,19 @@ export class ReadingListItemElement extends LitElement {
       height: 100%;
       transform: rotateZ(0) scale(1);
       background: transparent;
-      transition: transform 0.3s ease,
-      box-shadow 0.5s ease;
+      transition: transform 0.3s ease, box-shadow 0.5s ease;
     }
 
-    .delete-button:focus-visible {
+    .delete-button:focus-visible,
+    .new-tab-button:focus-visible {
       outline: none;
     }
 
     .delete-button:focus-visible .delete-button-content {
+      outline: 3px solid lightblue;
+    }
+
+    .new-tab-button:focus-visible .new-tab-button-content {
       outline: 3px solid lightblue;
     }
 
@@ -161,6 +175,18 @@ export class ReadingListItemElement extends LitElement {
       transform: rotateZ(90deg) scale(2);
       box-shadow: 1px 0 1px rgba(0, 0, 0, 0.15);
       background: #ccc;
+    }
+
+    .new-tab-button:focus-visible .new-tab-button-content,
+    .new-tab-button:hover .new-tab-button-content {
+      color: #fff;
+      box-shadow: 1px 0 1px rgba(0, 0, 0, 0.15);
+      background: var(--primary-color);
+    }
+
+    .new-tab-button.active .new-tab-button-content {
+      color: #fff;
+      background: var(--primary-color);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -199,6 +225,17 @@ export class ReadingListItemElement extends LitElement {
       .delete-button:focus-visible .delete-button-content,
       .delete-button:hover .delete-button-content {
         background: #444;
+        color: #fff;
+      }
+
+      .new-tab-button:focus-visible .new-tab-button-content,
+      .new-tab-button:hover .new-tab-button-content {
+        background: var(--primary-color);
+        color: #fff;
+      }
+
+      .new-tab-button.active .new-tab-button-content {
+        background: var(--primary-color);
         color: #fff;
       }
     }
@@ -253,9 +290,18 @@ export class ReadingListItemElement extends LitElement {
               : ''}
           </div>
         </div>
-        <button class="delete-button" @click=${this._onDeleteClick}>
-          <span class="delete-button-content">&times;</span>
-        </button>
+        <div class="action-buttons">
+          <button
+            class="new-tab-button ${this.newtab ? 'active' : ''}"
+            @click=${this._onNewTabToggle}
+            title="Open in new tab"
+          >
+            <span class="new-tab-button-content">⧉</span>
+          </button>
+          <button class="delete-button" @click=${this._onDeleteClick}>
+            <span class="delete-button-content">&times;</span>
+          </button>
+        </div>
       </div>
     `;
   }
@@ -267,6 +313,17 @@ export class ReadingListItemElement extends LitElement {
       const modifierDown = event.ctrlKey || event.metaKey || this.newtab;
       openLink(this.href, modifierDown);
     }
+  }
+
+  private _onNewTabToggle() {
+    this.newtab = !this.newtab;
+    this.dispatchEvent(
+      new CustomEvent('toggle-new-tab', {
+        detail: { href: this.href, openNewTab: this.newtab },
+        bubbles: true,
+        composed: true,
+      }),
+    );
   }
 
   private _onDeleteClick() {
