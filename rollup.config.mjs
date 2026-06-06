@@ -9,6 +9,13 @@ export default {
   input: {
     'background': 'extension/scripts/background.js',
   },
+  onwarn(warning) {
+    // Ignore the "this is undefined" warning from TypeScript decorators
+    if (warning.code === 'THIS_IS_UNDEFINED') {
+      return;
+    }
+    console.warn(warning.message);
+  },
   plugins: [
     // Entry point for application build; can specify a glob to build multiple
     // HTML files for non-SPA app
