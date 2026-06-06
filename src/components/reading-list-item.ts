@@ -306,11 +306,16 @@ export class ReadingListItemElement extends LitElement {
     `;
   }
 
-  private _onLinkClick(event: MouseEvent) {
+  private async _onLinkClick(event: MouseEvent) {
     if (this.href) {
       event.preventDefault();
-      // If the control or meta key (⌘ on Mac, ⊞ on Windows) is pressed or if options is selected…
-      const modifierDown = event.ctrlKey || event.metaKey || this.newtab;
+      // Check if newtab is set, or fall back to global setting
+      let shouldOpenNewTab = this.newtab;
+      if (!shouldOpenNewTab) {
+        const settings = await chrome.storage.sync.get('settings');
+        shouldOpenNewTab = settings.settings?.openNewTab ?? false;
+      }
+      const modifierDown = event.ctrlKey || event.metaKey || shouldOpenNewTab;
       openLink(this.href, modifierDown);
     }
   }
