@@ -215,9 +215,7 @@ export class ReadingListAppElement extends LitElement {
             html`<reading-list-item
               .name=${listItem.title}
               .href=${listItem.url}
-              .newtab=${listItem.openNewTab ?? false}
               @delete-item=${this._onDeleteItemClicked}
-              @toggle-new-tab=${this._onToggleNewTab}
             ></reading-list-item>`,
         )}
       </div>
@@ -234,12 +232,6 @@ export class ReadingListAppElement extends LitElement {
     const url = (event.target as ReadingListItemElement).href;
     await rl.removeReadingItem(url);
     this._listItems = this._listItems.filter((item) => item.url !== url);
-  }
-
-  private async _onToggleNewTab(event: Event) {
-    const customEvent = event as CustomEvent<{ href: string; openNewTab: boolean }>;
-    const { href, openNewTab } = customEvent.detail;
-    await rl.updateReadingItem(href, { openNewTab });
   }
 
   private async _addReadingItem(url: string, title: string) {
