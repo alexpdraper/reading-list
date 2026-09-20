@@ -17,15 +17,6 @@ export const styles = css`
       --rl-bg-color: #777;
       --rl-text-color: #000;
     }
-
-    button {
-      background: #555;
-      color: #eee;
-    }
-
-    button:hover {
-      background: #333;
-    }
   }
 
   .section {
@@ -84,5 +75,16 @@ export const styles = css`
 
   details > div {
     margin-top: 1em;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    button {
+      background: #555;
+      color: #eee;
+    }
+
+    button:hover {
+      background: #333;
+    }
   }
 `;
