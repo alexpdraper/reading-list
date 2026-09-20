@@ -329,10 +329,10 @@ export const styles = css`
 
   @media (prefers-color-scheme: dark) {
     :host {
-      --rl-bg-color: #23272e;
+      --rl-bg-color: #555;
       --rl-shadow: 0 1px 1px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
-      --rl-link-color: #e0e0e0;
-      --rl-link-hover-bg: #2c313a;
+      --rl-link-color: #eee;
+      --rl-link-hover-bg: #333;
       --primary-color: #66cc98;
     }
 
@@ -349,23 +349,23 @@ export const styles = css`
     .item-content:hover,
     .item-content:focus {
       background-color: var(--rl-link-hover-bg);
-      color: var(--primary-color);
+      color: var(--rl-link-color);
     }
 
     .favicon {
-      border-color: #444;
+      border: 0;
     }
 
     .delete-button-content,
     .edit-button-content {
-      color: #888;
+      color: #ccc;
     }
 
     .delete-button:focus-visible .delete-button-content,
     .delete-button:hover .delete-button-content,
     .edit-button:focus-visible .edit-button-content,
     .edit-button:hover .edit-button-content {
-      background: #444;
+      background: #333;
       color: #fff;
     }
   }
