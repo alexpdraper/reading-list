@@ -4,7 +4,7 @@ export interface ListItemData {
   url: string;
   openNewTab?: boolean;
   favIconUrl?: string;
-  shiny?: boolean;
+  viewed?: boolean;
 }
 
 export interface Settings {
@@ -13,7 +13,7 @@ export interface Settings {
   addContextMenu?: boolean;
   theme?: 'light' | 'dark';
   sortOption?: 'date' | 'title' | '';
-  sortOrder?: 'asc' | 'desc' | '';
+  sortOrder?: 'up' | 'down' | '';
   viewAll?: boolean;
   askedForReview?: boolean;
 }

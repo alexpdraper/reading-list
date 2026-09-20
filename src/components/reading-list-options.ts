@@ -1,15 +1,53 @@
 import { html, css, LitElement } from 'lit';
+import { property, state } from 'lit/decorators.js';
 import { rl, getSettings, updateSettings } from '../lib/rl';
 import { i18n } from '../lib/i18n';
 
 export class ReadingListOptions extends LitElement {
   static override styles = css`
     :host {
+      --rl-bg-color: #f9f9f9;
+      --rl-text-color: #222;
+      --rl-input-bg: #fff;
+      --rl-input-border: #ccc;
+
       display: block;
       padding: 2em;
-      background: #f9f9f9;
-      color: #222;
+      background: var(--rl-bg-color);
+      color: var(--rl-text-color);
       font-family: sans-serif;
+    }
+
+    select {
+      font-size: 1em;
+      padding: 0.3em;
+      background: var(--rl-input-bg);
+      color: var(--rl-text-color);
+      border: 1px solid var(--rl-input-border);
+      border-radius: 4px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :host {
+        --rl-bg-color: #181a20;
+        --rl-text-color: #e0e0e0;
+        --rl-input-bg: #23272e;
+        --rl-input-border: #444;
+      }
+    }
+
+    :host([theme='dark']) {
+      --rl-bg-color: #181a20;
+      --rl-text-color: #e0e0e0;
+      --rl-input-bg: #23272e;
+      --rl-input-border: #444;
+    }
+
+    :host([theme='light']) {
+      --rl-bg-color: #f9f9f9;
+      --rl-text-color: #222;
+      --rl-input-bg: #fff;
+      --rl-input-border: #ccc;
     }
 
     .section {
@@ -71,9 +109,12 @@ export class ReadingListOptions extends LitElement {
     }
   `;
 
-  globalOpenNewTab = false;
-  globalAnimateItems = true;
-  globalAddContextMenu = true;
+  @state() globalOpenNewTab = false;
+  @state() globalAnimateItems = true;
+  @state() globalAddContextMenu = true;
+
+  @property({ type: String, reflect: true })
+  theme: '' | 'light' | 'dark' = '';
 
   override connectedCallback() {
     super.connectedCallback();
@@ -113,6 +154,18 @@ export class ReadingListOptions extends LitElement {
           />
           <label for="addContextMenu">Show "Add to Reading List" in the right-click menu</label>
         </div>
+        <div class="option">
+          <label for="theme">${i18n.getMessage('theme', 'Theme:')}</label>
+          <select id="theme" @change=${this._onThemeChange}>
+            <option value="" ?selected=${this.theme === ''}>System</option>
+            <option value="light" ?selected=${this.theme === 'light'}>
+              ${i18n.getMessage('light', 'Light')}
+            </option>
+            <option value="dark" ?selected=${this.theme === 'dark'}>
+              ${i18n.getMessage('dark', 'Dark')}
+            </option>
+          </select>
+        </div>
       </div>
 
       <div class="section">
@@ -138,6 +191,7 @@ export class ReadingListOptions extends LitElement {
     this.globalOpenNewTab = settings.openNewTab ?? false;
     this.globalAnimateItems = settings.animateItems ?? true;
     this.globalAddContextMenu = settings.addContextMenu ?? true;
+    this.theme = settings.theme ?? '';
   }
 
   private async _onSettingChange(
@@ -149,6 +203,12 @@ export class ReadingListOptions extends LitElement {
     if (key === 'animateItems') this.globalAnimateItems = checked;
     if (key === 'addContextMenu') this.globalAddContextMenu = checked;
     await updateSettings({ [key]: checked });
+  }
+
+  private async _onThemeChange(e: Event) {
+    const value = (e.target as HTMLSelectElement).value as '' | 'light' | 'dark';
+    this.theme = value;
+    await updateSettings({ theme: value || undefined });
   }
 
   async _onResetClick() {

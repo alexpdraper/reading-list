@@ -30,6 +30,44 @@ export class ReadingListItemElement extends LitElement {
       overflow: hidden;
     }
 
+    :host([theme='dark']) {
+      --rl-bg-color: #23272e;
+      --rl-shadow: 0 1px 1px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+      --rl-link-color: #e0e0e0;
+      --rl-link-hover-bg: #2c313a;
+      --primary-color: #66cc98;
+    }
+
+    :host([theme='light']) {
+      --rl-bg-color: #f7f7f7;
+      --rl-shadow: 0 1px 1px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+      --rl-link-color: #555;
+      --rl-link-hover-bg: #fff;
+      --primary-color: #66cc98;
+    }
+
+    :host([theme='dark']) .favicon {
+      border-color: #444;
+    }
+    :host([theme='dark']) .delete-button-content {
+      color: #888;
+    }
+    :host([theme='dark']) .delete-button:focus-visible .delete-button-content,
+    :host([theme='dark']) .delete-button:hover .delete-button-content {
+      background: #444;
+    }
+
+    :host([theme='light']) .favicon {
+      border-color: #ccc;
+    }
+    :host([theme='light']) .delete-button-content {
+      color: #ccc;
+    }
+    :host([theme='light']) .delete-button:focus-visible .delete-button-content,
+    :host([theme='light']) .delete-button:hover .delete-button-content {
+      background: #ccc;
+    }
+
     *,
     *::before,
     *::after {
@@ -304,6 +342,9 @@ export class ReadingListItemElement extends LitElement {
 
   @property({ type: Boolean })
   shiny = false;
+
+  @property({ type: String, reflect: true })
+  theme: '' | 'light' | 'dark' = '';
 
   @state()
   private _slidein = false;

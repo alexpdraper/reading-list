@@ -1,6 +1,6 @@
 import { LitElement, html, css, PropertyValues } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import Fuse from 'fuse.js';
 import { i18n } from '../lib/i18n';
 import { rl, ListItemData, getSettings, updateSettings } from '../lib/rl';
@@ -133,6 +133,77 @@ export class ReadingListAppElement extends LitElement {
       margin-top: 0.5rem;
     }
 
+    .controls {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .filter,
+    .sort {
+      display: flex;
+      flex: 1;
+      box-shadow: var(--rl-shadow);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .filter button,
+    .sort button {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.25rem;
+      border: 0;
+      background: var(--rl-bg-color);
+      color: var(--rl-link-color);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.7rem;
+      padding: 0.5rem;
+      cursor: pointer;
+    }
+
+    .filter button:hover,
+    .filter button:focus,
+    .filter button.active,
+    .sort button:hover,
+    .sort button:focus,
+    .sort button.active {
+      background: var(--rl-link-hover-bg);
+      color: var(--primary-color);
+    }
+
+    .count {
+      font-size: 80%;
+      display: inline-block;
+      border: 1px solid currentColor;
+      padding: 0.1rem 0.4rem;
+      border-radius: 8px;
+    }
+
+    .arrow {
+      display: none;
+      border: solid currentColor;
+      border-width: 0 2px 2px 0;
+      padding: 3px;
+      transition: transform 0.3s ease;
+    }
+
+    .arrow.up,
+    .arrow.down {
+      display: inline-block;
+    }
+
+    .arrow.up {
+      transform: rotate(-135deg);
+    }
+
+    .arrow.down {
+      transform: rotate(45deg);
+    }
+
     @media (prefers-color-scheme: dark) {
       :host {
         --rl-bg-color: #23272e;
@@ -156,6 +227,34 @@ export class ReadingListAppElement extends LitElement {
         color: #e0e0e0;
       }
     }
+
+    :host([theme='dark']) {
+      --rl-bg-color: #23272e;
+      --rl-shadow: 0 1px 1px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+      --rl-link-color: #e0e0e0;
+      --rl-link-hover-bg: #2c313a;
+      --primary-color: #66cc98;
+      --primary-color-focus: #44aa76;
+    }
+    :host([theme='dark']) input {
+      background: #181a20;
+      color: #e0e0e0;
+      border-color: #444;
+    }
+
+    :host([theme='light']) {
+      --rl-bg-color: #f7f7f7;
+      --rl-shadow: 0 1px 1px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+      --rl-link-color: #555;
+      --rl-link-hover-bg: #fff;
+      --primary-color: #66cc98;
+      --primary-color-focus: #44aa76;
+    }
+    :host([theme='light']) input {
+      background: transparent;
+      color: inherit;
+      border-color: #eee;
+    }
   `;
 
   constructor() {
@@ -166,8 +265,15 @@ export class ReadingListAppElement extends LitElement {
     });
     getSettings().then((settings) => {
       this._animateItems = settings.animateItems ?? true;
+      this._viewAll = settings.viewAll ?? true;
+      this._sortOption = settings.sortOption ?? '';
+      this._sortOrder = settings.sortOrder ?? '';
+      this.theme = settings.theme ?? '';
     });
   }
+
+  @property({ type: String, reflect: true })
+  theme: '' | 'light' | 'dark' = '';
 
   private async _maybeAskForReview(listItems: ListItemData[]) {
     if (listItems.length < 6) return;
@@ -175,16 +281,19 @@ export class ReadingListAppElement extends LitElement {
     if (settings.askedForReview) return;
 
     const isFirefox = navigator.userAgent.includes('Firefox');
-    const reviewItem: ListItemData = {
+    this._reviewItem = {
       title: 'Like the Reading List? Give us a review!',
       url: isFirefox
         ? 'https://addons.mozilla.org/en-US/firefox/addon/reading_list/'
         : 'https://chrome.google.com/webstore/detail/reading-list/lloccabjgblebdmncjndmiibianflabo/reviews',
       addedAt: Date.now(),
       favIconUrl: chrome.runtime.getURL('icons/icon48.png'),
-      shiny: true,
     };
-    this._listItems = [reviewItem, ...listItems];
+  }
+
+  private async _onDismissReview() {
+    this._reviewItem = null;
+    await updateSettings({ askedForReview: true });
   }
 
   override connectedCallback(): void {
@@ -205,6 +314,18 @@ export class ReadingListAppElement extends LitElement {
   @state()
   private _justAddedUrl: string | null = null;
 
+  @state()
+  private _reviewItem: ListItemData | null = null;
+
+  @state()
+  private _viewAll = true;
+
+  @state()
+  private _sortOption: 'date' | 'title' | '' = '';
+
+  @state()
+  private _sortOrder: 'up' | 'down' | '' = '';
+
   private _animateItems = true;
 
   private _fuse: Fuse<ListItemData> | null = null;
@@ -217,9 +338,32 @@ export class ReadingListAppElement extends LitElement {
     }
   }
 
+  private get _unreadCount(): number {
+    return (this._listItems ?? []).filter((item) => !item.viewed).length;
+  }
+
+  private _compareItems = (a: ListItemData, b: ListItemData): number => {
+    if (this._sortOption === 'date') {
+      return this._sortOrder === 'up' ? a.addedAt - b.addedAt : b.addedAt - a.addedAt;
+    }
+    const cmp = a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' });
+    return this._sortOrder === 'up' ? -cmp : cmp;
+  };
+
   private get _visibleItems(): ListItemData[] {
-    if (!this.searchQuery) return this._listItems ?? [];
-    return this._fuse?.search(this.searchQuery).map((result) => result.item) ?? [];
+    let items = this.searchQuery
+      ? (this._fuse?.search(this.searchQuery).map((result) => result.item) ?? [])
+      : (this._listItems ?? []);
+
+    if (!this._viewAll) {
+      items = items.filter((item) => !item.viewed);
+    }
+
+    if (this._sortOption) {
+      items = [...items].sort(this._compareItems);
+    }
+
+    return items;
   }
 
   override render() {
@@ -250,6 +394,53 @@ export class ReadingListAppElement extends LitElement {
         />
       </search>
 
+      <div class="controls">
+        <div class="filter">
+          <button
+            class=${this._viewAll ? 'active' : ''}
+            @click=${() => this._onFilterClick(true)}
+          >
+            ${i18n.getMessage('allButton', 'all')}
+            <span class="count">${this._listItems?.length ?? 0}</span>
+          </button>
+          <button
+            class=${!this._viewAll ? 'active' : ''}
+            @click=${() => this._onFilterClick(false)}
+          >
+            ${i18n.getMessage('unreadButton', 'unread')}
+            <span class="count">${this._unreadCount}</span>
+          </button>
+        </div>
+
+        <div class="sort">
+          <button
+            class=${this._sortOption === 'date' ? 'active' : ''}
+            @click=${() => this._onSortClick('date')}
+          >
+            ${i18n.getMessage('dateButton', 'date')}
+            <em class="arrow ${this._sortOption === 'date' ? this._sortOrder : ''}"></em>
+          </button>
+          <button
+            class=${this._sortOption === 'title' ? 'active' : ''}
+            @click=${() => this._onSortClick('title')}
+          >
+            ${i18n.getMessage('titleButton', 'title')}
+            <em class="arrow ${this._sortOption === 'title' ? this._sortOrder : ''}"></em>
+          </button>
+        </div>
+      </div>
+
+      ${this._reviewItem
+        ? html`<reading-list-item
+            .name=${this._reviewItem.title}
+            .href=${this._reviewItem.url}
+            .favIconUrl=${this._reviewItem.favIconUrl}
+            .shiny=${true}
+            .theme=${this.theme}
+            @delete-item=${this._onDismissReview}
+          ></reading-list-item>`
+        : ''}
+
       <div class="reading-list">
         ${repeat(
           this._visibleItems,
@@ -259,8 +450,8 @@ export class ReadingListAppElement extends LitElement {
               .name=${listItem.title}
               .href=${listItem.url}
               .favIconUrl=${listItem.favIconUrl}
-              .shiny=${listItem.shiny}
               .isNew=${listItem.url === this._justAddedUrl}
+              .theme=${this.theme}
               @delete-item=${this._onDeleteItemClicked}
             ></reading-list-item>`,
         )}
@@ -273,15 +464,31 @@ export class ReadingListAppElement extends LitElement {
     this.searchQuery = input.value.trim();
   }
 
+  private async _onFilterClick(viewAll: boolean) {
+    this._viewAll = viewAll;
+    await updateSettings({ viewAll });
+  }
+
+  private async _onSortClick(option: 'date' | 'title') {
+    let nextOption: 'date' | 'title' | '' = option;
+    let nextOrder: 'up' | 'down' | '' = 'down';
+    if (this._sortOption === option) {
+      if (this._sortOrder === 'down') {
+        nextOrder = 'up';
+      } else {
+        nextOption = '';
+        nextOrder = '';
+      }
+    }
+    this._sortOption = nextOption;
+    this._sortOrder = nextOrder;
+    await updateSettings({ sortOption: nextOption, sortOrder: nextOrder });
+  }
+
   private async _onDeleteItemClicked(event: Event) {
     if (!this._listItems) return;
-    const target = event.target as ReadingListItemElement;
-    const url = target.href;
-    if (target.shiny) {
-      await updateSettings({ askedForReview: true });
-    } else {
-      await rl.removeReadingItem(url);
-    }
+    const url = (event.target as ReadingListItemElement).href;
+    await rl.removeReadingItem(url);
     this._listItems = this._listItems.filter((item) => item.url !== url);
     await this._syncBadgeForActiveTab();
   }

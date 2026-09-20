@@ -53,14 +53,19 @@ async function addToReadingList(url: string, title: string, favIconUrl?: string)
   if (tab?.id) void syncBadgeForTab(tab.id, tab.url);
 }
 
+async function handleTabUrl(tabId: number, url: string) {
+  await syncBadgeForTab(tabId, url);
+  await rl.updateReadingItem(url, {viewed: true});
+}
+
 chrome.tabs.onActivated.addListener(({tabId}) => {
   chrome.tabs.get(tabId).then((tab) => {
-    if (tab.url) void syncBadgeForTab(tabId, tab.url);
+    if (tab.url) void handleTabUrl(tabId, tab.url);
   });
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.url) {
-    void syncBadgeForTab(tabId, tab.url);
+    void handleTabUrl(tabId, tab.url);
   }
 });
