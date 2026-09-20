@@ -23,6 +23,12 @@ export class ReadingListItemElement extends LitElement {
       font-family: var(--base-font);
       font-size: var(--base-font-size);
       line-height: var(--base-line-height);
+
+      /* Contain the slidein animation's transform, which moves the item
+         off its own box and would otherwise cause a horizontal scrollbar
+         on the popup while it plays. */
+      display: block;
+      overflow: hidden;
     }
 
     *,
