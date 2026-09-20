@@ -20,7 +20,7 @@
     "type": "module"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; script-src-attr 'unsafe-hashes' 'sha256-1yqAQLUTuQHw6lKtvky9RrCMQjXOIVpFjDLSAh4ib5Y='; object-src 'none'"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'none'"
   },
   "browser_specific_settings": {
     "gecko": {

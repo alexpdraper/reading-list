@@ -311,7 +311,7 @@ export class ReadingListItemElement extends LitElement {
             ${this.favicon && !this.faviconError
               ? html`<img
                   class="favicon-img"
-                  onerror="this.onerror=null;this.hidden=true"
+                  @error=${() => (this.faviconError = true)}
                   src=${this.favicon}
                 />`
               : ''}
