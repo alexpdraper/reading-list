@@ -116,17 +116,26 @@ export class ReadingListAppElement extends LitElement {
   override render() {
     return html`
       <header>
-        ${isFirefox && !this._isSidebar
-          ? html`<button
-              class="sidebar-button"
-              aria-label="Open sidebar"
-              @click=${this._onSidebarClick}
-            >
-              Sidebar
-            </button>`
-          : ''}
-        <h1>${i18n.getMessage('appName', 'Reading List')}</h1>
-        <div class="header-actions">
+        <div class="header-top">
+          ${isFirefox && !this._isSidebar
+            ? html`<button
+                class="sidebar-button"
+                aria-label="Open sidebar"
+                @click=${this._onSidebarClick}
+              >
+                Sidebar
+              </button>`
+            : html`<span></span>`}
+          <button
+            class="settings-button"
+            aria-label="Options"
+            @click=${this._onSettingsClick}
+          >
+            &#9881;
+          </button>
+        </div>
+        <div class="header-title">
+          <h1>${i18n.getMessage('appName', 'Reading List')}</h1>
           <button
             class="save-button"
             id="save-button"
@@ -134,13 +143,6 @@ export class ReadingListAppElement extends LitElement {
             @click=${this._onSaveButtonClick}
           >
             +
-          </button>
-          <button
-            class="settings-button"
-            aria-label="Options"
-            @click=${this._onSettingsClick}
-          >
-            &#9881;
           </button>
         </div>
       </header>

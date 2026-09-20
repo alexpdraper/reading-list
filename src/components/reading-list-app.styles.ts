@@ -49,20 +49,23 @@ export const styles = css`
 
   header {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    gap: 0.5rem;
     width: 100%;
-    gap: 1rem;
     padding-bottom: 0.5rem;
   }
 
-  header h1 {
-    flex: 1;
-  }
-
-  .header-actions {
+  .header-top {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: space-between;
+  }
+
+  .header-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
   }
 
   .save-button,
