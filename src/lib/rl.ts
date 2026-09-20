@@ -8,10 +8,6 @@ import {
 } from './storage/buckets.js';
 import { getItemsRemote } from './storage/migrations.js';
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 // data: favicons (e.g. Gmail) can exceed a bucket's 8KB quota, so they're
 // stripped before storing.
 function normalizeItemForStorage(item: ListItemData): ListItemData {
@@ -121,36 +117,17 @@ class RL {
         maxKeyBytes = Math.max(maxKeyBytes, keyBytes);
       }
 
-      // Retry with backoff in case of a transient rejection (e.g. genuinely
-      // being right at the byte-quota boundary while other writes settle).
-      const MAX_RETRIES = 5;
-      let attempt = 0;
-      let batchWritten = false;
-      let lastErr: unknown = null;
-      while (attempt <= MAX_RETRIES && !batchWritten) {
-        try {
-          await chrome.storage.sync.set(toWrite);
-          batchWritten = true;
-        } catch (err) {
-          lastErr = err;
-          attempt++;
-          if (attempt <= MAX_RETRIES) {
-            await sleep(1000 * attempt);
-          }
-        }
-      }
-
-      if (!batchWritten) {
-        const name = lastErr instanceof Error ? lastErr.name : typeof lastErr;
-        const message =
-          lastErr instanceof Error ? lastErr.message : String(lastErr);
+      try {
+        await chrome.storage.sync.set(toWrite);
+      } catch (err) {
+        const name = err instanceof Error ? err.name : typeof err;
+        const message = err instanceof Error ? err.message : String(err);
         diagnostics =
           `at item ${i}/${rawItems.length}, ` +
           `~${bytesWrittenSoFar}B written so far, ` +
           `this batch: ${Object.keys(toWrite).length} keys / ~${batchBytes}B ` +
-          `(largest key ~${maxKeyBytes}B), gave up after ${MAX_RETRIES} retries, ` +
-          `error: ${name}: ${message}`;
-        firstError ??= lastErr;
+          `(largest key ~${maxKeyBytes}B), error: ${name}: ${message}`;
+        firstError ??= err;
         break;
       }
 
