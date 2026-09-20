@@ -112,6 +112,7 @@ export class ReadingListOptions extends LitElement {
       const text = await file.text();
       const items = JSON.parse(text);
       if (Array.isArray(items)) {
+        await rl.getListItems();
         for (const item of items) {
           await rl.addReadingItem(item);
         }
