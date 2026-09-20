@@ -212,7 +212,7 @@ export const styles = css`
     text-decoration: none;
     display: block;
     width: 100%;
-    padding: 10px 74px 10px 56px;
+    padding: 10px 50px 10px 56px;
     min-height: 56px;
     position: relative;
   }
@@ -268,22 +268,22 @@ export const styles = css`
     font: inherit;
     font-weight: bold;
     width: 100%;
-    padding: 0;
+    padding: 0.125rem 0.25rem;
     margin: 0;
     border: 0;
-    border-bottom: 1px solid var(--primary-color);
-    background: transparent;
+    border-radius: 0.25rem;
+    background-color: var(--rl-link-hover-bg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     color: inherit;
     position: relative;
-    z-index: 2;
+    z-index: 3;
   }
 
   .edit-title:focus {
     outline: none;
   }
 
-  .delete-button,
-  .edit-button {
+  .delete-button {
     position: absolute;
     text-align: center;
     font-weight: bold;
@@ -299,7 +299,31 @@ export const styles = css`
   }
 
   .edit-button {
-    right: 1.5rem;
+    position: absolute;
+    bottom: 0.4rem;
+    right: 0.4rem;
+    padding: 0;
+    width: 0.7rem;
+    height: 0.7rem;
+    border: 0;
+    border-radius: 0;
+    margin: 0;
+    text-align: center;
+    background: transparent;
+    color: #ccc;
+    transition: all 0.3s ease;
+    z-index: 2;
+  }
+
+  .edit-button:hover,
+  .edit-button:focus-visible {
+    cursor: pointer;
+    width: 1.5rem;
+    height: 1.5rem;
+    bottom: -0.1rem;
+    right: 0.1rem;
+    border-radius: 100%;
+    box-shadow: 1px 0 1px rgba(0, 0, 0, 0.15);
   }
 
   .delete-button-content,
@@ -337,8 +361,6 @@ export const styles = css`
   .edit-button:focus-visible .edit-button-content,
   .edit-button:hover .edit-button-content {
     color: #fff;
-    transform: scale(1.2);
-    box-shadow: 1px 0 1px rgba(0, 0, 0, 0.15);
     background: #ccc;
   }
 

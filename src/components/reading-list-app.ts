@@ -73,6 +73,8 @@ export class ReadingListAppElement extends LitElement {
 
   private _animateItems = true;
 
+  private _draggedUrl: string | null = null;
+
   private _listFilter = new ListFilter();
 
   override willUpdate(changedProperties: PropertyValues<this>) {
@@ -183,7 +185,13 @@ export class ReadingListAppElement extends LitElement {
           ></reading-list-item>`
         : ''}
 
-      <div class="reading-list" @dragover=${this._onDragOver} @drop=${this._onDrop}>
+      <div
+        class="reading-list"
+        @dragstart=${this._onDragStart}
+        @dragover=${this._onDragOver}
+        @drop=${this._onDrop}
+        @dragend=${this._onDragEnd}
+      >
         ${repeat(
           this._visibleItems,
           (item) => item.url,
@@ -247,35 +255,47 @@ export class ReadingListAppElement extends LitElement {
     );
   }
 
-  private _onDragOver(event: DragEvent) {
-    if (this._sortOption || this.searchQuery) return;
-    event.preventDefault();
-  }
-
-  private async _onDrop(event: DragEvent) {
-    if (this._sortOption || this.searchQuery || !this._listItems) return;
-    event.preventDefault();
-
-    const draggedUrl = event.dataTransfer?.getData('text/plain');
-    if (!draggedUrl) return;
-
-    const targetItem = (event.composedPath() as HTMLElement[]).find(
+  private _findItemElement(event: DragEvent): ReadingListItemElement | undefined {
+    return (event.composedPath() as HTMLElement[]).find(
       (el) => el.tagName === 'READING-LIST-ITEM',
     ) as ReadingListItemElement | undefined;
-    const targetUrl = targetItem?.href;
-    if (!targetUrl || targetUrl === draggedUrl) return;
+  }
+
+  private _onDragStart(event: DragEvent) {
+    if (this._sortOption || this.searchQuery) {
+      event.preventDefault();
+      return;
+    }
+    this._draggedUrl = this._findItemElement(event)?.href ?? null;
+  }
+
+  private _onDragOver(event: DragEvent) {
+    if (this._sortOption || this.searchQuery || !this._listItems || !this._draggedUrl) return;
+    event.preventDefault();
+
+    const targetUrl = this._findItemElement(event)?.href;
+    if (!targetUrl || targetUrl === this._draggedUrl) return;
 
     const items = [...this._listItems];
-    const fromIndex = items.findIndex((item) => item.url === draggedUrl);
+    const fromIndex = items.findIndex((item) => item.url === this._draggedUrl);
     const toIndex = items.findIndex((item) => item.url === targetUrl);
-    if (fromIndex === -1 || toIndex === -1) return;
+    if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return;
 
     const [dragged] = items.splice(fromIndex, 1);
     items.splice(toIndex, 0, dragged);
-    items.forEach((item, index) => {
-      item.index = index;
-    });
+    this._listItems = items;
+  }
 
+  private _onDrop(event: DragEvent) {
+    event.preventDefault();
+  }
+
+  private async _onDragEnd() {
+    const wasDragging = this._draggedUrl !== null;
+    this._draggedUrl = null;
+    if (!wasDragging || this._sortOption || this.searchQuery || !this._listItems) return;
+
+    const items = this._listItems.map((item, index) => ({ ...item, index }));
     this._listItems = items;
     for (const item of items) {
       await rl.updateReadingItem(item.url, { index: item.index });
