@@ -1,0 +1,55 @@
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Reading List</title>
+    <script
+      type="module"
+      src="./scripts/components/reading-list-app.js"
+    ></script>
+    <style>
+      :root {
+        --base-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+        --base-font-size: 13px;
+        --base-line-height: 1.4;
+        --text-color: #555;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        padding: 0;
+        margin: 0;
+        font-family: var(--base-font);
+        font-size: var(--base-font-size);
+        line-height: var(--base-line-height);
+        color: var(--text-color);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --text-color: #e0e0e0;
+        }
+        body, main {
+          background: #181a20;
+          color: var(--text-color);
+        }
+      }
+
+      main {
+        padding: 1rem;
+      }
+    </style>
+  </head>
+  <body class="sidebar-page">
+    <main>
+      <reading-list-app></reading-list-app>
+    </main>
+  </body>
+</html>

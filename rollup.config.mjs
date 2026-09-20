@@ -13,7 +13,7 @@ export default {
     // Entry point for application build; can specify a glob to build multiple
     // HTML files for non-SPA app
     html({
-      input: ['extension/popup.html', 'extension/options.html']
+      input: ['extension/popup.html', 'extension/options.html', 'extension/sidebar.html']
     }),
     // Resolve bare module specifiers to relative paths
     resolve(),
