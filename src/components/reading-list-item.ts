@@ -107,6 +107,7 @@ export class ReadingListItemElement extends LitElement {
           ${this._editing
             ? html`<input
                 class="edit-title"
+                autocomplete="off"
                 .value=${this._editValue}
                 @input=${(e: Event) => (this._editValue = (e.target as HTMLInputElement).value)}
                 @keydown=${this._onEditKeydown}
