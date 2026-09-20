@@ -72,9 +72,11 @@ export const styles = css`
   .settings-button {
     --button-size: 2rem;
 
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: var(--button-size);
     height: var(--button-size);
-    line-height: var(--button-size);
     font-weight: bold;
     border: 0;
     border-radius: 9999px;
@@ -259,6 +261,13 @@ export const styles = css`
     main {
       background: #777;
       color: #000;
+    }
+    .save-button {
+      background: #555;
+    }
+    .save-button:hover,
+    .save-button:focus {
+      background: #333;
     }
     .filter button,
     .sort button {
