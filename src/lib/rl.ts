@@ -3,6 +3,7 @@ export interface ListItemData {
   title: string;
   url: string;
   openNewTab?: boolean;
+  favIconUrl?: string;
 }
 
 // const storageItems = {

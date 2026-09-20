@@ -1,6 +1,8 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
+const isFirefox = navigator.userAgent.includes('Firefox');
+
 @customElement('reading-list-item')
 export class ReadingListItemElement extends LitElement {
   static override styles = css`
@@ -215,6 +217,14 @@ export class ReadingListItemElement extends LitElement {
   @property({ type: String })
   href = '';
 
+  /**
+   * The favicon URL captured from the tab when the item was added, if any.
+   * Firefox restricts access to cached tab favicons, so it always falls
+   * back to the DuckDuckGo icon service instead of using this.
+   */
+  @property({ type: String })
+  favIconUrl?: string;
+
   private get url() {
     return this.href ? new URL(this.href) : null;
   }
@@ -223,6 +233,9 @@ export class ReadingListItemElement extends LitElement {
    * The src for the favicon image.
    */
   private get favicon() {
+    if (!isFirefox && this.favIconUrl) {
+      return this.favIconUrl;
+    }
     if (!this.url || !this.url.hostname) {
       return null;
     }

@@ -215,6 +215,7 @@ export class ReadingListAppElement extends LitElement {
             html`<reading-list-item
               .name=${listItem.title}
               .href=${listItem.url}
+              .favIconUrl=${listItem.favIconUrl}
               @delete-item=${this._onDeleteItemClicked}
             ></reading-list-item>`,
         )}
@@ -234,9 +235,9 @@ export class ReadingListAppElement extends LitElement {
     this._listItems = this._listItems.filter((item) => item.url !== url);
   }
 
-  private async _addReadingItem(url: string, title: string) {
+  private async _addReadingItem(url: string, title: string, favIconUrl?: string) {
     if (this._listItems) {
-      const listItem: ListItemData = { url, title, addedAt: Date.now() };
+      const listItem: ListItemData = { url, title, addedAt: Date.now(), favIconUrl };
 
       try {
         await rl.addReadingItem(listItem);
@@ -255,7 +256,7 @@ export class ReadingListAppElement extends LitElement {
   private async _onSaveButtonClick() {
     const tab = await this._getActiveTab();
     if (tab && tab.url && tab.title && this._listItems) {
-      return this._addReadingItem(tab.url, tab.title);
+      return this._addReadingItem(tab.url, tab.title, tab.favIconUrl);
     }
   }
 

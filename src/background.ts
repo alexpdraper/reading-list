@@ -19,12 +19,12 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === 'add-link-to-reading-list' && info.linkUrl) {
       void addToReadingList(info.linkUrl, info.selectionText || info.linkUrl);
     } else if (info.menuItemId === 'add-page-to-reading-list' && tab && tab.url) {
-      void addToReadingList(tab.url, tab.title || tab.url);
+      void addToReadingList(tab.url, tab.title || tab.url, tab.favIconUrl);
     }
   });
 });
 
-async function addToReadingList(url: string, title: string) {
-  const newItem: ListItemData = {url, title, addedAt: Date.now()};
+async function addToReadingList(url: string, title: string, favIconUrl?: string) {
+  const newItem: ListItemData = {url, title, addedAt: Date.now(), favIconUrl};
   await rl.addReadingItem(newItem);
 }
