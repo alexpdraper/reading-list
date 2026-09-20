@@ -48,12 +48,15 @@ export const styles = css`
   }
 
   header {
-    display: grid;
-    grid-template-columns: 1fr auto;
+    display: flex;
     align-items: center;
     width: 100%;
     gap: 1rem;
     padding-bottom: 0.5rem;
+  }
+
+  header h1 {
+    flex: 1;
   }
 
   .header-actions {
@@ -99,6 +102,29 @@ export const styles = css`
 
   .save-button:focus,
   .settings-button:focus {
+    outline: 3px solid lightblue;
+  }
+
+  .sidebar-button {
+    background: transparent;
+    color: var(--rl-link-color);
+    border: 1px solid var(--rl-link-color);
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+  }
+
+  .sidebar-button:hover,
+  .sidebar-button:focus {
+    background-color: var(--rl-bg-color);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+
+  .sidebar-button:focus {
     outline: 3px solid lightblue;
   }
 

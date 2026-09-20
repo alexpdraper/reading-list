@@ -6,6 +6,7 @@ import { rl, ListItemData, getSettings, updateSettings } from '../lib/rl';
 import { syncBadgeForTab } from '../lib/badge';
 import { ListFilter, SortOption, SortOrder } from '../lib/list-filter';
 import { maybeGetReviewItem, dismissReview } from '../lib/review';
+import { isFirefox } from '../lib/browser';
 import { ReadingListItemElement } from './reading-list-item';
 import { styles } from './reading-list-app.styles';
 import './reading-list-item.js';
@@ -115,6 +116,15 @@ export class ReadingListAppElement extends LitElement {
   override render() {
     return html`
       <header>
+        ${isFirefox && !this._isSidebar
+          ? html`<button
+              class="sidebar-button"
+              aria-label="Open sidebar"
+              @click=${this._onSidebarClick}
+            >
+              Sidebar
+            </button>`
+          : ''}
         <h1>${i18n.getMessage('appName', 'Reading List')}</h1>
         <div class="header-actions">
           <button
@@ -361,6 +371,15 @@ export class ReadingListAppElement extends LitElement {
 
   private _onSettingsClick() {
     chrome.runtime.openOptionsPage();
+  }
+
+  private get _isSidebar() {
+    return document.body.classList.contains('sidebar-page');
+  }
+
+  private _onSidebarClick() {
+    (window as unknown as { browser?: { sidebarAction?: { toggle: () => void } } }).browser
+      ?.sidebarAction?.toggle();
   }
 
   private async _getActiveTab() {
