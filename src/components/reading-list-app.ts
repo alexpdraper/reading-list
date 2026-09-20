@@ -193,6 +193,10 @@ export class ReadingListAppElement extends LitElement {
     document.title = i18n.getMessage('appName', 'Reading List');
   }
 
+  override updated() {
+    if (this._justAddedUrl !== null) this._justAddedUrl = null;
+  }
+
   @state()
   _listItems: ListItemData[] | null = null;
 
