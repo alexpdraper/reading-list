@@ -12,7 +12,6 @@ export interface Settings {
   openNewTab?: boolean;
   animateItems?: boolean;
   addContextMenu?: boolean;
-  theme?: 'light' | 'dark';
   sortOption?: 'date' | 'title' | '';
   sortOrder?: 'up' | 'down' | '';
   viewAll?: boolean;

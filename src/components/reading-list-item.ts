@@ -35,9 +35,6 @@ export class ReadingListItemElement extends LitElement {
   @property({ type: Boolean })
   locked = false;
 
-  @property({ type: String, reflect: true })
-  theme: '' | 'light' | 'dark' = '';
-
   @state()
   private _slidein = false;
 

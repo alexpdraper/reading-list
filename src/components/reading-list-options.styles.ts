@@ -32,20 +32,6 @@ export const styles = css`
     }
   }
 
-  :host([theme='dark']) {
-    --rl-bg-color: #181a20;
-    --rl-text-color: #e0e0e0;
-    --rl-input-bg: #23272e;
-    --rl-input-border: #444;
-  }
-
-  :host([theme='light']) {
-    --rl-bg-color: #f9f9f9;
-    --rl-text-color: #222;
-    --rl-input-bg: #fff;
-    --rl-input-border: #ccc;
-  }
-
   .section {
     margin-bottom: 2em;
   }

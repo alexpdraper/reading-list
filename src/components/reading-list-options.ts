@@ -1,5 +1,5 @@
 import { html, LitElement } from 'lit';
-import { property, state } from 'lit/decorators.js';
+import { state } from 'lit/decorators.js';
 import { rl, getSettings, updateSettings } from '../lib/rl';
 import { i18n } from '../lib/i18n';
 import { styles } from './reading-list-options.styles';
@@ -10,9 +10,6 @@ export class ReadingListOptions extends LitElement {
   @state() globalOpenNewTab = false;
   @state() globalAnimateItems = true;
   @state() globalAddContextMenu = true;
-
-  @property({ type: String, reflect: true })
-  theme: '' | 'light' | 'dark' = '';
 
   override connectedCallback() {
     super.connectedCallback();
@@ -52,18 +49,6 @@ export class ReadingListOptions extends LitElement {
           />
           <label for="addContextMenu">Show "Add to Reading List" in the right-click menu</label>
         </div>
-        <div class="option">
-          <label for="theme">${i18n.getMessage('theme', 'Theme:')}</label>
-          <select id="theme" @change=${this._onThemeChange}>
-            <option value="" ?selected=${this.theme === ''}>System</option>
-            <option value="light" ?selected=${this.theme === 'light'}>
-              ${i18n.getMessage('light', 'Light')}
-            </option>
-            <option value="dark" ?selected=${this.theme === 'dark'}>
-              ${i18n.getMessage('dark', 'Dark')}
-            </option>
-          </select>
-        </div>
       </div>
 
       <div class="section">
@@ -89,7 +74,6 @@ export class ReadingListOptions extends LitElement {
     this.globalOpenNewTab = settings.openNewTab ?? false;
     this.globalAnimateItems = settings.animateItems ?? true;
     this.globalAddContextMenu = settings.addContextMenu ?? true;
-    this.theme = settings.theme ?? '';
   }
 
   private async _onSettingChange(
@@ -101,12 +85,6 @@ export class ReadingListOptions extends LitElement {
     if (key === 'animateItems') this.globalAnimateItems = checked;
     if (key === 'addContextMenu') this.globalAddContextMenu = checked;
     await updateSettings({ [key]: checked });
-  }
-
-  private async _onThemeChange(e: Event) {
-    const value = (e.target as HTMLSelectElement).value as '' | 'light' | 'dark';
-    this.theme = value;
-    await updateSettings({ theme: value || undefined });
   }
 
   async _onResetClick() {

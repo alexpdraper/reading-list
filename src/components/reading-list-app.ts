@@ -1,6 +1,6 @@
 import { LitElement, html, PropertyValues } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { i18n } from '../lib/i18n';
 import { rl, ListItemData, getSettings, updateSettings } from '../lib/rl';
 import { syncBadgeForTab } from '../lib/badge';
@@ -22,7 +22,6 @@ export class ReadingListAppElement extends LitElement {
       this._viewAll = settings.viewAll ?? true;
       this._sortOption = settings.sortOption ?? '';
       this._sortOrder = settings.sortOrder ?? '';
-      this.theme = settings.theme ?? '';
 
       this._listItems = listItems;
       maybeGetReviewItem(listItems.length).then((item) => {
@@ -33,9 +32,6 @@ export class ReadingListAppElement extends LitElement {
       }
     });
   }
-
-  @property({ type: String, reflect: true })
-  theme: '' | 'light' | 'dark' = '';
 
   private async _onDismissReview() {
     this._reviewItem = null;
@@ -205,7 +201,6 @@ export class ReadingListAppElement extends LitElement {
             .shiny=${true}
             .animateItems=${this._animateItems}
             .locked=${this._editingUrl !== null}
-            .theme=${this.theme}
             @delete-item=${this._onDismissReview}
           ></reading-list-item>`
         : ''}
@@ -230,7 +225,6 @@ export class ReadingListAppElement extends LitElement {
               .isNew=${this._animatingUrls.has(listItem.url)}
               .animateItems=${this._animateItems}
               .locked=${this._editingUrl !== null && this._editingUrl !== listItem.url}
-              .theme=${this.theme}
               @delete-item=${this._onDeleteItemClicked}
               @edit-item=${this._onEditItemClicked}
             ></reading-list-item>`,
