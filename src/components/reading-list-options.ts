@@ -1,6 +1,6 @@
 import { html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
-import { rl, getSettings, updateSettings } from '../lib/rl';
+import { rl, getSettings, updateSettings, getStorageDiagnostics } from '../lib/rl';
 import { i18n } from '../lib/i18n';
 import { styles } from './reading-list-options.styles';
 
@@ -61,6 +61,7 @@ export class ReadingListOptions extends LitElement {
       <details class="section">
         <summary>Advanced</summary>
         <div>
+          <button @click=${this._onDiagnosticsClick}>Storage Diagnostics</button>
           <button class="danger" @click=${this._onResetClick}>
             ${i18n.getMessage('clearData', 'Clear Reading List')}
           </button>
@@ -95,8 +96,12 @@ export class ReadingListOptions extends LitElement {
       ),
     );
     if (confirmed) {
-      await chrome.storage.sync.clear();
+      await rl.clearAll();
     }
+  }
+
+  async _onDiagnosticsClick() {
+    alert(await getStorageDiagnostics());
   }
 
   openImportDialog() {
@@ -113,16 +118,8 @@ export class ReadingListOptions extends LitElement {
       const items = JSON.parse(text);
       if (Array.isArray(items)) {
         await rl.getListItems();
-        let succeeded = 0;
-        let firstError: unknown = null;
-        for (const item of items) {
-          try {
-            await rl.addReadingItem(item);
-            succeeded++;
-          } catch (err) {
-            firstError ??= err;
-          }
-        }
+        const { succeeded, firstError, diagnostics } =
+          await rl.bulkAddReadingItems(items);
         if (succeeded === items.length) {
           alert(`Import complete! Added ${succeeded} items.`);
         } else {
@@ -130,7 +127,7 @@ export class ReadingListOptions extends LitElement {
             `Imported ${succeeded} of ${items.length} items. ` +
               `${items.length - succeeded} failed` +
               (firstError ? ` (first error: ${firstError})` : '') +
-              ' — this usually means chrome.storage.sync\'s quota (512 items / ~100KB total) was hit.',
+              (diagnostics ? `\n\nDiagnostics: ${diagnostics}` : ''),
           );
         }
       } else {
