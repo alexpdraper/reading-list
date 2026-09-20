@@ -1,5 +1,6 @@
-import { ListItemData, getSettings, updateSettings } from './rl';
-import { isFirefox } from './browser';
+import { ListItemData } from './storage/buckets.js';
+import { getSettings, updateSettings } from './settings.js';
+import { isFirefox } from './browser.js';
 
 const REVIEW_URL_FIREFOX = 'https://addons.mozilla.org/en-US/firefox/addon/reading_list/';
 const REVIEW_URL_CHROME =

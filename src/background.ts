@@ -1,7 +1,8 @@
-import {rl, getSettings} from './lib/rl';
-import {i18n} from './lib/i18n';
-import {syncBadgeForTab} from './lib/badge';
-import {addReadingItemAndSyncBadge} from './lib/add-item';
+import {rl} from './lib/rl.js';
+import {getSettings} from './lib/settings.js';
+import {i18n} from './lib/i18n.js';
+import {syncBadgeForTab} from './lib/badge.js';
+import {addReadingItemAndSyncBadge} from './lib/add-item.js';
 
 chrome.action.setBadgeBackgroundColor({color: '#2ea99c'});
 

@@ -1,16 +1,18 @@
 import { LitElement, html, PropertyValues } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import { customElement, state } from 'lit/decorators.js';
-import { i18n } from '../lib/i18n';
-import { rl, ListItemData, getSettings, updateSettings } from '../lib/rl';
-import { syncBadgeForTab } from '../lib/badge';
-import { ListFilter, SortOption, SortOrder } from '../lib/list-filter';
-import { maybeGetReviewItem, dismissReview } from '../lib/review';
-import { isFirefox, getActiveTab } from '../lib/browser';
-import { addReadingItemAndSyncBadge } from '../lib/add-item';
-import { ReadingListItemElement } from './reading-list-item';
-import { styles } from './reading-list-app.styles';
-import { theme } from './theme.styles';
+import { i18n } from '../lib/i18n.js';
+import { rl } from '../lib/rl.js';
+import { ListItemData } from '../lib/storage/buckets.js';
+import { getSettings, updateSettings } from '../lib/settings.js';
+import { syncBadgeForTab } from '../lib/badge.js';
+import { ListFilter, SortOption, SortOrder } from '../lib/list-filter.js';
+import { maybeGetReviewItem, dismissReview } from '../lib/review.js';
+import { isFirefox, getActiveTab } from '../lib/browser.js';
+import { addReadingItemAndSyncBadge } from '../lib/add-item.js';
+import { ReadingListItemElement } from './reading-list-item.js';
+import { styles } from './reading-list-app.styles.js';
+import { theme } from './theme.styles.js';
 import './reading-list-item.js';
 
 @customElement('reading-list-app')

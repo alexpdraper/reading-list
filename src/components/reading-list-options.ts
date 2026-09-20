@@ -1,15 +1,27 @@
 import { html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
-import { rl, getSettings, updateSettings, getStorageDiagnostics } from '../lib/rl';
-import { i18n } from '../lib/i18n';
-import { styles } from './reading-list-options.styles';
+import { rl } from '../lib/rl.js';
+import { getSettings, updateSettings } from '../lib/settings.js';
+import { getStorageDiagnostics } from '../lib/storage/diagnostics.js';
+import { i18n } from '../lib/i18n.js';
+import { styles } from './reading-list-options.styles.js';
+
+type CheckboxSettingKey = 'openNewTab' | 'animateItems' | 'addContextMenu';
+
+const CHECKBOX_SETTINGS: { key: CheckboxSettingKey; label: string }[] = [
+  { key: 'openNewTab', label: 'Open items in new tab by default' },
+  { key: 'animateItems', label: 'Animate items' },
+  { key: 'addContextMenu', label: 'Show "Add to Reading List" in the right-click menu' },
+];
 
 export class ReadingListOptions extends LitElement {
   static override styles = styles;
 
-  @state() globalOpenNewTab = false;
-  @state() globalAnimateItems = true;
-  @state() globalAddContextMenu = true;
+  @state() settings: Record<CheckboxSettingKey, boolean> = {
+    openNewTab: false,
+    animateItems: true,
+    addContextMenu: true,
+  };
 
   override connectedCallback() {
     super.connectedCallback();
@@ -22,33 +34,19 @@ export class ReadingListOptions extends LitElement {
 
       <div class="section">
         <h3>Default Behavior</h3>
-        <div class="option">
-          <input
-            type="checkbox"
-            id="openNewTab"
-            ?checked=${this.globalOpenNewTab}
-            @change=${(e: Event) => this._onSettingChange('openNewTab', e)}
-          />
-          <label for="openNewTab">Open items in new tab by default</label>
-        </div>
-        <div class="option">
-          <input
-            type="checkbox"
-            id="animateItems"
-            ?checked=${this.globalAnimateItems}
-            @change=${(e: Event) => this._onSettingChange('animateItems', e)}
-          />
-          <label for="animateItems">Animate items</label>
-        </div>
-        <div class="option">
-          <input
-            type="checkbox"
-            id="addContextMenu"
-            ?checked=${this.globalAddContextMenu}
-            @change=${(e: Event) => this._onSettingChange('addContextMenu', e)}
-          />
-          <label for="addContextMenu">Show "Add to Reading List" in the right-click menu</label>
-        </div>
+        ${CHECKBOX_SETTINGS.map(
+          ({ key, label }) => html`
+            <div class="option">
+              <input
+                type="checkbox"
+                id=${key}
+                ?checked=${this.settings[key]}
+                @change=${(e: Event) => this._onSettingChange(key, e)}
+              />
+              <label for=${key}>${label}</label>
+            </div>
+          `,
+        )}
       </div>
 
       <div class="section">
@@ -72,19 +70,16 @@ export class ReadingListOptions extends LitElement {
 
   private async _loadSettings() {
     const settings = await getSettings();
-    this.globalOpenNewTab = settings.openNewTab;
-    this.globalAnimateItems = settings.animateItems;
-    this.globalAddContextMenu = settings.addContextMenu;
+    this.settings = {
+      openNewTab: settings.openNewTab,
+      animateItems: settings.animateItems,
+      addContextMenu: settings.addContextMenu,
+    };
   }
 
-  private async _onSettingChange(
-    key: 'openNewTab' | 'animateItems' | 'addContextMenu',
-    e: Event,
-  ) {
+  private async _onSettingChange(key: CheckboxSettingKey, e: Event) {
     const checked = (e.target as HTMLInputElement).checked;
-    if (key === 'openNewTab') this.globalOpenNewTab = checked;
-    if (key === 'animateItems') this.globalAnimateItems = checked;
-    if (key === 'addContextMenu') this.globalAddContextMenu = checked;
+    this.settings = { ...this.settings, [key]: checked };
     await updateSettings({ [key]: checked });
   }
 

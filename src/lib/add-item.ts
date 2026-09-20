@@ -1,6 +1,7 @@
-import { ListItemData, rl } from './rl';
-import { syncBadgeForTab } from './badge';
-import { getActiveTab } from './browser';
+import { rl } from './rl.js';
+import { ListItemData } from './storage/buckets.js';
+import { syncBadgeForTab } from './badge.js';
+import { getActiveTab } from './browser.js';
 
 export async function addReadingItemAndSyncBadge(
   url: string,

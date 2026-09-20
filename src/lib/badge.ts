@@ -1,4 +1,4 @@
-import { rl } from './rl';
+import { rl } from './rl.js';
 
 export async function syncBadgeForTab(tabId: number, url?: string) {
   if (!url) {
