@@ -24,9 +24,7 @@ export class ReadingListItemElement extends LitElement {
       font-size: var(--base-font-size);
       line-height: var(--base-line-height);
 
-      /* Contain the slidein animation's transform, which moves the item
-         off its own box and would otherwise cause a horizontal scrollbar
-         on the popup while it plays. */
+      /* clips the slidein transform so it can't scroll the popup */
       display: block;
       overflow: hidden;
     }
@@ -265,18 +263,9 @@ export class ReadingListItemElement extends LitElement {
   @property({ type: String })
   href = '';
 
-  /**
-   * The favicon URL captured from the tab when the item was added, if any.
-   * Firefox restricts access to cached tab favicons, so it always falls
-   * back to the DuckDuckGo icon service instead of using this.
-   */
   @property({ type: String })
   favIconUrl?: string;
 
-  /**
-   * Whether this item was just added to the list, so it should play the
-   * slide-in animation once on mount.
-   */
   @property({ type: Boolean, attribute: false })
   isNew = false;
 
