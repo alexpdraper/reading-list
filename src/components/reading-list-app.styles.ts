@@ -191,8 +191,8 @@ export const styles = css`
     align-items: center;
     gap: 0.25rem;
     border: 0;
-    background: var(--rl-bg-color);
-    color: var(--rl-link-color);
+    background: #fff;
+    color: #555;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-size: 0.7rem;
@@ -206,8 +206,7 @@ export const styles = css`
   .sort button:hover,
   .sort button:focus,
   .sort button.active {
-    background: var(--rl-link-hover-bg);
-    color: var(--primary-color);
+    background: #f7f7f7;
   }
 
   .count {
@@ -260,6 +259,20 @@ export const styles = css`
     main {
       background: #181a20;
       color: #e0e0e0;
+    }
+    .filter button,
+    .sort button {
+      background: var(--rl-bg-color);
+      color: var(--rl-link-color);
+    }
+    .filter button:hover,
+    .filter button:focus,
+    .filter button.active,
+    .sort button:hover,
+    .sort button:focus,
+    .sort button.active {
+      background: var(--rl-link-hover-bg);
+      color: var(--primary-color);
     }
   }
 
