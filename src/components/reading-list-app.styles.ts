@@ -11,7 +11,7 @@ export const styles = css`
     --rl-bg-color: #f7f7f7;
     --rl-shadow: 0 1px 1px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
     --rl-link-color: #555;
-    --rl-link-hover-bg: #fff;
+    --rl-link-hover-bg: #f7f7f7;
     --primary-color: #66cc98;
     --primary-color-focus: #44aa76;
   }
@@ -191,7 +191,7 @@ export const styles = css`
     align-items: center;
     gap: 0.25rem;
     border: 0;
-    background: var(--rl-bg-color);
+    background: #e9e9ed;
     color: var(--rl-link-color);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -259,6 +259,10 @@ export const styles = css`
     main {
       background: #181a20;
       color: #e0e0e0;
+    }
+    .filter button,
+    .sort button {
+      background: var(--rl-bg-color);
     }
   }
 
