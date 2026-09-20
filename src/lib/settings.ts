@@ -28,3 +28,18 @@ export async function updateSettings(updates: Partial<Settings>): Promise<Settin
   await chrome.storage.sync.set({ settings: next });
   return next;
 }
+
+export function onSettingsChanged(
+  callback: (settings: Required<Settings>) => void,
+): () => void {
+  if (!chrome?.storage?.onChanged) return () => {};
+  const listener = (
+    changes: { [key: string]: chrome.storage.StorageChange },
+    areaName: string,
+  ) => {
+    if (areaName !== 'sync' || !('settings' in changes)) return;
+    callback({ ...DEFAULT_SETTINGS, ...changes.settings.newValue });
+  };
+  chrome.storage.onChanged.addListener(listener);
+  return () => chrome.storage.onChanged.removeListener(listener);
+}

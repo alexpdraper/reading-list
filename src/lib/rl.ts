@@ -7,6 +7,7 @@ import {
   writeBucket,
 } from './storage/buckets.js';
 import { getItemsRemote } from './storage/migrations.js';
+import { broadcastListChange, onListChange } from './list-sync.js';
 
 // data: favicons (e.g. Gmail) can exceed a bucket's 8KB quota, so they're
 // stripped before storing.
@@ -22,6 +23,22 @@ function normalizeItemForStorage(item: ListItemData): ListItemData {
 class RL {
   private list: ListItemData[] = [];
   private initialized = false;
+  private subscribers = new Set<() => void>();
+
+  constructor() {
+    onListChange(() => void this.reloadFromRemoteChange());
+  }
+
+  subscribe(callback: () => void): () => void {
+    this.subscribers.add(callback);
+    return () => this.subscribers.delete(callback);
+  }
+
+  private async reloadFromRemoteChange() {
+    this.initialized = false;
+    await this.getListItems();
+    for (const callback of this.subscribers) callback();
+  }
 
   async getListItems() {
     if (!this.initialized) {
@@ -64,6 +81,7 @@ class RL {
       listItem,
       ...this.list.filter((item) => item.url !== listItem.url),
     ];
+    broadcastListChange();
   }
 
   // Adds many items at once, batching writes so a large import doesn't fire
@@ -138,6 +156,8 @@ class RL {
       succeeded += validated.length;
     }
 
+    if (succeeded > 0) broadcastListChange();
+
     return {
       succeeded,
       failed: rawItems.length - succeeded,
@@ -155,6 +175,7 @@ class RL {
       bucket.filter((item) => item.url !== url),
     );
     this.list = this.list.filter((item) => item.url !== url);
+    broadcastListChange();
   }
 
   async updateReadingItem(url: string, updates: Partial<ListItemData>) {
@@ -173,6 +194,7 @@ class RL {
         bucket.map((b) => (b.url === url ? updatedItem : b)),
       );
       Object.assign(item, updates);
+      broadcastListChange();
     }
   }
 
@@ -194,6 +216,7 @@ class RL {
     }
     if (Object.keys(toWrite).length > 0) {
       await chrome.storage.sync.set(toWrite);
+      broadcastListChange();
     }
   }
 
@@ -201,6 +224,7 @@ class RL {
     await chrome.storage.sync.clear();
     this.list = [];
     this.initialized = true;
+    broadcastListChange();
   }
 }
 

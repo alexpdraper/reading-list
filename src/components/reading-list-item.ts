@@ -27,6 +27,9 @@ export class ReadingListItemElement extends LitElement {
   @property({ type: Boolean, attribute: false })
   isNew = false;
 
+  @property({ type: Boolean, attribute: false })
+  removing = false;
+
   @property({ type: Boolean })
   shiny = false;
 
@@ -43,6 +46,9 @@ export class ReadingListItemElement extends LitElement {
   private _slideout = false;
 
   @state()
+  private _localDelete = false;
+
+  @state()
   private _dragging = false;
 
   @state()
@@ -57,6 +63,13 @@ export class ReadingListItemElement extends LitElement {
   override willUpdate(changedProperties: PropertyValues<this>) {
     if (changedProperties.has('isNew') && this.isNew) {
       this._slidein = true;
+    }
+    if (changedProperties.has('removing') && this.removing) {
+      if (this.animateItems) {
+        this._slideout = true;
+      } else {
+        this._dispatchRemoveAnimationEnd();
+      }
     }
   }
 
@@ -200,6 +213,7 @@ export class ReadingListItemElement extends LitElement {
 
   private _onDeleteClick() {
     if (this.animateItems) {
+      this._localDelete = true;
       this._slideout = true;
     } else {
       this._dispatchDelete();
@@ -210,13 +224,23 @@ export class ReadingListItemElement extends LitElement {
     if (event.animationName === 'slidein') {
       this._slidein = false;
     } else if (event.animationName === 'slideout') {
-      this._dispatchDelete();
+      if (this._localDelete) {
+        this._dispatchDelete();
+      } else {
+        this._dispatchRemoveAnimationEnd();
+      }
     }
   }
 
   private _dispatchDelete() {
     this.dispatchEvent(
       new Event('delete-item', { bubbles: true, composed: true }),
+    );
+  }
+
+  private _dispatchRemoveAnimationEnd() {
+    this.dispatchEvent(
+      new Event('remove-animation-end', { bubbles: true, composed: true }),
     );
   }
 

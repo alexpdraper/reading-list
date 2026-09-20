@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { i18n } from '../lib/i18n.js';
 import { rl } from '../lib/rl.js';
 import { ListItemData } from '../lib/storage/buckets.js';
-import { getSettings, updateSettings } from '../lib/settings.js';
+import { getSettings, updateSettings, onSettingsChanged } from '../lib/settings.js';
 import { syncBadgeForTab } from '../lib/badge.js';
 import { ListFilter, SortOption, SortOrder } from '../lib/list-filter.js';
 import { maybeGetReviewItem, dismissReview } from '../lib/review.js';
@@ -14,6 +14,9 @@ import { ReadingListItemElement } from './reading-list-item.js';
 import { styles } from './reading-list-app.styles.js';
 import { theme } from './theme.styles.js';
 import './reading-list-item.js';
+
+// Slightly past the 0.65s slideout animation (reading-list-item.styles.ts).
+const REMOTE_REMOVE_TIMEOUT_MS = 850;
 
 @customElement('reading-list-app')
 export class ReadingListAppElement extends LitElement {
@@ -45,6 +48,67 @@ export class ReadingListAppElement extends LitElement {
   override connectedCallback(): void {
     super.connectedCallback();
     document.title = i18n.getMessage('appName', 'Reading List');
+    this._unsubscribe?.();
+    this._unsubscribe = rl.subscribe(() => void this._onRemoteChange());
+    this._unsubscribeSettings?.();
+    this._unsubscribeSettings = onSettingsChanged((settings) => {
+      this._animateItems = settings.animateItems;
+      this._viewAll = settings.viewAll;
+      this._sortOption = settings.sortOption;
+      this._sortOrder = settings.sortOrder;
+    });
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._unsubscribe?.();
+    this._unsubscribe = undefined;
+    this._unsubscribeSettings?.();
+    this._unsubscribeSettings = undefined;
+  }
+
+  private async _onRemoteChange() {
+    const previous = this._listItems ?? [];
+    const items = await rl.getListItems();
+
+    const previousUrls = new Set(previous.map((item) => item.url));
+    const nextUrls = new Set(items.map((item) => item.url));
+
+    const removed = previous.filter((item) => !nextUrls.has(item.url));
+    const removedVisible = this._animateItems
+      ? removed.filter((item) =>
+          this._visibleItems.some((visible) => visible.url === item.url),
+        )
+      : [];
+    const added = items.filter((item) => !previousUrls.has(item.url));
+
+    this._listItems = [...items, ...removedVisible];
+
+    if (removedVisible.length > 0) {
+      this._removingUrls = new Set([
+        ...this._removingUrls,
+        ...removedVisible.map((item) => item.url),
+      ]);
+      for (const item of removedVisible) {
+        setTimeout(() => this._finishRemoval(item.url), REMOTE_REMOVE_TIMEOUT_MS);
+      }
+    }
+
+    if (this._animateItems && added.length > 0) {
+      this._animatingUrls = new Set(added.map((item) => item.url));
+    }
+  }
+
+  private _finishRemoval(url: string) {
+    if (!this._removingUrls.has(url)) return;
+    this._removingUrls = new Set(
+      [...this._removingUrls].filter((removingUrl) => removingUrl !== url),
+    );
+    this._listItems = (this._listItems ?? []).filter((item) => item.url !== url);
+  }
+
+  private _onRemoteRemoveAnimationEnd(event: Event) {
+    this._finishRemoval((event.target as ReadingListItemElement).href);
   }
 
   override updated() {
@@ -61,6 +125,9 @@ export class ReadingListAppElement extends LitElement {
   private _animatingUrls: Set<string> = new Set();
 
   @state()
+  private _removingUrls: Set<string> = new Set();
+
+  @state()
   private _reviewItem: ListItemData | null = null;
 
   @state()
@@ -75,7 +142,12 @@ export class ReadingListAppElement extends LitElement {
   @state()
   private _editingUrl: string | null = null;
 
+  @state()
   private _animateItems = true;
+
+  private _unsubscribe?: () => void;
+
+  private _unsubscribeSettings?: () => void;
 
   private _draggedUrl: string | null = null;
 
@@ -205,6 +277,7 @@ export class ReadingListAppElement extends LitElement {
         @dragend=${this._onDragEnd}
         @edit-start=${this._onEditStart}
         @edit-end=${this._onEditEnd}
+        @remove-animation-end=${this._onRemoteRemoveAnimationEnd}
       >
         ${this._reviewItem
           ? html`<reading-list-item
@@ -226,6 +299,7 @@ export class ReadingListAppElement extends LitElement {
               .href=${listItem.url}
               .favIconUrl=${listItem.favIconUrl}
               .isNew=${this._animatingUrls.has(listItem.url)}
+              .removing=${this._removingUrls.has(listItem.url)}
               .animateItems=${this._animateItems}
               .locked=${this._editingUrl !== null && this._editingUrl !== listItem.url}
               @delete-item=${this._onDeleteItemClicked}
