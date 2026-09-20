@@ -96,7 +96,7 @@ export const styles = css`
   .settings-button {
     background: transparent;
     color: var(--rl-link-color);
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     cursor: pointer;
   }
 
