@@ -159,6 +159,12 @@ export const styles = css`
     opacity: 0.5;
   }
 
+  .reading-list-item.locked {
+    pointer-events: none;
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+  }
+
   .reading-list-item.shiny {
     background: linear-gradient(to right, #fa709a 0%, #fee140 100%);
   }

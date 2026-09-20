@@ -71,6 +71,9 @@ export class ReadingListAppElement extends LitElement {
   @state()
   private _sortOrder: SortOrder = '';
 
+  @state()
+  private _editingUrl: string | null = null;
+
   private _animateItems = true;
 
   private _draggedUrl: string | null = null;
@@ -180,6 +183,7 @@ export class ReadingListAppElement extends LitElement {
             .favIconUrl=${this._reviewItem.favIconUrl}
             .shiny=${true}
             .animateItems=${this._animateItems}
+            .locked=${this._editingUrl !== null}
             .theme=${this.theme}
             @delete-item=${this._onDismissReview}
           ></reading-list-item>`
@@ -191,6 +195,8 @@ export class ReadingListAppElement extends LitElement {
         @dragover=${this._onDragOver}
         @drop=${this._onDrop}
         @dragend=${this._onDragEnd}
+        @edit-start=${this._onEditStart}
+        @edit-end=${this._onEditEnd}
       >
         ${repeat(
           this._visibleItems,
@@ -202,6 +208,7 @@ export class ReadingListAppElement extends LitElement {
               .favIconUrl=${listItem.favIconUrl}
               .isNew=${this._animatingUrls.has(listItem.url)}
               .animateItems=${this._animateItems}
+              .locked=${this._editingUrl !== null && this._editingUrl !== listItem.url}
               .theme=${this.theme}
               @delete-item=${this._onDeleteItemClicked}
               @edit-item=${this._onEditItemClicked}
@@ -209,6 +216,15 @@ export class ReadingListAppElement extends LitElement {
         )}
       </div>
     `;
+  }
+
+  private _onEditStart(event: Event) {
+    this._editingUrl = (event.target as ReadingListItemElement).href;
+  }
+
+  private _onEditEnd(event: Event) {
+    const url = (event.target as ReadingListItemElement).href;
+    if (this._editingUrl === url) this._editingUrl = null;
   }
 
   private _onSearchInput(event: InputEvent) {

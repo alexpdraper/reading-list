@@ -32,6 +32,9 @@ export class ReadingListItemElement extends LitElement {
   @property({ type: Boolean })
   animateItems = true;
 
+  @property({ type: Boolean })
+  locked = false;
+
   @property({ type: String, reflect: true })
   theme: '' | 'light' | 'dark' = '';
 
@@ -93,12 +96,13 @@ export class ReadingListItemElement extends LitElement {
       this._slideout ? 'slideout' : '',
       this.shiny ? 'shiny' : '',
       this._dragging ? 'dragging' : '',
+      this.locked ? 'locked' : '',
     ].join(' ');
 
     return html`
       <div
         class=${classes}
-        draggable=${!this.shiny && !this._editing}
+        draggable=${!this.shiny && !this._editing && !this.locked}
         @animationend=${this._onAnimationEnd}
         @dragstart=${this._onDragStart}
         @dragend=${() => (this._dragging = false)}
@@ -158,6 +162,9 @@ export class ReadingListItemElement extends LitElement {
     } else {
       this._editValue = this.name;
       this._editing = true;
+      this.dispatchEvent(
+        new Event('edit-start', { bubbles: true, composed: true }),
+      );
     }
   }
 
@@ -188,6 +195,9 @@ export class ReadingListItemElement extends LitElement {
         }),
       );
     }
+    this.dispatchEvent(
+      new Event('edit-end', { bubbles: true, composed: true }),
+    );
   }
 
   private _onDeleteClick() {
