@@ -116,14 +116,23 @@ export class ReadingListAppElement extends LitElement {
     return html`
       <header>
         <h1>${i18n.getMessage('appName', 'Reading List')}</h1>
-        <button
-          class="save-button"
-          id="save-button"
-          aria-label=${i18n.getMessage('addPage', 'Add page to Reading List')}
-          @click=${this._onSaveButtonClick}
-        >
-          +
-        </button>
+        <div class="header-actions">
+          <button
+            class="save-button"
+            id="save-button"
+            aria-label=${i18n.getMessage('addPage', 'Add page to Reading List')}
+            @click=${this._onSaveButtonClick}
+          >
+            +
+          </button>
+          <button
+            class="settings-button"
+            aria-label="Options"
+            @click=${this._onSettingsClick}
+          >
+            &#9881;
+          </button>
+        </div>
       </header>
 
       <search class="search">
@@ -348,6 +357,10 @@ export class ReadingListAppElement extends LitElement {
     if (tab && tab.url && tab.title && this._listItems) {
       return this._addReadingItem(tab.url, tab.title, tab.favIconUrl);
     }
+  }
+
+  private _onSettingsClick() {
+    chrome.runtime.openOptionsPage();
   }
 
   private async _getActiveTab() {

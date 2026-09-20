@@ -56,11 +56,16 @@ export const styles = css`
     padding-bottom: 0.5rem;
   }
 
-  .save-button {
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .save-button,
+  .settings-button {
     --button-size: 2rem;
 
-    color: #fff;
-    background: var(--primary-color);
     width: var(--button-size);
     height: var(--button-size);
     line-height: var(--button-size);
@@ -70,12 +75,30 @@ export const styles = css`
     text-align: center;
   }
 
+  .save-button {
+    color: #fff;
+    background: var(--primary-color);
+  }
+
   .save-button:hover,
   .save-button:focus {
     background-color: var(--primary-color-focus);
   }
 
-  .save-button:focus {
+  .settings-button {
+    background: transparent;
+    color: var(--rl-link-color);
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+
+  .settings-button:hover,
+  .settings-button:focus {
+    background-color: var(--rl-bg-color);
+  }
+
+  .save-button:focus,
+  .settings-button:focus {
     outline: 3px solid lightblue;
   }
 
