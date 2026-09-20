@@ -8,6 +8,54 @@ This is a Chrome and Firefox browser extension for saving pages to read later. I
 
 ## Architecture
 
+```mermaid
+graph TD
+    subgraph Entry["Entry points (extension/*.html)"]
+        Popup["popup.html"]
+        Options["options.html"]
+        Sidebar["sidebar.html (Firefox)"]
+    end
+
+    subgraph Components["src/components"]
+        App["reading-list-app.ts<br/>list, search, sort, add"]
+        OptComp["reading-list-options.ts<br/>settings, import/export, diagnostics"]
+        Item["reading-list-item.ts<br/>one entry: edit, delete, drag"]
+    end
+
+    subgraph Lib["src/lib"]
+        RL["rl.ts<br/>storage CRUD"]
+        Filter["list-filter.ts<br/>fuzzy search + sort"]
+        Badge["badge.ts"]
+        Browser["browser.ts"]
+        Review["review.ts"]
+        I18n["i18n.ts"]
+    end
+
+    BG["background.ts<br/>service worker"]
+    Storage[("chrome.storage.sync /<br/>browser.storage.sync<br/>hashed + compressed buckets")]
+
+    Popup --> App
+    Sidebar --> App
+    Options --> OptComp
+
+    App --> Item
+    App --> Filter
+    App --> Review
+    App --> Browser
+    App --> RL
+    OptComp --> RL
+    Item --> Browser
+
+    BG -- "context menu click" --> RL
+    BG --> Badge
+    Badge --> RL
+    Review --> RL
+    App -.-> I18n
+    OptComp -.-> I18n
+
+    RL --> Storage
+```
+
 Three HTML entry points, each mounting Lit components:
 
 - **`extension/popup.html`** — the popup shown when clicking the extension icon, mounts `<reading-list-app>`
@@ -33,6 +81,18 @@ Source (`src/`):
 Items are **not** stored one key per bookmark. `chrome.storage.sync`/`browser.storage.sync` cap the item count at `MAX_ITEMS = 512` **keys**, regardless of value size — storing `{ [item.url]: item }` per bookmark (the original design) hard-caps the list at ~511 items even when the ~100KB byte quota has headroom left.
 
 Instead, items are grouped into a fixed number of **hashed buckets** (`BUCKET_COUNT = 40`, key format `b${hash(url) % 40}`), each holding a compressed array of items. This removes the per-item key cap; the real ceiling becomes the ~100KB total byte quota. Verified capacity: **~1,200 items** (vs. ~511 with the old per-item-key scheme).
+
+```mermaid
+flowchart LR
+    Item["item { url, title, ... }"]
+    Hash["hashUrl(url) % 40<br/>FNV-1a"]
+    Key["bucket key: b0 .. b39"]
+    Merge["merge into that bucket's<br/>current item array"]
+    Compress["JSON.stringify<br/>+ lz-string.compressToBase64"]
+    Write["chrome.storage.sync.set<br/>one key per touched bucket"]
+
+    Item --> Hash --> Key --> Merge --> Compress --> Write
+```
 
 Two non-obvious things to know before touching this code:
 
