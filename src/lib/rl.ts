@@ -45,6 +45,13 @@ class RL {
 
   async addReadingItem(listItem: ListItemData) {
     if (!this.initialized) return;
+    // Some sites (e.g. Gmail) serve a data: URI favicon that can be many KB,
+    // which blows past storage.sync's 8KB-per-item quota. Only persist
+    // favicons that are plain URLs; the UI falls back to a icon lookup
+    // service otherwise.
+    if (listItem.favIconUrl?.startsWith('data:')) {
+      listItem = { ...listItem, favIconUrl: undefined };
+    }
     await chrome?.storage.sync.set({ [listItem.url]: listItem });
     this.list = [
       listItem,
