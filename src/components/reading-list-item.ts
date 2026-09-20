@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { getSettings } from '../lib/rl';
 
 const isFirefox = navigator.userAgent.includes('Firefox');
 
@@ -327,10 +328,8 @@ export class ReadingListItemElement extends LitElement {
   private async _onLinkClick(event: MouseEvent) {
     if (this.href) {
       event.preventDefault();
-      // Check global setting for open in new tab default
-      const settings = await chrome.storage.sync.get('settings');
-      const openNewTab = settings.settings?.openNewTab ?? false;
-      const modifierDown = event.ctrlKey || event.metaKey || openNewTab;
+      const settings = await getSettings();
+      const modifierDown = event.ctrlKey || event.metaKey || (settings.openNewTab ?? false);
       openLink(this.href, modifierDown);
     }
   }

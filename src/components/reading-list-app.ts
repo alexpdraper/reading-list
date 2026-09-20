@@ -1,8 +1,10 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html, css, PropertyValues } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import { customElement, state } from 'lit/decorators.js';
+import Fuse from 'fuse.js';
 import { i18n } from '../lib/i18n';
-import { rl, ListItemData } from '../lib/rl';
+import { rl, ListItemData, getSettings, updateSettings } from '../lib/rl';
+import { syncBadgeForTab } from '../lib/badge';
 import { ReadingListItemElement } from './reading-list-item';
 import './reading-list-item.js';
 
@@ -160,7 +162,30 @@ export class ReadingListAppElement extends LitElement {
     super();
     rl.getListItems().then((listItems) => {
       this._listItems = listItems;
+      void this._maybeAskForReview(listItems);
     });
+    getSettings().then((settings) => {
+      this._animateItems = settings.animateItems ?? true;
+    });
+  }
+
+  private async _maybeAskForReview(listItems: ListItemData[]) {
+    if (listItems.length < 6) return;
+    const settings = await getSettings();
+    if (settings.askedForReview) return;
+
+    const isFirefox = navigator.userAgent.includes('Firefox');
+    const reviewItem: ListItemData = {
+      title: 'Like the Reading List? Give us a review!',
+      url: isFirefox
+        ? 'https://addons.mozilla.org/en-US/firefox/addon/reading_list/'
+        : 'https://chrome.google.com/webstore/detail/reading-list/lloccabjgblebdmncjndmiibianflabo/reviews',
+      addedAt: Date.now(),
+      favIconUrl: chrome.runtime.getURL('icons/icon48.png'),
+    };
+    await rl.addReadingItem(reviewItem);
+    await updateSettings({ askedForReview: true });
+    this._listItems = [reviewItem, ...listItems];
   }
 
   override connectedCallback(): void {
@@ -176,6 +201,23 @@ export class ReadingListAppElement extends LitElement {
 
   @state()
   private _justAddedUrl: string | null = null;
+
+  private _animateItems = true;
+
+  private _fuse: Fuse<ListItemData> | null = null;
+
+  override willUpdate(changedProperties: PropertyValues<this>) {
+    if (changedProperties.has('_listItems')) {
+      this._fuse = this._listItems
+        ? new Fuse(this._listItems, { keys: ['title', 'url'], threshold: 0.4 })
+        : null;
+    }
+  }
+
+  private get _visibleItems(): ListItemData[] {
+    if (!this.searchQuery) return this._listItems ?? [];
+    return this._fuse?.search(this.searchQuery).map((result) => result.item) ?? [];
+  }
 
   override render() {
     return html`
@@ -207,12 +249,7 @@ export class ReadingListAppElement extends LitElement {
 
       <div class="reading-list">
         ${repeat(
-          this._listItems?.filter(
-            (item) =>
-              !this.searchQuery ||
-              item.url.toLocaleUpperCase().includes(this.searchQuery) ||
-              item.title.toLocaleUpperCase().includes(this.searchQuery),
-          ) ?? [],
+          this._visibleItems,
           (item) => item.url,
           (listItem) =>
             html`<reading-list-item
@@ -229,7 +266,7 @@ export class ReadingListAppElement extends LitElement {
 
   private _onSearchInput(event: InputEvent) {
     const input = event.target as HTMLInputElement;
-    this.searchQuery = input.value.trim().toLocaleUpperCase();
+    this.searchQuery = input.value.trim();
   }
 
   private async _onDeleteItemClicked(event: Event) {
@@ -237,6 +274,7 @@ export class ReadingListAppElement extends LitElement {
     const url = (event.target as ReadingListItemElement).href;
     await rl.removeReadingItem(url);
     this._listItems = this._listItems.filter((item) => item.url !== url);
+    await this._syncBadgeForActiveTab();
   }
 
   private async _addReadingItem(url: string, title: string, favIconUrl?: string) {
@@ -250,12 +288,18 @@ export class ReadingListAppElement extends LitElement {
         return;
       }
 
-      this._justAddedUrl = url;
+      if (this._animateItems) this._justAddedUrl = url;
       this._listItems = [
         listItem,
         ...this._listItems.filter((item) => item.url !== url),
       ];
+      await this._syncBadgeForActiveTab();
     }
+  }
+
+  private async _syncBadgeForActiveTab() {
+    const tab = await this._getActiveTab();
+    if (tab?.id) await syncBadgeForTab(tab.id, tab.url);
   }
 
   private async _onSaveButtonClick() {

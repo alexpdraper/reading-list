@@ -1,5 +1,6 @@
 import { html, css, LitElement } from 'lit';
-import { rl } from '../lib/rl';
+import { rl, getSettings, updateSettings } from '../lib/rl';
+import { i18n } from '../lib/i18n';
 
 export class ReadingListOptions extends LitElement {
   static override styles = css`
@@ -47,9 +48,32 @@ export class ReadingListOptions extends LitElement {
     button:hover {
       background: #44aa76;
     }
+
+    button.danger {
+      background: #cc4444;
+    }
+
+    button.danger:hover {
+      background: #aa2222;
+    }
+
+    details {
+      margin-top: 1em;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    details > div {
+      margin-top: 1em;
+    }
   `;
 
   globalOpenNewTab = false;
+  globalAnimateItems = true;
+  globalAddContextMenu = true;
 
   override connectedCallback() {
     super.connectedCallback();
@@ -67,9 +91,27 @@ export class ReadingListOptions extends LitElement {
             type="checkbox"
             id="openNewTab"
             ?checked=${this.globalOpenNewTab}
-            @change=${this._onOpenNewTabChange}
+            @change=${(e: Event) => this._onSettingChange('openNewTab', e)}
           />
           <label for="openNewTab">Open items in new tab by default</label>
+        </div>
+        <div class="option">
+          <input
+            type="checkbox"
+            id="animateItems"
+            ?checked=${this.globalAnimateItems}
+            @change=${(e: Event) => this._onSettingChange('animateItems', e)}
+          />
+          <label for="animateItems">Animate items</label>
+        </div>
+        <div class="option">
+          <input
+            type="checkbox"
+            id="addContextMenu"
+            ?checked=${this.globalAddContextMenu}
+            @change=${(e: Event) => this._onSettingChange('addContextMenu', e)}
+          />
+          <label for="addContextMenu">Show "Add to Reading List" in the right-click menu</label>
         </div>
       </div>
 
@@ -79,29 +121,46 @@ export class ReadingListOptions extends LitElement {
         <input id="importInput" type="file" accept="application/json" style="display:none" @change=${this.importList} />
         <button @click=${this.openImportDialog}>Import Reading List</button>
       </div>
+
+      <details class="section">
+        <summary>Advanced</summary>
+        <div>
+          <button class="danger" @click=${this._onResetClick}>
+            ${i18n.getMessage('clearData', 'Clear Reading List')}
+          </button>
+        </div>
+      </details>
     `;
   }
 
   private async _loadSettings() {
-    const settings = await chrome.storage.sync.get('settings');
-    if (settings.settings) {
-      this.globalOpenNewTab = settings.settings.openNewTab ?? false;
-    }
+    const settings = await getSettings();
+    this.globalOpenNewTab = settings.openNewTab ?? false;
+    this.globalAnimateItems = settings.animateItems ?? true;
+    this.globalAddContextMenu = settings.addContextMenu ?? true;
   }
 
-  private async _onOpenNewTabChange(e: Event) {
-    const input = e.target as HTMLInputElement;
-    this.globalOpenNewTab = input.checked;
+  private async _onSettingChange(
+    key: 'openNewTab' | 'animateItems' | 'addContextMenu',
+    e: Event,
+  ) {
+    const checked = (e.target as HTMLInputElement).checked;
+    if (key === 'openNewTab') this.globalOpenNewTab = checked;
+    if (key === 'animateItems') this.globalAnimateItems = checked;
+    if (key === 'addContextMenu') this.globalAddContextMenu = checked;
+    await updateSettings({ [key]: checked });
+  }
 
-    const settings = await chrome.storage.sync.get('settings');
-    const currentSettings = settings.settings || {};
-
-    await chrome.storage.sync.set({
-      settings: {
-        ...currentSettings,
-        openNewTab: this.globalOpenNewTab,
-      },
-    });
+  async _onResetClick() {
+    const confirmed = confirm(
+      i18n.getMessage(
+        'confirmMsg',
+        'You are about to delete everything in the reading list. Are you sure?',
+      ),
+    );
+    if (confirmed) {
+      await chrome.storage.sync.clear();
+    }
   }
 
   openImportDialog() {

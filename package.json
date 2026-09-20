@@ -10,6 +10,7 @@
   "type": "module",
   "author": "",
   "dependencies": {
+    "fuse.js": "^7.5.0",
     "lit": "^3.2.1"
   },
   "devDependencies": {

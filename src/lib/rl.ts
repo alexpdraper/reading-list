@@ -6,17 +6,27 @@ export interface ListItemData {
   favIconUrl?: string;
 }
 
-// const storageItems = {
-//   settings: {
-//     addContextMenu: true,
-//     addPageAction: true,
-//     animateItems: false,
-//     askedForReview: true,
-//     openNewTab: false,
-//     theme: 'light',
-//     viewAll: true,
-//   },
-// };
+export interface Settings {
+  openNewTab?: boolean;
+  animateItems?: boolean;
+  addContextMenu?: boolean;
+  theme?: 'light' | 'dark';
+  sortOption?: 'date' | 'title' | '';
+  sortOrder?: 'asc' | 'desc' | '';
+  viewAll?: boolean;
+  askedForReview?: boolean;
+}
+
+export async function getSettings(): Promise<Settings> {
+  const stored = await chrome.storage.sync.get('settings');
+  return stored.settings ?? {};
+}
+
+export async function updateSettings(updates: Partial<Settings>): Promise<Settings> {
+  const next = { ...(await getSettings()), ...updates };
+  await chrome.storage.sync.set({ settings: next });
+  return next;
+}
 
 const getItemsRemote = async () => {
   const pages = await chrome.storage.sync.get();
