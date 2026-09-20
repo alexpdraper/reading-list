@@ -270,8 +270,26 @@ class RL {
     return this.list;
   }
 
+  private groupItemsByBucket(items: ListItemData[]): Map<string, ListItemData[]> {
+    const byBucket = new Map<string, ListItemData[]>();
+    for (const item of items) {
+      const key = bucketKey(item.url);
+      if (!byBucket.has(key)) {
+        byBucket.set(
+          key,
+          this.list.filter((existing) => bucketKey(existing.url) === key),
+        );
+      }
+      const bucket = byBucket.get(key)!;
+      const idx = bucket.findIndex((existing) => existing.url === item.url);
+      if (idx >= 0) bucket[idx] = item;
+      else bucket.push(item);
+    }
+    return byBucket;
+  }
+
   async addReadingItem(listItem: ListItemData) {
-    if (!this.initialized) return;
+    if (!this.initialized) await this.getListItems();
     if (!/^https?:\/\//i.test(listItem.url)) {
       throw new Error(`Unsupported URL scheme: ${listItem.url}`);
     }
@@ -333,20 +351,7 @@ class RL {
         );
       }
 
-      const byBucket = new Map<string, ListItemData[]>();
-      for (const item of validated) {
-        const key = bucketKey(item.url);
-        if (!byBucket.has(key)) {
-          byBucket.set(
-            key,
-            this.list.filter((existing) => bucketKey(existing.url) === key),
-          );
-        }
-        const bucket = byBucket.get(key)!;
-        const idx = bucket.findIndex((existing) => existing.url === item.url);
-        if (idx >= 0) bucket[idx] = item;
-        else bucket.push(item);
-      }
+      const byBucket = this.groupItemsByBucket(validated);
 
       const toWrite: Record<string, string> = {};
       let batchBytes = 0;
@@ -408,7 +413,7 @@ class RL {
   }
 
   async removeReadingItem(url: string) {
-    if (!this.initialized) return;
+    if (!this.initialized) await this.getListItems();
     const key = bucketKey(url);
     const bucket = await readBucket(key);
     await writeBucket(
@@ -419,9 +424,13 @@ class RL {
   }
 
   async updateReadingItem(url: string, updates: Partial<ListItemData>) {
-    if (!this.initialized) return;
+    if (!this.initialized) await this.getListItems();
     const item = this.list.find((item) => item.url === url);
     if (item) {
+      const isNoop = (Object.keys(updates) as (keyof ListItemData)[]).every(
+        (key) => item[key] === updates[key],
+      );
+      if (isNoop) return;
       const updatedItem = { ...item, ...updates };
       const key = bucketKey(url);
       const bucket = await readBucket(key);
@@ -430,6 +439,27 @@ class RL {
         bucket.map((b) => (b.url === url ? updatedItem : b)),
       );
       Object.assign(item, updates);
+    }
+  }
+
+  async reorderItems(orderedUrls: string[]) {
+    if (!this.initialized) await this.getListItems();
+    const indexByUrl = new Map(orderedUrls.map((url, index) => [url, index]));
+    const reordered: ListItemData[] = [];
+    for (const item of this.list) {
+      const index = indexByUrl.get(item.url);
+      if (index === undefined) continue;
+      item.index = index;
+      reordered.push(item);
+    }
+
+    const byBucket = this.groupItemsByBucket(reordered);
+    const toWrite: Record<string, string> = {};
+    for (const [key, items] of byBucket) {
+      toWrite[key] = encodeBucket(items);
+    }
+    if (Object.keys(toWrite).length > 0) {
+      await chrome.storage.sync.set(toWrite);
     }
   }
 

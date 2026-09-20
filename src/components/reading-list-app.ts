@@ -327,9 +327,7 @@ export class ReadingListAppElement extends LitElement {
 
     const items = this._listItems.map((item, index) => ({ ...item, index }));
     this._listItems = items;
-    for (const item of items) {
-      await rl.updateReadingItem(item.url, { index: item.index });
-    }
+    await rl.reorderItems(items.map((item) => item.url));
   }
 
   private async _addReadingItem(url: string, title: string, favIconUrl?: string) {
