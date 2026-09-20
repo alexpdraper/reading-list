@@ -184,8 +184,6 @@ export class ReadingListAppElement extends LitElement {
       favIconUrl: chrome.runtime.getURL('icons/icon48.png'),
       shiny: true,
     };
-    await rl.addReadingItem(reviewItem);
-    await updateSettings({ askedForReview: true });
     this._listItems = [reviewItem, ...listItems];
   }
 
@@ -277,8 +275,13 @@ export class ReadingListAppElement extends LitElement {
 
   private async _onDeleteItemClicked(event: Event) {
     if (!this._listItems) return;
-    const url = (event.target as ReadingListItemElement).href;
-    await rl.removeReadingItem(url);
+    const target = event.target as ReadingListItemElement;
+    const url = target.href;
+    if (target.shiny) {
+      await updateSettings({ askedForReview: true });
+    } else {
+      await rl.removeReadingItem(url);
+    }
     this._listItems = this._listItems.filter((item) => item.url !== url);
     await this._syncBadgeForActiveTab();
   }

@@ -190,7 +190,7 @@ export class ReadingListOptions extends LitElement {
   }
 
   async exportList() {
-    const data = (await rl.getListItems()).filter((item) => !item.shiny);
+    const data = await rl.getListItems();
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
