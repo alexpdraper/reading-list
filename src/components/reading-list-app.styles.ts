@@ -195,7 +195,6 @@ export const styles = css`
     color: var(--rl-link-color);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    font-size: 0.7rem;
     padding: 0.5rem;
     cursor: pointer;
   }
