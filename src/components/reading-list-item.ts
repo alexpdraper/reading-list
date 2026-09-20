@@ -94,6 +94,38 @@ export class ReadingListItemElement extends LitElement {
       }
     }
 
+    .reading-list-item.shiny {
+      background: linear-gradient(to right, #fa709a 0%, #fee140 100%);
+    }
+
+    .reading-list-item.shiny .item-content,
+    .reading-list-item.shiny .delete-button-content {
+      color: #000;
+    }
+
+    .reading-list-item.shiny .item-content:hover,
+    .reading-list-item.shiny .item-content:focus {
+      color: #fee140;
+      background: transparent;
+    }
+
+    .reading-list-item.shiny .item-content:hover .favicon,
+    .reading-list-item.shiny .item-content:focus .favicon,
+    .reading-list-item.shiny .favicon {
+      border-color: transparent;
+    }
+
+    .reading-list-item.shiny .delete-button:focus-visible .delete-button-content,
+    .reading-list-item.shiny .delete-button:hover .delete-button-content {
+      background: transparent;
+      color: #fa709a;
+    }
+
+    .reading-list-item.shiny:hover,
+    .reading-list-item.shiny:focus-within {
+      box-shadow: 1px 3px 17px rgba(254, 225, 64, 0.9), 0px -1px 5px rgba(254, 225, 64, 0.7);
+    }
+
     .favicon {
       position: absolute;
       top: var(--rl-item-gap);
@@ -270,6 +302,9 @@ export class ReadingListItemElement extends LitElement {
   @property({ type: Boolean, attribute: false })
   isNew = false;
 
+  @property({ type: Boolean })
+  shiny = false;
+
   @state()
   private _slidein = false;
 
@@ -302,7 +337,7 @@ export class ReadingListItemElement extends LitElement {
   override render() {
     return html`
       <div
-        class="reading-list-item ${this._slidein ? 'slidein' : ''}"
+        class="reading-list-item ${this._slidein ? 'slidein' : ''} ${this.shiny ? 'shiny' : ''}"
         @animationend=${() => (this._slidein = false)}
       >
         <div class="item-content">

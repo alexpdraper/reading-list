@@ -4,6 +4,7 @@ export interface ListItemData {
   url: string;
   openNewTab?: boolean;
   favIconUrl?: string;
+  shiny?: boolean;
 }
 
 export interface Settings {

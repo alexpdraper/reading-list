@@ -182,6 +182,7 @@ export class ReadingListAppElement extends LitElement {
         : 'https://chrome.google.com/webstore/detail/reading-list/lloccabjgblebdmncjndmiibianflabo/reviews',
       addedAt: Date.now(),
       favIconUrl: chrome.runtime.getURL('icons/icon48.png'),
+      shiny: true,
     };
     await rl.addReadingItem(reviewItem);
     await updateSettings({ askedForReview: true });
@@ -260,6 +261,7 @@ export class ReadingListAppElement extends LitElement {
               .name=${listItem.title}
               .href=${listItem.url}
               .favIconUrl=${listItem.favIconUrl}
+              .shiny=${listItem.shiny}
               .isNew=${listItem.url === this._justAddedUrl}
               @delete-item=${this._onDeleteItemClicked}
             ></reading-list-item>`,
