@@ -3,10 +3,11 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { getSettings } from '../lib/rl';
 import { isFirefox, openLink } from '../lib/browser';
 import { styles } from './reading-list-item.styles';
+import { theme } from './theme.styles';
 
 @customElement('reading-list-item')
 export class ReadingListItemElement extends LitElement {
-  static override styles = styles;
+  static override styles = [theme, styles];
 
   /**
    * The URL title text.

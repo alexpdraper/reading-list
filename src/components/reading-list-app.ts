@@ -6,14 +6,16 @@ import { rl, ListItemData, getSettings, updateSettings } from '../lib/rl';
 import { syncBadgeForTab } from '../lib/badge';
 import { ListFilter, SortOption, SortOrder } from '../lib/list-filter';
 import { maybeGetReviewItem, dismissReview } from '../lib/review';
-import { isFirefox } from '../lib/browser';
+import { isFirefox, getActiveTab } from '../lib/browser';
+import { addReadingItemAndSyncBadge } from '../lib/add-item';
 import { ReadingListItemElement } from './reading-list-item';
 import { styles } from './reading-list-app.styles';
+import { theme } from './theme.styles';
 import './reading-list-item.js';
 
 @customElement('reading-list-app')
 export class ReadingListAppElement extends LitElement {
-  static override styles = styles;
+  static override styles = [theme, styles];
 
   constructor() {
     super();
@@ -272,7 +274,8 @@ export class ReadingListAppElement extends LitElement {
     const url = (event.target as ReadingListItemElement).href;
     await rl.removeReadingItem(url);
     this._listItems = this._listItems.filter((item) => item.url !== url);
-    await this._syncBadgeForActiveTab();
+    const tab = await getActiveTab();
+    if (tab?.id) await syncBadgeForTab(tab.id, tab.url);
   }
 
   private async _onEditItemClicked(event: Event) {
@@ -331,32 +334,20 @@ export class ReadingListAppElement extends LitElement {
   }
 
   private async _addReadingItem(url: string, title: string, favIconUrl?: string) {
-    if (this._listItems) {
-      const listItem: ListItemData = { url, title, addedAt: Date.now(), favIconUrl };
+    if (!this._listItems) return;
 
-      try {
-        await rl.addReadingItem(listItem);
-      } catch (e) {
-        console.error(e);
-        return;
-      }
+    const listItem = await addReadingItemAndSyncBadge(url, title, favIconUrl);
+    if (!listItem) return;
 
-      if (this._animateItems) this._animatingUrls = new Set([url]);
-      this._listItems = [
-        listItem,
-        ...this._listItems.filter((item) => item.url !== url),
-      ];
-      await this._syncBadgeForActiveTab();
-    }
-  }
-
-  private async _syncBadgeForActiveTab() {
-    const tab = await this._getActiveTab();
-    if (tab?.id) await syncBadgeForTab(tab.id, tab.url);
+    if (this._animateItems) this._animatingUrls = new Set([url]);
+    this._listItems = [
+      listItem,
+      ...this._listItems.filter((item) => item.url !== url),
+    ];
   }
 
   private async _onSaveButtonClick() {
-    const tab = await this._getActiveTab();
+    const tab = await getActiveTab();
     if (tab && tab.url && tab.title && this._listItems) {
       return this._addReadingItem(tab.url, tab.title, tab.favIconUrl);
     }
@@ -373,19 +364,6 @@ export class ReadingListAppElement extends LitElement {
   private _onSidebarClick() {
     (window as unknown as { browser?: { sidebarAction?: { toggle: () => void } } }).browser
       ?.sidebarAction?.toggle();
-  }
-
-  private async _getActiveTab() {
-    try {
-      const [tab] = await chrome.tabs.query({
-        active: true,
-        currentWindow: true,
-      });
-      return tab;
-    } catch (e) {
-      console.error(e);
-    }
-    return null;
   }
 }
 

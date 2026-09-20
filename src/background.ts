@@ -1,6 +1,7 @@
-import {ListItemData, rl, getSettings} from './lib/rl';
+import {rl, getSettings} from './lib/rl';
 import {i18n} from './lib/i18n';
 import {syncBadgeForTab} from './lib/badge';
+import {addReadingItemAndSyncBadge} from './lib/add-item';
 
 chrome.action.setBadgeBackgroundColor({color: '#2ea99c'});
 
@@ -34,24 +35,12 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   rl.getListItems().then(() => {
     if (info.menuItemId === 'add-link-to-reading-list' && info.linkUrl) {
-      void addToReadingList(info.linkUrl, info.selectionText || info.linkUrl);
+      void addReadingItemAndSyncBadge(info.linkUrl, info.selectionText || info.linkUrl);
     } else if (info.menuItemId === 'add-page-to-reading-list' && tab && tab.url) {
-      void addToReadingList(tab.url, tab.title || tab.url, tab.favIconUrl);
+      void addReadingItemAndSyncBadge(tab.url, tab.title || tab.url, tab.favIconUrl);
     }
   });
 });
-
-async function addToReadingList(url: string, title: string, favIconUrl?: string) {
-  const newItem: ListItemData = {url, title, addedAt: Date.now(), favIconUrl};
-  try {
-    await rl.addReadingItem(newItem);
-  } catch (e) {
-    console.error(e);
-    return;
-  }
-  const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
-  if (tab?.id) void syncBadgeForTab(tab.id, tab.url);
-}
 
 async function handleTabUrl(tabId: number, url: string) {
   await syncBadgeForTab(tabId, url);
