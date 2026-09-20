@@ -2,7 +2,7 @@ import { css } from 'lit';
 
 export const styles = css`
   :host {
-    --rl-bg-color: #f9f9f9;
+    --rl-bg-color: #fff;
     --rl-text-color: #222;
 
     display: block;
@@ -16,6 +16,15 @@ export const styles = css`
     :host {
       --rl-bg-color: #777;
       --rl-text-color: #000;
+    }
+
+    button {
+      background: #555;
+      color: #eee;
+    }
+
+    button:hover {
+      background: #333;
     }
   }
 
