@@ -24,6 +24,15 @@ function compareItems(
   return sortOrder === 'up' ? -cmp : cmp;
 }
 
+// Manual drag order when no explicit sort is active. Items without an
+// index (never dragged) sort above indexed ones, newest first.
+function compareByIndex(a: ListItemData, b: ListItemData): number {
+  if (a.index == null && b.index == null) return b.addedAt - a.addedAt;
+  if (a.index == null) return -1;
+  if (b.index == null) return 1;
+  return a.index - b.index;
+}
+
 export class ListFilter {
   private fuse: Fuse<ListItemData> | null = null;
 
@@ -38,9 +47,9 @@ export class ListFilter {
       result = result.filter((item) => !item.viewed);
     }
 
-    if (sortOption) {
-      result = [...result].sort((a, b) => compareItems(a, b, sortOption, sortOrder));
-    }
+    result = sortOption
+      ? [...result].sort((a, b) => compareItems(a, b, sortOption, sortOrder))
+      : [...result].sort(compareByIndex);
 
     return result;
   }

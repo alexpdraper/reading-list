@@ -16,18 +16,20 @@ export class ReadingListAppElement extends LitElement {
 
   constructor() {
     super();
-    rl.getListItems().then((listItems) => {
-      this._listItems = listItems;
-      maybeGetReviewItem(listItems.length).then((item) => {
-        this._reviewItem = item;
-      });
-    });
-    getSettings().then((settings) => {
+    Promise.all([rl.getListItems(), getSettings()]).then(([listItems, settings]) => {
       this._animateItems = settings.animateItems ?? true;
       this._viewAll = settings.viewAll ?? true;
       this._sortOption = settings.sortOption ?? '';
       this._sortOrder = settings.sortOrder ?? '';
       this.theme = settings.theme ?? '';
+
+      this._listItems = listItems;
+      maybeGetReviewItem(listItems.length).then((item) => {
+        this._reviewItem = item;
+      });
+      if (this._animateItems) {
+        this._staggerReveal(listItems);
+      }
     });
   }
 
@@ -45,7 +47,7 @@ export class ReadingListAppElement extends LitElement {
   }
 
   override updated() {
-    if (this._justAddedUrl !== null) this._justAddedUrl = null;
+    if (this._animatingUrls.size > 0) this._animatingUrls = new Set();
   }
 
   @state()
@@ -55,7 +57,7 @@ export class ReadingListAppElement extends LitElement {
   searchQuery = '';
 
   @state()
-  private _justAddedUrl: string | null = null;
+  private _animatingUrls: Set<string> = new Set();
 
   @state()
   private _reviewItem: ListItemData | null = null;
@@ -90,6 +92,19 @@ export class ReadingListAppElement extends LitElement {
       sortOption: this._sortOption,
       sortOrder: this._sortOrder,
     });
+  }
+
+  private _staggerReveal(items: ListItemData[]) {
+    const itemsToAnimate = Math.min(10, items.length);
+    const animateNext = (index: number, waitTime: number) => {
+      if (index >= itemsToAnimate) return;
+      setTimeout(() => {
+        this._animatingUrls = new Set([items[index].url]);
+        const nextWait = Math.trunc(waitTime * ((itemsToAnimate - (index + 1)) / itemsToAnimate));
+        animateNext(index + 1, nextWait);
+      }, waitTime);
+    };
+    animateNext(0, 150);
   }
 
   override render() {
@@ -162,12 +177,13 @@ export class ReadingListAppElement extends LitElement {
             .href=${this._reviewItem.url}
             .favIconUrl=${this._reviewItem.favIconUrl}
             .shiny=${true}
+            .animateItems=${this._animateItems}
             .theme=${this.theme}
             @delete-item=${this._onDismissReview}
           ></reading-list-item>`
         : ''}
 
-      <div class="reading-list">
+      <div class="reading-list" @dragover=${this._onDragOver} @drop=${this._onDrop}>
         ${repeat(
           this._visibleItems,
           (item) => item.url,
@@ -176,9 +192,11 @@ export class ReadingListAppElement extends LitElement {
               .name=${listItem.title}
               .href=${listItem.url}
               .favIconUrl=${listItem.favIconUrl}
-              .isNew=${listItem.url === this._justAddedUrl}
+              .isNew=${this._animatingUrls.has(listItem.url)}
+              .animateItems=${this._animateItems}
               .theme=${this.theme}
               @delete-item=${this._onDeleteItemClicked}
+              @edit-item=${this._onEditItemClicked}
             ></reading-list-item>`,
         )}
       </div>
@@ -219,6 +237,51 @@ export class ReadingListAppElement extends LitElement {
     await this._syncBadgeForActiveTab();
   }
 
+  private async _onEditItemClicked(event: Event) {
+    if (!this._listItems) return;
+    const target = event.target as ReadingListItemElement;
+    const { title } = (event as CustomEvent<{ title: string }>).detail;
+    await rl.updateReadingItem(target.href, { title });
+    this._listItems = this._listItems.map((item) =>
+      item.url === target.href ? { ...item, title } : item,
+    );
+  }
+
+  private _onDragOver(event: DragEvent) {
+    if (this._sortOption || this.searchQuery) return;
+    event.preventDefault();
+  }
+
+  private async _onDrop(event: DragEvent) {
+    if (this._sortOption || this.searchQuery || !this._listItems) return;
+    event.preventDefault();
+
+    const draggedUrl = event.dataTransfer?.getData('text/plain');
+    if (!draggedUrl) return;
+
+    const targetItem = (event.composedPath() as HTMLElement[]).find(
+      (el) => el.tagName === 'READING-LIST-ITEM',
+    ) as ReadingListItemElement | undefined;
+    const targetUrl = targetItem?.href;
+    if (!targetUrl || targetUrl === draggedUrl) return;
+
+    const items = [...this._listItems];
+    const fromIndex = items.findIndex((item) => item.url === draggedUrl);
+    const toIndex = items.findIndex((item) => item.url === targetUrl);
+    if (fromIndex === -1 || toIndex === -1) return;
+
+    const [dragged] = items.splice(fromIndex, 1);
+    items.splice(toIndex, 0, dragged);
+    items.forEach((item, index) => {
+      item.index = index;
+    });
+
+    this._listItems = items;
+    for (const item of items) {
+      await rl.updateReadingItem(item.url, { index: item.index });
+    }
+  }
+
   private async _addReadingItem(url: string, title: string, favIconUrl?: string) {
     if (this._listItems) {
       const listItem: ListItemData = { url, title, addedAt: Date.now(), favIconUrl };
@@ -230,7 +293,7 @@ export class ReadingListAppElement extends LitElement {
         return;
       }
 
-      if (this._animateItems) this._justAddedUrl = url;
+      if (this._animateItems) this._animatingUrls = new Set([url]);
       this._listItems = [
         listItem,
         ...this._listItems.filter((item) => item.url !== url),

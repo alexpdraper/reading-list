@@ -1,5 +1,5 @@
-import { LitElement, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { LitElement, html, PropertyValues } from 'lit';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { getSettings } from '../lib/rl';
 import { isFirefox, openLink } from '../lib/browser';
 import { styles } from './reading-list-item.styles';
@@ -29,15 +29,40 @@ export class ReadingListItemElement extends LitElement {
   @property({ type: Boolean })
   shiny = false;
 
+  @property({ type: Boolean })
+  animateItems = true;
+
   @property({ type: String, reflect: true })
   theme: '' | 'light' | 'dark' = '';
 
   @state()
   private _slidein = false;
 
-  override firstUpdated() {
-    if (this.isNew) {
+  @state()
+  private _slideout = false;
+
+  @state()
+  private _dragging = false;
+
+  @state()
+  _editing = false;
+
+  @state()
+  private _editValue = '';
+
+  @query('.edit-title')
+  private _editInput?: HTMLInputElement;
+
+  override willUpdate(changedProperties: PropertyValues<this>) {
+    if (changedProperties.has('isNew') && this.isNew) {
       this._slidein = true;
+    }
+  }
+
+  override updated(changedProperties: PropertyValues<this>) {
+    if (changedProperties.has('_editing') && this._editing) {
+      this._editInput?.focus();
+      this._editInput?.select();
     }
   }
 
@@ -62,13 +87,32 @@ export class ReadingListItemElement extends LitElement {
   faviconError = false;
 
   override render() {
+    const classes = [
+      'reading-list-item',
+      this._slidein ? 'slidein' : '',
+      this._slideout ? 'slideout' : '',
+      this.shiny ? 'shiny' : '',
+      this._dragging ? 'dragging' : '',
+    ].join(' ');
+
     return html`
       <div
-        class="reading-list-item ${this._slidein ? 'slidein' : ''} ${this.shiny ? 'shiny' : ''}"
-        @animationend=${() => (this._slidein = false)}
+        class=${classes}
+        draggable=${!this.shiny && !this._editing}
+        @animationend=${this._onAnimationEnd}
+        @dragstart=${this._onDragStart}
+        @dragend=${() => (this._dragging = false)}
       >
         <div class="item-content">
-          <a class="title" href=${this.href} @click=${this._onLinkClick}>${this.name}</a>
+          ${this._editing
+            ? html`<input
+                class="edit-title"
+                .value=${this._editValue}
+                @input=${(e: Event) => (this._editValue = (e.target as HTMLInputElement).value)}
+                @keydown=${this._onEditKeydown}
+                @blur=${this._onEditBlur}
+              />`
+            : html`<a class="title" href=${this.href} @click=${this._onLinkClick}>${this.name}</a>`}
           <div class="host">${this.url?.hostname ?? this.href}</div>
           <div class="favicon">
             ${this.favicon && !this.faviconError
@@ -80,6 +124,16 @@ export class ReadingListItemElement extends LitElement {
               : ''}
           </div>
         </div>
+        ${this.shiny
+          ? ''
+          : html`<button
+              class="edit-button"
+              aria-label="Edit title"
+              @mousedown=${(e: Event) => e.preventDefault()}
+              @click=${this._onEditClick}
+            >
+              <span class="edit-button-content">${this._editing ? '\u{1F4BE}' : '✎'}</span>
+            </button>`}
         <button class="delete-button" @click=${this._onDeleteClick}>
           <span class="delete-button-content">&times;</span>
         </button>
@@ -96,10 +150,75 @@ export class ReadingListItemElement extends LitElement {
     }
   }
 
+  private _onEditClick(event: Event) {
+    event.preventDefault();
+    if (this._editing) {
+      this._commitEdit(true);
+    } else {
+      this._editValue = this.name;
+      this._editing = true;
+    }
+  }
+
+  private _onEditKeydown(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this._commitEdit(true);
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      this._commitEdit(false);
+    }
+  }
+
+  private _onEditBlur() {
+    this._commitEdit(true);
+  }
+
+  private _commitEdit(save: boolean) {
+    if (!this._editing) return;
+    this._editing = false;
+    const title = this._editValue.trim();
+    if (save && title && title !== this.name) {
+      this.dispatchEvent(
+        new CustomEvent('edit-item', {
+          detail: { title },
+          bubbles: true,
+          composed: true,
+        }),
+      );
+    }
+  }
+
   private _onDeleteClick() {
+    if (this.animateItems) {
+      this._slideout = true;
+    } else {
+      this._dispatchDelete();
+    }
+  }
+
+  private _onAnimationEnd(event: AnimationEvent) {
+    if (event.animationName === 'slidein') {
+      this._slidein = false;
+    } else if (event.animationName === 'slideout') {
+      this._dispatchDelete();
+    }
+  }
+
+  private _dispatchDelete() {
     this.dispatchEvent(
       new Event('delete-item', { bubbles: true, composed: true }),
     );
+  }
+
+  private _onDragStart(event: DragEvent) {
+    if (this.shiny || this._editing) {
+      event.preventDefault();
+      return;
+    }
+    this._dragging = true;
+    event.dataTransfer?.setData('text/plain', this.href);
+    if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
   }
 }
 

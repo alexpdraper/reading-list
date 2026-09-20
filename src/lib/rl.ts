@@ -5,6 +5,7 @@ export interface ListItemData {
   openNewTab?: boolean;
   favIconUrl?: string;
   viewed?: boolean;
+  index?: number;
 }
 
 export interface Settings {

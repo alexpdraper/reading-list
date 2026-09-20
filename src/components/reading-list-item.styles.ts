@@ -43,22 +43,28 @@ export const styles = css`
   :host([theme='dark']) .favicon {
     border-color: #444;
   }
-  :host([theme='dark']) .delete-button-content {
+  :host([theme='dark']) .delete-button-content,
+  :host([theme='dark']) .edit-button-content {
     color: #888;
   }
   :host([theme='dark']) .delete-button:focus-visible .delete-button-content,
-  :host([theme='dark']) .delete-button:hover .delete-button-content {
+  :host([theme='dark']) .delete-button:hover .delete-button-content,
+  :host([theme='dark']) .edit-button:focus-visible .edit-button-content,
+  :host([theme='dark']) .edit-button:hover .edit-button-content {
     background: #444;
   }
 
   :host([theme='light']) .favicon {
     border-color: #ccc;
   }
-  :host([theme='light']) .delete-button-content {
+  :host([theme='light']) .delete-button-content,
+  :host([theme='light']) .edit-button-content {
     color: #ccc;
   }
   :host([theme='light']) .delete-button:focus-visible .delete-button-content,
-  :host([theme='light']) .delete-button:hover .delete-button-content {
+  :host([theme='light']) .delete-button:hover .delete-button-content,
+  :host([theme='light']) .edit-button:focus-visible .edit-button-content,
+  :host([theme='light']) .edit-button:hover .edit-button-content {
     background: #ccc;
   }
 
@@ -126,6 +132,33 @@ export const styles = css`
     }
   }
 
+  .reading-list-item.slideout {
+    margin: 0;
+    animation: 0.65s slideout;
+  }
+
+  @keyframes slideout {
+    0% {
+      max-height: 100px;
+      transform: translateX(0) scaleY(1);
+    }
+    40% {
+      max-height: 0px;
+    }
+    100% {
+      max-height: 0px;
+      transform: translateX(100%) scaleY(0);
+    }
+  }
+
+  [draggable='true'] {
+    cursor: grab;
+  }
+
+  .reading-list-item.dragging {
+    opacity: 0.5;
+  }
+
   .reading-list-item.shiny {
     background: linear-gradient(to right, #fa709a 0%, #fee140 100%);
   }
@@ -179,7 +212,7 @@ export const styles = css`
     text-decoration: none;
     display: block;
     width: 100%;
-    padding: 10px 50px 10px 56px;
+    padding: 10px 74px 10px 56px;
     min-height: 56px;
     position: relative;
   }
@@ -231,7 +264,26 @@ export const styles = css`
     display: block;
   }
 
-  .delete-button {
+  .edit-title {
+    font: inherit;
+    font-weight: bold;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    border-bottom: 1px solid var(--primary-color);
+    background: transparent;
+    color: inherit;
+    position: relative;
+    z-index: 2;
+  }
+
+  .edit-title:focus {
+    outline: none;
+  }
+
+  .delete-button,
+  .edit-button {
     position: absolute;
     text-align: center;
     font-weight: bold;
@@ -246,7 +298,12 @@ export const styles = css`
     z-index: 2;
   }
 
-  .delete-button-content {
+  .edit-button {
+    right: 1.5rem;
+  }
+
+  .delete-button-content,
+  .edit-button-content {
     color: #ccc;
     border-radius: 9999px;
     display: flex;
@@ -259,11 +316,13 @@ export const styles = css`
     transition: transform 0.3s ease, box-shadow 0.5s ease;
   }
 
-  .delete-button:focus-visible {
+  .delete-button:focus-visible,
+  .edit-button:focus-visible {
     outline: none;
   }
 
-  .delete-button:focus-visible .delete-button-content {
+  .delete-button:focus-visible .delete-button-content,
+  .edit-button:focus-visible .edit-button-content {
     outline: 3px solid lightblue;
   }
 
@@ -271,6 +330,14 @@ export const styles = css`
   .delete-button:hover .delete-button-content {
     color: #fff;
     transform: rotateZ(90deg) scale(2);
+    box-shadow: 1px 0 1px rgba(0, 0, 0, 0.15);
+    background: #ccc;
+  }
+
+  .edit-button:focus-visible .edit-button-content,
+  .edit-button:hover .edit-button-content {
+    color: #fff;
+    transform: scale(1.2);
     box-shadow: 1px 0 1px rgba(0, 0, 0, 0.15);
     background: #ccc;
   }
@@ -304,12 +371,15 @@ export const styles = css`
       border-color: #444;
     }
 
-    .delete-button-content {
+    .delete-button-content,
+    .edit-button-content {
       color: #888;
     }
 
     .delete-button:focus-visible .delete-button-content,
-    .delete-button:hover .delete-button-content {
+    .delete-button:hover .delete-button-content,
+    .edit-button:focus-visible .edit-button-content,
+    .edit-button:hover .edit-button-content {
       background: #444;
       color: #fff;
     }
