@@ -24,12 +24,12 @@ function compareItems(
   return sortOrder === 'up' ? -cmp : cmp;
 }
 
-// Manual drag order when no explicit sort is active. Items without an
-// index (never dragged) sort above indexed ones, newest first.
+// Manual drag order when no explicit sort is active. Indexed items sort
+// first by index; items without one (never dragged) fall after, newest first.
 function compareByIndex(a: ListItemData, b: ListItemData): number {
   if (a.index == null && b.index == null) return b.addedAt - a.addedAt;
-  if (a.index == null) return -1;
-  if (b.index == null) return 1;
+  if (a.index == null) return 1;
+  if (b.index == null) return -1;
   return a.index - b.index;
 }
 
