@@ -15,7 +15,7 @@ function createContextMenu(id: string, i18nKey: string, defaultTitle: string, co
 async function syncContextMenu() {
   const settings = await getSettings();
   await chrome.contextMenus.removeAll();
-  if (settings.addContextMenu ?? true) {
+  if (settings.addContextMenu) {
     createContextMenu('add-page-to-reading-list', 'addPage', 'Add page to Reading List', ['page']);
     createContextMenu('add-link-to-reading-list', 'addLink', 'Add link to Reading List', ['link']);
   }

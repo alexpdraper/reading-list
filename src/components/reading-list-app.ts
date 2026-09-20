@@ -18,10 +18,10 @@ export class ReadingListAppElement extends LitElement {
   constructor() {
     super();
     Promise.all([rl.getListItems(), getSettings()]).then(([listItems, settings]) => {
-      this._animateItems = settings.animateItems ?? true;
-      this._viewAll = settings.viewAll ?? true;
-      this._sortOption = settings.sortOption ?? '';
-      this._sortOrder = settings.sortOrder ?? '';
+      this._animateItems = settings.animateItems;
+      this._viewAll = settings.viewAll;
+      this._sortOption = settings.sortOption;
+      this._sortOrder = settings.sortOrder;
 
       this._listItems = listItems;
       maybeGetReviewItem(listItems.length).then((item) => {

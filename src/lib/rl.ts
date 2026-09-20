@@ -8,7 +8,6 @@ export interface ListItemData {
   addedAt: number;
   title: string;
   url: string;
-  openNewTab?: boolean;
   favIconUrl?: string;
   viewed?: boolean;
   index?: number;
@@ -24,9 +23,19 @@ export interface Settings {
   askedForReview?: boolean;
 }
 
-export async function getSettings(): Promise<Settings> {
+export const DEFAULT_SETTINGS: Required<Settings> = {
+  openNewTab: false,
+  animateItems: true,
+  addContextMenu: true,
+  sortOption: '',
+  sortOrder: '',
+  viewAll: true,
+  askedForReview: false,
+};
+
+export async function getSettings(): Promise<Required<Settings>> {
   const stored = await chrome.storage.sync.get('settings');
-  return stored.settings ?? {};
+  return { ...DEFAULT_SETTINGS, ...stored.settings };
 }
 
 export async function updateSettings(updates: Partial<Settings>): Promise<Settings> {
@@ -139,6 +148,17 @@ function encodeBucket(items: ListItemData[]): string {
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// data: favicons (e.g. Gmail) can exceed a bucket's 8KB quota, so they're
+// stripped before storing.
+function normalizeItemForStorage(item: ListItemData): ListItemData {
+  if (!/^https?:\/\//i.test(item.url)) {
+    throw new Error(`Unsupported URL scheme: ${item.url}`);
+  }
+  return item.favIconUrl?.startsWith('data:')
+    ? { ...item, favIconUrl: undefined }
+    : item;
 }
 
 async function readBucket(key: string): Promise<ListItemData[]> {
@@ -290,13 +310,7 @@ class RL {
 
   async addReadingItem(listItem: ListItemData) {
     if (!this.initialized) await this.getListItems();
-    if (!/^https?:\/\//i.test(listItem.url)) {
-      throw new Error(`Unsupported URL scheme: ${listItem.url}`);
-    }
-    // data: favicons (e.g. Gmail) can exceed a bucket's 8KB quota
-    if (listItem.favIconUrl?.startsWith('data:')) {
-      listItem = { ...listItem, favIconUrl: undefined };
-    }
+    listItem = normalizeItemForStorage(listItem);
     const key = bucketKey(listItem.url);
     const bucket = await readBucket(key);
     await writeBucket(key, [
@@ -340,15 +354,11 @@ class RL {
       const batch = rawItems.slice(i, i + BATCH_SIZE);
       const validated: ListItemData[] = [];
       for (const raw of batch) {
-        if (!/^https?:\/\//i.test(raw.url)) {
-          firstError ??= new Error(`Unsupported URL scheme: ${raw.url}`);
-          continue;
+        try {
+          validated.push(normalizeItemForStorage(raw));
+        } catch (err) {
+          firstError ??= err;
         }
-        validated.push(
-          raw.favIconUrl?.startsWith('data:')
-            ? { ...raw, favIconUrl: undefined }
-            : raw,
-        );
       }
 
       const byBucket = this.groupItemsByBucket(validated);

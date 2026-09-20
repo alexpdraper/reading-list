@@ -147,7 +147,7 @@ export class ReadingListItemElement extends LitElement {
     if (this.href) {
       event.preventDefault();
       const settings = await getSettings();
-      const modifierDown = event.ctrlKey || event.metaKey || (settings.openNewTab ?? false);
+      const modifierDown = event.ctrlKey || event.metaKey || settings.openNewTab;
       openLink(this.href, modifierDown);
     }
   }

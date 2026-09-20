@@ -6,8 +6,6 @@ export const styles = css`
     Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
     --base-font-size: 13px;
     --base-line-height: 1.4;
-    --container-width: 360px;
-    --spacer: 15px;
     --rl-bg-color: #f7f7f7;
     --rl-shadow: 0 1px 1px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
     --rl-link-color: #555;

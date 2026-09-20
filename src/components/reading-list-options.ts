@@ -72,9 +72,9 @@ export class ReadingListOptions extends LitElement {
 
   private async _loadSettings() {
     const settings = await getSettings();
-    this.globalOpenNewTab = settings.openNewTab ?? false;
-    this.globalAnimateItems = settings.animateItems ?? true;
-    this.globalAddContextMenu = settings.addContextMenu ?? true;
+    this.globalOpenNewTab = settings.openNewTab;
+    this.globalAnimateItems = settings.animateItems;
+    this.globalAddContextMenu = settings.addContextMenu;
   }
 
   private async _onSettingChange(
