@@ -113,10 +113,26 @@ export class ReadingListOptions extends LitElement {
       const items = JSON.parse(text);
       if (Array.isArray(items)) {
         await rl.getListItems();
+        let succeeded = 0;
+        let firstError: unknown = null;
         for (const item of items) {
-          await rl.addReadingItem(item);
+          try {
+            await rl.addReadingItem(item);
+            succeeded++;
+          } catch (err) {
+            firstError ??= err;
+          }
         }
-        alert('Import complete!');
+        if (succeeded === items.length) {
+          alert(`Import complete! Added ${succeeded} items.`);
+        } else {
+          alert(
+            `Imported ${succeeded} of ${items.length} items. ` +
+              `${items.length - succeeded} failed` +
+              (firstError ? ` (first error: ${firstError})` : '') +
+              ' — this usually means chrome.storage.sync\'s quota (512 items / ~100KB total) was hit.',
+          );
+        }
       } else {
         alert('Invalid file format.');
       }
