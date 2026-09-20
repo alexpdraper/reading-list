@@ -45,6 +45,12 @@ class RL {
 
   async addReadingItem(listItem: ListItemData) {
     if (!this.initialized) return;
+    // Browsers block extensions from navigating tabs to privileged URLs
+    // (about:, chrome:, etc.) via tabs.create/update, so saving one here
+    // would just produce an unusable item that errors when clicked.
+    if (!/^https?:\/\//i.test(listItem.url)) {
+      throw new Error(`Unsupported URL scheme: ${listItem.url}`);
+    }
     // Some sites (e.g. Gmail) serve a data: URI favicon that can be many KB,
     // which blows past storage.sync's 8KB-per-item quota. Only persist
     // favicons that are plain URLs; the UI falls back to a icon lookup

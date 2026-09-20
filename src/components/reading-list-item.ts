@@ -289,7 +289,7 @@ export class ReadingListItemElement extends LitElement {
 function openLink(url: string, newTab: boolean) {
   if (newTab) {
     // Create a new tab with the URL
-    chrome?.tabs.create({ url: url, active: false });
+    chrome?.tabs.create({ url: url, active: false }).catch(console.error);
   } else {
     // Query for the active tab
     chrome?.tabs.query(
@@ -302,7 +302,7 @@ function openLink(url: string, newTab: boolean) {
 
         if (tab.id) {
           // Update the URL of the current tab
-          chrome.tabs.update(tab.id, { url: url });
+          chrome.tabs.update(tab.id, { url: url }).catch(console.error);
 
           // Close the popup
           const isPopup = document.body.classList.contains('popup-page');
