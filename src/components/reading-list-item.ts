@@ -47,6 +47,48 @@ export class ReadingListItemElement extends LitElement {
       box-shadow: var(--rl-shadow);
     }
 
+    .reading-list-item.slidein {
+      animation: 0.2s linear slidein;
+    }
+
+    .reading-list-item.slidein .item-content {
+      animation: 0.8s ease-out slidein-bounce;
+    }
+
+    @keyframes slidein-bounce {
+      0% {
+        transform: translateX(100%) scaleY(0);
+      }
+      40% {
+        transform: translateX(100%) scaleY(0);
+      }
+      50% {
+        transform: translateX(30px) scaleY(1);
+      }
+      60% {
+        transform: translateX(0) scaleY(1);
+      }
+      80% {
+        transform: translateX(35px) scaleY(1);
+      }
+      100% {
+        transform: translateX(0) scaleY(1);
+      }
+    }
+
+    @keyframes slidein {
+      0% {
+        max-height: 0px;
+        transform: translateX(100%) scaleY(0);
+      }
+      80% {
+        max-height: 100px;
+      }
+      100% {
+        transform: translateX(0) scaleY(1);
+      }
+    }
+
     .favicon {
       position: absolute;
       top: var(--rl-item-gap);
@@ -225,6 +267,22 @@ export class ReadingListItemElement extends LitElement {
   @property({ type: String })
   favIconUrl?: string;
 
+  /**
+   * Whether this item was just added to the list, so it should play the
+   * slide-in animation once on mount.
+   */
+  @property({ type: Boolean, attribute: false })
+  isNew = false;
+
+  @state()
+  private _slidein = false;
+
+  override firstUpdated() {
+    if (this.isNew) {
+      this._slidein = true;
+    }
+  }
+
   private get url() {
     return this.href ? new URL(this.href) : null;
   }
@@ -247,7 +305,10 @@ export class ReadingListItemElement extends LitElement {
 
   override render() {
     return html`
-      <div class="reading-list-item">
+      <div
+        class="reading-list-item ${this._slidein ? 'slidein' : ''}"
+        @animationend=${() => (this._slidein = false)}
+      >
         <div class="item-content">
           <a class="title" href=${this.href} @click=${this._onLinkClick}>${this.name}</a>
           <div class="host">${this.url?.hostname ?? this.href}</div>

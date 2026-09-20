@@ -174,6 +174,9 @@ export class ReadingListAppElement extends LitElement {
   @state()
   searchQuery = '';
 
+  @state()
+  private _justAddedUrl: string | null = null;
+
   override render() {
     return html`
       <header>
@@ -216,6 +219,7 @@ export class ReadingListAppElement extends LitElement {
               .name=${listItem.title}
               .href=${listItem.url}
               .favIconUrl=${listItem.favIconUrl}
+              .isNew=${listItem.url === this._justAddedUrl}
               @delete-item=${this._onDeleteItemClicked}
             ></reading-list-item>`,
         )}
@@ -246,6 +250,7 @@ export class ReadingListAppElement extends LitElement {
         return;
       }
 
+      this._justAddedUrl = url;
       this._listItems = [
         listItem,
         ...this._listItems.filter((item) => item.url !== url),
