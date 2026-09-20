@@ -193,18 +193,6 @@ export class ReadingListAppElement extends LitElement {
         </div>
       </div>
 
-      ${this._reviewItem
-        ? html`<reading-list-item
-            .name=${this._reviewItem.title}
-            .href=${this._reviewItem.url}
-            .favIconUrl=${this._reviewItem.favIconUrl}
-            .shiny=${true}
-            .animateItems=${this._animateItems}
-            .locked=${this._editingUrl !== null}
-            @delete-item=${this._onDismissReview}
-          ></reading-list-item>`
-        : ''}
-
       <div
         class="reading-list"
         @dragstart=${this._onDragStart}
@@ -214,6 +202,17 @@ export class ReadingListAppElement extends LitElement {
         @edit-start=${this._onEditStart}
         @edit-end=${this._onEditEnd}
       >
+        ${this._reviewItem
+          ? html`<reading-list-item
+              .name=${this._reviewItem.title}
+              .href=${this._reviewItem.url}
+              .favIconUrl=${this._reviewItem.favIconUrl}
+              .shiny=${true}
+              .animateItems=${this._animateItems}
+              .locked=${this._editingUrl !== null}
+              @delete-item=${this._onDismissReview}
+            ></reading-list-item>`
+          : ''}
         ${repeat(
           this._visibleItems,
           (item) => item.url,
