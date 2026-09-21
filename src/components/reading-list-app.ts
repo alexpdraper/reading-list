@@ -66,6 +66,15 @@ export class ReadingListAppElement extends LitElement {
     this._unsubscribe = undefined;
     this._unsubscribeSettings?.();
     this._unsubscribeSettings = undefined;
+    clearTimeout(this._syncErrorTimer);
+  }
+
+  notifySyncFailure() {
+    clearTimeout(this._syncErrorTimer);
+    this._syncError = true;
+    this._syncErrorTimer = setTimeout(() => {
+      this._syncError = false;
+    }, 4000);
   }
 
   private async _onRemoteChange() {
@@ -145,6 +154,11 @@ export class ReadingListAppElement extends LitElement {
 
   @state()
   private _animateItems = true;
+
+  @state()
+  private _syncError = false;
+
+  private _syncErrorTimer?: ReturnType<typeof setTimeout>;
 
   private _unsubscribe?: () => void;
 
@@ -271,6 +285,15 @@ export class ReadingListAppElement extends LitElement {
         </div>
       </div>
 
+      ${this._syncError
+        ? html`<p class="sync-error" role="status" aria-live="polite">
+            ${i18n.getMessage(
+              'syncFailed',
+              "Couldn't save that change. It may not appear on your other devices.",
+            )}
+          </p>`
+        : ''}
+
       <div
         class="reading-list"
         @dragstart=${this._dragReorder.onDragStart}
@@ -351,7 +374,11 @@ export class ReadingListAppElement extends LitElement {
   private async _onDeleteItemClicked(event: Event) {
     if (!this._listItems) return;
     const url = (event.target as ReadingListItemElement).href;
-    await rl.removeReadingItem(url);
+    const ok = await rl.removeReadingItem(url);
+    if (!ok) {
+      this.notifySyncFailure();
+      return;
+    }
     this._listItems = this._listItems.filter((item) => item.url !== url);
     const tab = await getActiveTab();
     if (tab?.id) await syncBadgeForTab(tab.id, tab.url);

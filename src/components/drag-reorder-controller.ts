@@ -11,6 +11,7 @@ export interface DragReorderHost extends ReactiveControllerHost {
   _sortOption: SortOption;
   searchQuery: string;
   shadowRoot: ShadowRoot | null;
+  notifySyncFailure(): void;
 }
 
 export class DragReorderController implements ReactiveController {
@@ -141,6 +142,10 @@ export class DragReorderController implements ReactiveController {
 
     const items = this.host._listItems.map((item, index) => ({ ...item, index }));
     this.host._listItems = items;
-    await rl.reorderItems(items.map((item) => item.url));
+    const ok = await rl.reorderItems(items.map((item) => item.url));
+    if (!ok) {
+      this.host._listItems = await rl.getListItems();
+      this.host.notifySyncFailure();
+    }
   };
 }

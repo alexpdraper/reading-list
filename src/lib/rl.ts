@@ -50,6 +50,18 @@ class RL {
     return this.list;
   }
 
+  // New items must sort above every existing indexed item (see compareByIndex
+  // in list-filter.ts), so each one takes the current minimum minus one.
+  // Going negative is fine and cheap; renumbering the whole list on every
+  // add would recreate the first-reorder cliff this exists to avoid.
+  private minExistingIndex(): number {
+    let min = 0;
+    for (const item of this.list) {
+      if (item.index != null && item.index < min) min = item.index;
+    }
+    return min;
+  }
+
   private groupItemsByBucket(items: ListItemData[]): Map<string, ListItemData[]> {
     const byBucket = new Map<string, ListItemData[]>();
     for (const item of items) {
@@ -71,6 +83,7 @@ class RL {
   async addReadingItem(listItem: ListItemData) {
     if (!this.initialized) await this.getListItems();
     listItem = normalizeItemForStorage(listItem);
+    listItem = { ...listItem, index: this.minExistingIndex() - 1 };
     const key = bucketKey(listItem.url);
     const bucket = await readBucket(key);
     await writeBucket(key, [
@@ -111,16 +124,22 @@ class RL {
     let bytesWrittenSoFar = 0;
     let diagnostics = '';
 
+    // Imported items are placed above all existing ones, as a single add
+    // would, in the order they appear in the file: earlier in the file gets
+    // a lower index (further above), all below the current minimum.
+    const topIndex = this.minExistingIndex();
+
     for (let i = 0; i < rawItems.length; i += BATCH_SIZE) {
       const batch = rawItems.slice(i, i + BATCH_SIZE);
       const validated: ListItemData[] = [];
-      for (const raw of batch) {
+      batch.forEach((raw, j) => {
         try {
-          validated.push(normalizeItemForStorage(raw));
+          const item = normalizeItemForStorage(raw);
+          validated.push({ ...item, index: topIndex - rawItems.length + i + j });
         } catch (err) {
           firstError ??= err;
         }
-      }
+      });
 
       const byBucket = this.groupItemsByBucket(validated);
 
@@ -166,16 +185,22 @@ class RL {
     };
   }
 
-  async removeReadingItem(url: string) {
+  async removeReadingItem(url: string): Promise<boolean> {
     if (!this.initialized) await this.getListItems();
     const key = bucketKey(url);
     const bucket = await readBucket(key);
-    await writeBucket(
-      key,
-      bucket.filter((item) => item.url !== url),
-    );
+    try {
+      await writeBucket(
+        key,
+        bucket.filter((item) => item.url !== url),
+      );
+    } catch (err) {
+      console.error('removeReadingItem: write failed', err);
+      return false;
+    }
     this.list = this.list.filter((item) => item.url !== url);
     broadcastListChange();
+    return true;
   }
 
   async updateReadingItem(url: string, updates: Partial<ListItemData>) {
@@ -198,13 +223,15 @@ class RL {
     }
   }
 
-  async reorderItems(orderedUrls: string[]) {
+  async reorderItems(orderedUrls: string[]): Promise<boolean> {
     if (!this.initialized) await this.getListItems();
     const indexByUrl = new Map(orderedUrls.map((url, index) => [url, index]));
     const reordered: ListItemData[] = [];
+    const previousIndices = new Map<ListItemData, number | undefined>();
     for (const item of this.list) {
       const index = indexByUrl.get(item.url);
       if (index === undefined) continue;
+      previousIndices.set(item, item.index);
       item.index = index;
       reordered.push(item);
     }
@@ -214,10 +241,18 @@ class RL {
     for (const [key, items] of byBucket) {
       toWrite[key] = encodeBucket(items);
     }
-    if (Object.keys(toWrite).length > 0) {
+    if (Object.keys(toWrite).length === 0) return true;
+
+    try {
       await chrome.storage.sync.set(toWrite);
-      broadcastListChange();
+    } catch (err) {
+      for (const [item, index] of previousIndices) item.index = index;
+      console.error('reorderItems: write failed', err);
+      return false;
     }
+
+    broadcastListChange();
+    return true;
   }
 
   async clearAll() {

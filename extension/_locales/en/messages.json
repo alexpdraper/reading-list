@@ -87,6 +87,10 @@
     "message": "Search",
     "description": "The label for the search box."
   },
+  "syncFailed": {
+    "message": "Couldn't save that change. It may not appear on your other devices.",
+    "description": "Shown briefly when a reading list write (e.g. reordering) fails to save."
+  },
   "theme": {
     "message": "Theme:",
     "description": "The label for the theme option."

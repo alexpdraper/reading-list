@@ -231,6 +231,15 @@ export const styles = css`
     transform: rotate(45deg);
   }
 
+  .sync-error {
+    margin: 0 0 0.5rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    background: #fdecea;
+    color: #611a15;
+  }
+
   @media (prefers-color-scheme: dark) {
     :host {
       --rl-link-color: #000;
@@ -268,6 +277,10 @@ export const styles = css`
     .sort button:focus,
     .sort button.active {
       color: #eee;
+    }
+    .sync-error {
+      background: #4a2320;
+      color: #f8d7d5;
     }
   }
 
