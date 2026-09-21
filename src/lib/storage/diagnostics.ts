@@ -1,4 +1,5 @@
 import { BUCKET_COUNT, BUCKET_KEY_RE, decodeBucket, utf8ByteLength } from './buckets.js';
+import { BUILD_TAG } from '../build-info.js';
 
 export async function getStorageDiagnostics(): Promise<string> {
   const all = await chrome.storage.sync.get(null);
@@ -34,6 +35,7 @@ export async function getStorageDiagnostics(): Promise<string> {
   const quotaBytesPerItem = chrome.storage.sync.QUOTA_BYTES_PER_ITEM ?? 8192;
 
   return [
+    `Build: ${BUILD_TAG}`,
     `Items: ${itemCount}`,
     `Buckets used: ${bucketCount} / ${BUCKET_COUNT}`,
     `Bytes in use (browser-reported): ${bytesInUse} / ${quotaBytes}`,
