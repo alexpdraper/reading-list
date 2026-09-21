@@ -12,8 +12,8 @@ import { isFirefox, getActiveTab } from '../lib/browser.js';
 import { addReadingItemAndSyncBadge } from '../lib/add-item.js';
 import { ReadingListItemElement } from './reading-list-item.js';
 import { DragReorderController } from './drag-reorder-controller.js';
-import { styles } from './reading-list-app.styles.js';
-import { theme } from './theme.styles.js';
+import { styles } from '../styles/reading-list-app.styles.js';
+import { theme } from '../styles/theme.styles.js';
 import './reading-list-item.js';
 
 // Slightly past the 0.65s slideout animation (reading-list-item.styles.ts).

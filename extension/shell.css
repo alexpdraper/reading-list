@@ -1,6 +1,6 @@
 /*
  * Light-DOM page chrome, outside the Lit component tree, so it can't
- * import src/components/theme.styles.ts directly. Keep these values in
+ * import src/styles/theme.styles.ts directly. Keep these values in
  * sync with that file by hand.
  */
 :root {

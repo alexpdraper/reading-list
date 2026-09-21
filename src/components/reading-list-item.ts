@@ -2,8 +2,8 @@ import { LitElement, html, PropertyValues } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { getSettings } from '../lib/settings.js';
 import { isFirefox, openLink } from '../lib/browser.js';
-import { styles } from './reading-list-item.styles.js';
-import { theme } from './theme.styles.js';
+import { styles } from '../styles/reading-list-item.styles.js';
+import { theme } from '../styles/theme.styles.js';
 
 @customElement('reading-list-item')
 export class ReadingListItemElement extends LitElement {
