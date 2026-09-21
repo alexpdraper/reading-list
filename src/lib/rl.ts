@@ -80,7 +80,7 @@ class RL {
     return byBucket;
   }
 
-  async addReadingItem(listItem: ListItemData) {
+  async addReadingItem(listItem: ListItemData): Promise<ListItemData> {
     if (!this.initialized) await this.getListItems();
     listItem = normalizeItemForStorage(listItem);
     listItem = { ...listItem, index: this.minExistingIndex() - 1 };
@@ -95,6 +95,7 @@ class RL {
       ...this.list.filter((item) => item.url !== listItem.url),
     ];
     broadcastListChange();
+    return listItem;
   }
 
   // Adds many items at once, batching writes so a large import doesn't fire

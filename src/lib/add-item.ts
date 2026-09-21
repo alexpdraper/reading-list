@@ -8,14 +8,14 @@ export async function addReadingItemAndSyncBadge(
   title: string,
   favIconUrl?: string,
 ): Promise<ListItemData | null> {
-  const listItem: ListItemData = { url, title, addedAt: Date.now(), favIconUrl };
+  let stored: ListItemData;
   try {
-    await rl.addReadingItem(listItem);
+    stored = await rl.addReadingItem({ url, title, addedAt: Date.now(), favIconUrl });
   } catch (e) {
     console.error(e);
     return null;
   }
   const tab = await getActiveTab();
   if (tab?.id) void syncBadgeForTab(tab.id, tab.url);
-  return listItem;
+  return stored;
 }
