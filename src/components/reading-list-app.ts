@@ -11,6 +11,7 @@ import { maybeGetReviewItem, dismissReview } from '../lib/review.js';
 import { isFirefox, getActiveTab } from '../lib/browser.js';
 import { addReadingItemAndSyncBadge } from '../lib/add-item.js';
 import { ReadingListItemElement } from './reading-list-item.js';
+import { DragReorderController } from './drag-reorder-controller.js';
 import { styles } from './reading-list-app.styles.js';
 import { theme } from './theme.styles.js';
 import './reading-list-item.js';
@@ -134,7 +135,7 @@ export class ReadingListAppElement extends LitElement {
   private _viewAll = true;
 
   @state()
-  private _sortOption: SortOption = '';
+  _sortOption: SortOption = '';
 
   @state()
   private _sortOrder: SortOrder = '';
@@ -149,9 +150,9 @@ export class ReadingListAppElement extends LitElement {
 
   private _unsubscribeSettings?: () => void;
 
-  private _draggedUrl: string | null = null;
-
   private _listFilter = new ListFilter();
+
+  private _dragReorder = new DragReorderController(this);
 
   override willUpdate(changedProperties: PropertyValues<this>) {
     if (changedProperties.has('_listItems')) {
@@ -271,10 +272,10 @@ export class ReadingListAppElement extends LitElement {
 
       <div
         class="reading-list"
-        @dragstart=${this._onDragStart}
-        @dragover=${this._onDragOver}
-        @drop=${this._onDrop}
-        @dragend=${this._onDragEnd}
+        @dragstart=${this._dragReorder.onDragStart}
+        @dragover=${this._dragReorder.onDragOver}
+        @drop=${this._dragReorder.onDrop}
+        @dragend=${this._dragReorder.onDragEnd}
         @edit-start=${this._onEditStart}
         @edit-end=${this._onEditEnd}
         @remove-animation-end=${this._onRemoteRemoveAnimationEnd}
@@ -301,6 +302,7 @@ export class ReadingListAppElement extends LitElement {
               .isNew=${this._animatingUrls.has(listItem.url)}
               .removing=${this._removingUrls.has(listItem.url)}
               .animateItems=${this._animateItems}
+              .reorderable=${!this._sortOption && !this.searchQuery}
               .locked=${this._editingUrl !== null && this._editingUrl !== listItem.url}
               @delete-item=${this._onDeleteItemClicked}
               @edit-item=${this._onEditItemClicked}
@@ -362,51 +364,6 @@ export class ReadingListAppElement extends LitElement {
     this._listItems = this._listItems.map((item) =>
       item.url === target.href ? { ...item, title } : item,
     );
-  }
-
-  private _findItemElement(event: DragEvent): ReadingListItemElement | undefined {
-    return (event.composedPath() as HTMLElement[]).find(
-      (el) => el.tagName === 'READING-LIST-ITEM',
-    ) as ReadingListItemElement | undefined;
-  }
-
-  private _onDragStart(event: DragEvent) {
-    if (this._sortOption || this.searchQuery) {
-      event.preventDefault();
-      return;
-    }
-    this._draggedUrl = this._findItemElement(event)?.href ?? null;
-  }
-
-  private _onDragOver(event: DragEvent) {
-    if (this._sortOption || this.searchQuery || !this._listItems || !this._draggedUrl) return;
-    event.preventDefault();
-
-    const targetUrl = this._findItemElement(event)?.href;
-    if (!targetUrl || targetUrl === this._draggedUrl) return;
-
-    const items = [...this._listItems];
-    const fromIndex = items.findIndex((item) => item.url === this._draggedUrl);
-    const toIndex = items.findIndex((item) => item.url === targetUrl);
-    if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return;
-
-    const [dragged] = items.splice(fromIndex, 1);
-    items.splice(toIndex, 0, dragged);
-    this._listItems = items;
-  }
-
-  private _onDrop(event: DragEvent) {
-    event.preventDefault();
-  }
-
-  private async _onDragEnd() {
-    const wasDragging = this._draggedUrl !== null;
-    this._draggedUrl = null;
-    if (!wasDragging || this._sortOption || this.searchQuery || !this._listItems) return;
-
-    const items = this._listItems.map((item, index) => ({ ...item, index }));
-    this._listItems = items;
-    await rl.reorderItems(items.map((item) => item.url));
   }
 
   private async _addReadingItem(url: string, title: string, favIconUrl?: string) {

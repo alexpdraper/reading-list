@@ -39,6 +39,9 @@ export class ReadingListItemElement extends LitElement {
   @property({ type: Boolean })
   locked = false;
 
+  @property({ type: Boolean })
+  reorderable = true;
+
   @state()
   private _slidein = false;
 
@@ -113,7 +116,7 @@ export class ReadingListItemElement extends LitElement {
     return html`
       <div
         class=${classes}
-        draggable=${!this.shiny && !this._editing && !this.locked}
+        draggable=${this.reorderable && !this.shiny && !this._editing && !this.locked}
         @animationend=${this._onAnimationEnd}
         @dragstart=${this._onDragStart}
         @dragend=${() => (this._dragging = false)}
