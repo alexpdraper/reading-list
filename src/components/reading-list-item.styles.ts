@@ -107,9 +107,6 @@ export const styles = css`
     cursor: grab;
   }
 
-  .reading-list-item.dragging {
-    opacity: 0.5;
-  }
 
   .reading-list-item.locked {
     pointer-events: none;
@@ -176,13 +173,15 @@ export const styles = css`
   }
 
   .item-content:hover,
-  .item-content:focus {
+  .item-content:focus,
+  .reading-list-item.dragging .item-content {
     color: var(--primary-color);
     background-color: var(--rl-link-hover-bg);
   }
 
   .item-content:hover .favicon,
-  .item-content:focus .favicon {
+  .item-content:focus .favicon,
+  .reading-list-item.dragging .item-content .favicon {
     border-color: var(--primary-color);
   }
 
@@ -269,7 +268,7 @@ export const styles = css`
     text-align: center;
     background: transparent;
     color: #ccc;
-    transition: all 0.3s ease;
+    transition: all 0.5s ease;
     z-index: 2;
   }
 
@@ -339,7 +338,8 @@ export const styles = css`
     }
 
     .item-content:hover,
-    .item-content:focus {
+    .item-content:focus,
+    .reading-list-item.dragging .item-content {
       background-color: var(--rl-link-hover-bg);
       color: var(--rl-link-color);
     }
