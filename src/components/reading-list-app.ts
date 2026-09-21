@@ -240,9 +240,7 @@ export class ReadingListAppElement extends LitElement {
             class="settings-button"
             aria-label="Options"
             @click=${this._onSettingsClick}
-          >
-            &#9881;
-          </button>
+          >&#9881;</button>
         </div>
         <div class="header-title">
           <h1>${i18n.getMessage('appName', 'Reading List')}</h1>
@@ -251,9 +249,7 @@ export class ReadingListAppElement extends LitElement {
             id="save-button"
             aria-label=${i18n.getMessage('addPage', 'Add page to Reading List')}
             @click=${this._onSaveButtonClick}
-          >
-            +
-          </button>
+          >+</button>
         </div>
       </header>
     `;

@@ -63,6 +63,7 @@ export const styles = css`
     width: var(--button-size);
     height: var(--button-size);
     font-weight: bold;
+    line-height: 1;
     border: 0;
     border-radius: 9999px;
     text-align: center;
