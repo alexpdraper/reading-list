@@ -4,7 +4,7 @@ import { rl } from '../lib/rl.js';
 import { getSettings, updateSettings, onSettingsChanged } from '../lib/settings.js';
 import { getStorageDiagnostics } from '../lib/storage/diagnostics.js';
 import { i18n } from '../lib/i18n.js';
-import { styles } from '../styles/reading-list-options.styles.js';
+import { styles } from '../styles/options.styles.js';
 import { theme } from '../styles/theme.styles.js';
 import { reset } from '../styles/reset.styles.js';
 

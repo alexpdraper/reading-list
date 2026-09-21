@@ -2,7 +2,7 @@ import { LitElement, html, PropertyValues } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { getSettings } from '../lib/settings.js';
 import { isFirefox, openLink } from '../lib/browser.js';
-import { styles } from '../styles/reading-list-item.styles.js';
+import { styles } from '../styles/item.styles.js';
 import { theme } from '../styles/theme.styles.js';
 import { reset } from '../styles/reset.styles.js';
 import { animations } from '../styles/animations.styles.js';

@@ -12,17 +12,20 @@ import { isFirefox, getActiveTab } from '../lib/browser.js';
 import { addReadingItemAndSyncBadge } from '../lib/add-item.js';
 import { ReadingListItemElement } from './reading-list-item.js';
 import { DragReorderController } from './drag-reorder-controller.js';
-import { styles } from '../styles/reading-list-app.styles.js';
+import { styles } from '../styles/app.styles.js';
+import { header } from '../styles/header.styles.js';
+import { search } from '../styles/search.styles.js';
+import { controls } from '../styles/controls.styles.js';
 import { theme } from '../styles/theme.styles.js';
 import { reset } from '../styles/reset.styles.js';
 import './reading-list-item.js';
 
-// Slightly past the 0.65s slideout animation (reading-list-item.styles.ts).
+// Slightly past the 0.65s slideout animation (item.styles.ts).
 const REMOTE_REMOVE_TIMEOUT_MS = 850;
 
 @customElement('reading-list-app')
 export class ReadingListAppElement extends LitElement {
-  static override styles = [theme, reset, styles];
+  static override styles = [theme, reset, header, search, controls, styles];
 
   constructor() {
     super();
