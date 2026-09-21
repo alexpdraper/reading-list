@@ -48,6 +48,7 @@ export const styles = css`
 
   .reading-list-item.slidein .item-content {
     animation: 0.8s ease-out slidein-bounce;
+    animation-fill-mode: forwards;
   }
 
   @keyframes slidein-bounce {
@@ -87,6 +88,8 @@ export const styles = css`
   .reading-list-item.slideout {
     margin: 0;
     animation: 0.65s slideout;
+    /* holds the collapsed end state through the async gap before the DOM node is actually removed */
+    animation-fill-mode: forwards;
   }
 
   @keyframes slideout {
