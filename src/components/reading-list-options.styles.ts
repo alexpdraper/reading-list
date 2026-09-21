@@ -2,17 +2,20 @@ import { css } from 'lit';
 
 export const styles = css`
   :host {
+    --rl-page-bg-color: #fff;
     --rl-text-color: #222;
 
     display: block;
     padding: 2em;
-    background: var(--rl-bg-color);
+    background: var(--rl-page-bg-color);
     color: var(--rl-text-color);
     font-family: sans-serif;
   }
 
   @media (prefers-color-scheme: dark) {
     :host {
+      /* Page chrome, not the --rl-bg-color card/hover surface from theme.styles.ts. */
+      --rl-page-bg-color: #777;
       --rl-text-color: #eee;
     }
   }
