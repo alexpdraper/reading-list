@@ -103,10 +103,12 @@ export const styles = css`
   }
 
 
-  .reading-list-item.locked {
-    pointer-events: none;
-    opacity: 0.5;
-    transition: opacity 0.2s ease;
+  /* Dimming while another item is being edited is handled by
+     reading-list-app's app-wide .editing-overlay, which also blocks clicks
+     to everything it covers - this item just needs to rise above it. */
+  .reading-list-item.editing {
+    position: relative;
+    z-index: 11;
   }
 
   .reading-list-item.shiny {
@@ -317,6 +319,10 @@ export const styles = css`
   .edit-button:focus-visible .edit-button-content,
   .edit-button:hover .edit-button-content {
     color: var(--rl-on-accent-color);
+    transform: scale(2);
+    /* Nudges the pencil glyph, not the circle - the circle's size/position
+       comes from this span's own (fixed) box, unaffected by its padding. */
+    padding-bottom: 4px;
     background: var(--rl-muted-color);
   }
 

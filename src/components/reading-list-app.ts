@@ -220,6 +220,7 @@ export class ReadingListAppElement extends LitElement {
           </p>`
         : ''}
       ${this._renderList()}
+      ${this._editingUrl !== null ? html`<div class="editing-overlay"></div>` : ''}
     `;
   }
 

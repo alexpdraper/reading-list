@@ -1,6 +1,12 @@
 import { css } from 'lit';
 
 export const styles = css`
+  :host {
+    /* containing block for .editing-overlay */
+    position: relative;
+    display: block;
+  }
+
   *,
   *::before,
   *::after {
@@ -63,10 +69,12 @@ export const styles = css`
     width: var(--button-size);
     height: var(--button-size);
     font-weight: bold;
-    line-height: 1;
     border: 0;
     border-radius: 9999px;
     text-align: center;
+    /* The glyph's line box carries more space above it than below within
+       this flex item; nudge it down to actually center the ink. */
+    padding-bottom: 4px;
   }
 
   .save-button {
@@ -234,6 +242,18 @@ export const styles = css`
     font-size: 0.85rem;
     background: var(--rl-error-bg);
     color: var(--rl-error-text);
+  }
+
+  /* Sits above everything except the item currently being edited (which
+     lifts itself to z-index: 11 - see reading-list-item.styles.ts).
+     inset: -1rem bleeds past :host's own box to also cover <main>'s
+     padding: 1rem in popup.html/sidebar.html - that padding lives outside
+     this shadow root, so :host's own bounds alone don't reach it. */
+  .editing-overlay {
+    position: absolute;
+    inset: -1rem;
+    background: var(--rl-overlay-color);
+    z-index: 10;
   }
 
   @media (prefers-color-scheme: dark) {

@@ -29,6 +29,7 @@ export const theme = css`
     --rl-shadow: 0 1px 1px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
     --rl-edit-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     --rl-icon-shadow: 1px 0 1px rgba(0, 0, 0, 0.15);
+    --rl-overlay-color: rgba(0, 0, 0, 0.4);
 
     /* Decorative, same in both color schemes. */
     --rl-shiny-gradient-start: #fa709a;
