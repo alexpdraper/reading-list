@@ -210,6 +210,21 @@ export class ReadingListAppElement extends LitElement {
 
   override render() {
     return html`
+      ${this._renderHeader()} ${this._renderSearch()} ${this._renderControls()}
+      ${this._syncError
+        ? html`<p class="sync-error" role="status" aria-live="polite">
+            ${i18n.getMessage(
+              'syncFailed',
+              "Couldn't save that change. It may not appear on your other devices.",
+            )}
+          </p>`
+        : ''}
+      ${this._renderList()}
+    `;
+  }
+
+  private _renderHeader() {
+    return html`
       <header>
         <div class="header-top">
           ${isFirefox && !this._isSidebar
@@ -241,7 +256,11 @@ export class ReadingListAppElement extends LitElement {
           </button>
         </div>
       </header>
+    `;
+  }
 
+  private _renderSearch() {
+    return html`
       <search class="search">
         <label class="visually-hidden" for="list-search"
           >${i18n.getMessage('search', 'Search')}</label
@@ -255,7 +274,11 @@ export class ReadingListAppElement extends LitElement {
           @input=${this._onSearchInput}
         />
       </search>
+    `;
+  }
 
+  private _renderControls() {
+    return html`
       <div class="controls">
         <div class="filter">
           <button
@@ -291,16 +314,11 @@ export class ReadingListAppElement extends LitElement {
           </button>
         </div>
       </div>
+    `;
+  }
 
-      ${this._syncError
-        ? html`<p class="sync-error" role="status" aria-live="polite">
-            ${i18n.getMessage(
-              'syncFailed',
-              "Couldn't save that change. It may not appear on your other devices.",
-            )}
-          </p>`
-        : ''}
-
+  private _renderList() {
+    return html`
       <div
         class="reading-list"
         @dragstart=${this._dragReorder.onDragStart}
