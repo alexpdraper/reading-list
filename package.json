@@ -3,7 +3,7 @@
   "version": "3.0.1",
   "description": "Reading List extension with manifest v3",
   "scripts": {
-    "build": "tsc && rollup -c",
+    "build": "rm -rf extension/scripts build && tsc && rollup -c",
     "format": "prettier --write src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
