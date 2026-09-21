@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
 import { rl } from '../lib/rl.js';
-import { getSettings, updateSettings } from '../lib/settings.js';
+import { getSettings, updateSettings, onSettingsChanged } from '../lib/settings.js';
 import { getStorageDiagnostics } from '../lib/storage/diagnostics.js';
 import { i18n } from '../lib/i18n.js';
 import { styles } from './reading-list-options.styles.js';
@@ -23,9 +23,25 @@ export class ReadingListOptions extends LitElement {
     addContextMenu: true,
   };
 
+  private _unsubscribeSettings?: () => void;
+
   override connectedCallback() {
     super.connectedCallback();
     void this._loadSettings();
+    this._unsubscribeSettings?.();
+    this._unsubscribeSettings = onSettingsChanged((settings) => {
+      this.settings = {
+        openNewTab: settings.openNewTab,
+        animateItems: settings.animateItems,
+        addContextMenu: settings.addContextMenu,
+      };
+    });
+  }
+
+  override disconnectedCallback() {
+    super.disconnectedCallback();
+    this._unsubscribeSettings?.();
+    this._unsubscribeSettings = undefined;
   }
 
   override render() {
