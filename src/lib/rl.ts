@@ -24,6 +24,7 @@ class RL {
   private list: ListItemData[] = [];
   private initialized = false;
   private subscribers = new Set<() => void>();
+  private reloadGeneration = 0;
 
   constructor() {
     onListChange(() => void this.reloadFromRemoteChange());
@@ -34,16 +35,27 @@ class RL {
     return () => this.subscribers.delete(callback);
   }
 
+  private async fetchItems(): Promise<ListItemData[]> {
+    const items = chrome ? await getItemsRemote() : [];
+    items.sort((a, b) => b.addedAt - a.addedAt);
+    return items;
+  }
+
+  // Rapid pings can leave two reloads in flight; storage reads don't resolve
+  // in start order, so only the read started most recently may be applied.
   private async reloadFromRemoteChange() {
+    const generation = ++this.reloadGeneration;
     this.initialized = false;
-    await this.getListItems();
+    const items = await this.fetchItems();
+    if (generation !== this.reloadGeneration) return;
+    this.list = items;
+    this.initialized = true;
     for (const callback of this.subscribers) callback();
   }
 
   async getListItems() {
     if (!this.initialized) {
-      this.list = chrome ? await getItemsRemote() : [];
-      this.list.sort((a, b) => b.addedAt - a.addedAt);
+      this.list = await this.fetchItems();
       this.initialized = true;
     }
 

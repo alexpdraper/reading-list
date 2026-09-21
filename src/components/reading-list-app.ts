@@ -78,8 +78,13 @@ export class ReadingListAppElement extends LitElement {
   }
 
   private async _onRemoteChange() {
+    const generation = ++this._remoteChangeGeneration;
     const previous = this._listItems ?? [];
     const items = await rl.getListItems();
+    // A superseded invocation never writes _listItems, so the next
+    // invocation's `previous` (captured fresh at its own start) is always
+    // the last state actually applied, not a stale one.
+    if (generation !== this._remoteChangeGeneration) return;
 
     const previousUrls = new Set(previous.map((item) => item.url));
     const nextUrls = new Set(items.map((item) => item.url));
@@ -159,6 +164,8 @@ export class ReadingListAppElement extends LitElement {
   private _syncError = false;
 
   private _syncErrorTimer?: ReturnType<typeof setTimeout>;
+
+  private _remoteChangeGeneration = 0;
 
   private _unsubscribe?: () => void;
 
