@@ -2,7 +2,6 @@ import { css } from 'lit';
 
 export const styles = css`
   :host {
-    --rl-bg-color: #fff;
     --rl-text-color: #222;
 
     display: block;
@@ -14,8 +13,7 @@ export const styles = css`
 
   @media (prefers-color-scheme: dark) {
     :host {
-      --rl-bg-color: #777;
-      --rl-text-color: #000;
+      --rl-text-color: #eee;
     }
   }
 
@@ -45,7 +43,7 @@ export const styles = css`
     padding: 0.5em 1em;
     font-size: 1em;
     margin-top: 1em;
-    background: #66cc98;
+    background: var(--primary-color);
     color: white;
     border: none;
     border-radius: 4px;

@@ -5,6 +5,7 @@ import { getSettings, updateSettings, onSettingsChanged } from '../lib/settings.
 import { getStorageDiagnostics } from '../lib/storage/diagnostics.js';
 import { i18n } from '../lib/i18n.js';
 import { styles } from './reading-list-options.styles.js';
+import { theme } from './theme.styles.js';
 
 type CheckboxSettingKey = 'openNewTab' | 'animateItems' | 'addContextMenu';
 
@@ -15,7 +16,7 @@ const CHECKBOX_SETTINGS: { key: CheckboxSettingKey; label: string }[] = [
 ];
 
 export class ReadingListOptions extends LitElement {
-  static override styles = styles;
+  static override styles = [theme, styles];
 
   @state() settings: Record<CheckboxSettingKey, boolean> = {
     openNewTab: false,
