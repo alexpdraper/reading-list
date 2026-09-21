@@ -14,6 +14,7 @@ import { ReadingListItemElement } from './reading-list-item.js';
 import { DragReorderController } from './drag-reorder-controller.js';
 import { styles } from '../styles/reading-list-app.styles.js';
 import { theme } from '../styles/theme.styles.js';
+import { reset } from '../styles/reset.styles.js';
 import './reading-list-item.js';
 
 // Slightly past the 0.65s slideout animation (reading-list-item.styles.ts).
@@ -21,7 +22,7 @@ const REMOTE_REMOVE_TIMEOUT_MS = 850;
 
 @customElement('reading-list-app')
 export class ReadingListAppElement extends LitElement {
-  static override styles = [theme, styles];
+  static override styles = [theme, reset, styles];
 
   constructor() {
     super();

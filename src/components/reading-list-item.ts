@@ -4,10 +4,12 @@ import { getSettings } from '../lib/settings.js';
 import { isFirefox, openLink } from '../lib/browser.js';
 import { styles } from '../styles/reading-list-item.styles.js';
 import { theme } from '../styles/theme.styles.js';
+import { reset } from '../styles/reset.styles.js';
+import { animations } from '../styles/animations.styles.js';
 
 @customElement('reading-list-item')
 export class ReadingListItemElement extends LitElement {
-  static override styles = [theme, styles];
+  static override styles = [theme, reset, animations, styles];
 
   /**
    * The URL title text.

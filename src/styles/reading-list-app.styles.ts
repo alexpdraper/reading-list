@@ -7,16 +7,6 @@ export const styles = css`
     display: block;
   }
 
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
-
-  :focus-visible {
-    outline: 3px solid var(--rl-focus-color);
-  }
-
   .visually-hidden:not(caption) {
     position: absolute !important;
   }
