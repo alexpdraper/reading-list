@@ -131,7 +131,13 @@ export class ReadingListItemElement extends LitElement {
                 @keydown=${this._onEditKeydown}
                 @blur=${this._onEditBlur}
               />`
-            : html`<a class="title" href=${this.href} @click=${this._onLinkClick}>${this.name}</a>`}
+            : html`<a
+                class="title"
+                href=${this.href}
+                draggable="false"
+                @click=${this._onLinkClick}
+                >${this.name}</a
+              >`}
           <div class="host">${this.url?.hostname ?? this.href}</div>
           <div class="favicon">
             ${this.favicon && !this.faviconError

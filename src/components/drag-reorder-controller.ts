@@ -22,6 +22,10 @@ export class DragReorderController implements ReactiveController {
     host.addController(this);
   }
 
+  get isDragging(): boolean {
+    return this._draggedUrl !== null;
+  }
+
   hostConnected(): void {}
 
   hostDisconnected(): void {

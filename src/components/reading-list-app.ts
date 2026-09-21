@@ -170,6 +170,7 @@ export class ReadingListAppElement extends LitElement {
       viewAll: this._viewAll,
       sortOption: this._sortOption,
       sortOrder: this._sortOrder,
+      preserveOrder: this._dragReorder.isDragging,
     });
   }
 

@@ -9,6 +9,7 @@ export interface FilterOptions {
   viewAll: boolean;
   sortOption: SortOption;
   sortOrder: SortOrder;
+  preserveOrder?: boolean;
 }
 
 function compareItems(
@@ -40,16 +41,21 @@ export class ListFilter {
     this.fuse = items ? new Fuse(items, { keys: ['title', 'url'], threshold: 0.4 }) : null;
   }
 
-  visibleItems(items: ListItemData[], { query, viewAll, sortOption, sortOrder }: FilterOptions): ListItemData[] {
+  visibleItems(
+    items: ListItemData[],
+    { query, viewAll, sortOption, sortOrder, preserveOrder }: FilterOptions,
+  ): ListItemData[] {
     let result = query ? (this.fuse?.search(query).map((r) => r.item) ?? []) : items;
 
     if (!viewAll) {
       result = result.filter((item) => !item.viewed);
     }
 
-    result = sortOption
-      ? [...result].sort((a, b) => compareItems(a, b, sortOption, sortOrder))
-      : [...result].sort(compareByIndex);
+    if (sortOption) {
+      result = [...result].sort((a, b) => compareItems(a, b, sortOption, sortOrder));
+    } else if (!preserveOrder) {
+      result = [...result].sort(compareByIndex);
+    }
 
     return result;
   }
