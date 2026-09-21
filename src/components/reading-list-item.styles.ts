@@ -2,14 +2,6 @@ import { css } from 'lit';
 
 export const styles = css`
   :host {
-    --base-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
-    --base-font-size: 13px;
-    --base-line-height: 1.4;
-    --rl-link-color: #555;
-    --rl-link-hover-bg: #fff;
-    --rl-item-gap: 0.5rem;
-
     font-family: var(--base-font);
     font-size: var(--base-font-size);
     line-height: var(--base-line-height);
@@ -27,7 +19,7 @@ export const styles = css`
   }
 
   :focus-visible {
-    outline: 3px solid lightblue;
+    outline: 3px solid var(--rl-focus-color);
   }
 
   .reading-list-item {
@@ -37,7 +29,7 @@ export const styles = css`
     position: relative;
     overflow: hidden;
     transition: all 0.5s ease 0s;
-    color: var(--rl-link-color);
+    color: var(--rl-text-color);
     background-color: var(--rl-bg-color);
     box-shadow: var(--rl-shadow);
   }
@@ -118,17 +110,21 @@ export const styles = css`
   }
 
   .reading-list-item.shiny {
-    background: linear-gradient(to right, #fa709a 0%, #fee140 100%);
+    background: linear-gradient(
+      to right,
+      var(--rl-shiny-gradient-start) 0%,
+      var(--rl-shiny-gradient-end) 100%
+    );
   }
 
   .reading-list-item.shiny .item-content,
   .reading-list-item.shiny .delete-button-content {
-    color: #000;
+    color: var(--rl-shiny-text-color);
   }
 
   .reading-list-item.shiny .item-content:hover,
   .reading-list-item.shiny .item-content:focus {
-    color: #fee140;
+    color: var(--rl-shiny-gradient-end);
     background: transparent;
   }
 
@@ -141,12 +137,12 @@ export const styles = css`
   .reading-list-item.shiny .delete-button:focus-visible .delete-button-content,
   .reading-list-item.shiny .delete-button:hover .delete-button-content {
     background: transparent;
-    color: #fa709a;
+    color: var(--rl-shiny-gradient-start);
   }
 
   .reading-list-item.shiny:hover,
   .reading-list-item.shiny:focus-within {
-    box-shadow: 1px 3px 17px rgba(254, 225, 64, 0.9), 0px -1px 5px rgba(254, 225, 64, 0.7);
+    box-shadow: var(--rl-shiny-shadow);
   }
 
   .favicon {
@@ -156,7 +152,7 @@ export const styles = css`
     width: 36px;
     height: 36px;
     border-radius: 0.25rem;
-    border: 1px solid #ccc;
+    border: 1px solid var(--rl-muted-color);
     padding: 1px;
   }
 
@@ -179,7 +175,7 @@ export const styles = css`
   .item-content:focus,
   .reading-list-item.dragging .item-content {
     color: var(--primary-color);
-    background-color: var(--rl-link-hover-bg);
+    background-color: var(--rl-hover-bg-color);
   }
 
   .item-content:hover .favicon,
@@ -232,8 +228,8 @@ export const styles = css`
     margin: 0;
     border: 0;
     border-radius: 0.25rem;
-    background-color: var(--rl-link-hover-bg);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    background-color: var(--rl-hover-bg-color);
+    box-shadow: var(--rl-edit-shadow);
     color: inherit;
     position: relative;
     z-index: 3;
@@ -270,7 +266,7 @@ export const styles = css`
     margin: 0;
     text-align: center;
     background: transparent;
-    color: #ccc;
+    color: var(--rl-muted-color);
     transition: all 0.5s ease;
     z-index: 2;
   }
@@ -283,12 +279,12 @@ export const styles = css`
     bottom: -0.1rem;
     right: 0.1rem;
     border-radius: 100%;
-    box-shadow: 1px 0 1px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--rl-icon-shadow);
   }
 
   .delete-button-content,
   .edit-button-content {
-    color: #ccc;
+    color: var(--rl-muted-color);
     border-radius: 9999px;
     display: flex;
     align-items: center;
@@ -307,61 +303,33 @@ export const styles = css`
 
   .delete-button:focus-visible .delete-button-content,
   .edit-button:focus-visible .edit-button-content {
-    outline: 3px solid lightblue;
+    outline: 3px solid var(--rl-focus-color);
   }
 
   .delete-button:focus-visible .delete-button-content,
   .delete-button:hover .delete-button-content {
-    color: #fff;
+    color: var(--rl-on-accent-color);
     transform: rotateZ(90deg) scale(2);
-    box-shadow: 1px 0 1px rgba(0, 0, 0, 0.15);
-    background: #ccc;
+    box-shadow: var(--rl-icon-shadow);
+    background: var(--rl-muted-color);
   }
 
   .edit-button:focus-visible .edit-button-content,
   .edit-button:hover .edit-button-content {
-    color: #fff;
-    background: #ccc;
+    color: var(--rl-on-accent-color);
+    background: var(--rl-muted-color);
   }
 
   @media (prefers-color-scheme: dark) {
-    :host {
-      --rl-link-color: #eee;
-      --rl-link-hover-bg: #333;
-    }
-
-    .reading-list-item {
-      background-color: var(--rl-bg-color);
-      color: var(--rl-link-color);
-      box-shadow: var(--rl-shadow);
-    }
-
-    .item-content {
-      color: var(--rl-link-color);
-    }
-
-    .item-content:hover,
-    .item-content:focus,
-    .reading-list-item.dragging .item-content {
-      background-color: var(--rl-link-hover-bg);
-      color: var(--rl-link-color);
-    }
-
     .favicon {
       border: 0;
-    }
-
-    .delete-button-content,
-    .edit-button-content {
-      color: #ccc;
     }
 
     .delete-button:focus-visible .delete-button-content,
     .delete-button:hover .delete-button-content,
     .edit-button:focus-visible .edit-button-content,
     .edit-button:hover .edit-button-content {
-      background: #333;
-      color: #fff;
+      background: var(--rl-hover-bg-color);
     }
   }
 `;

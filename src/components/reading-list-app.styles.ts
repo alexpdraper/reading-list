@@ -1,12 +1,6 @@
 import { css } from 'lit';
 
 export const styles = css`
-  :host {
-    --rl-link-color: #555;
-    --rl-link-hover-bg: #f7f7f7;
-    --primary-color-focus: #44aa76;
-  }
-
   *,
   *::before,
   *::after {
@@ -14,7 +8,7 @@ export const styles = css`
   }
 
   :focus-visible {
-    outline: 3px solid lightblue;
+    outline: 3px solid var(--rl-focus-color);
   }
 
   .visually-hidden:not(caption) {
@@ -75,7 +69,7 @@ export const styles = css`
   }
 
   .save-button {
-    color: #fff;
+    color: var(--rl-on-accent-color);
     background: var(--primary-color);
   }
 
@@ -86,7 +80,7 @@ export const styles = css`
 
   .settings-button {
     background: transparent;
-    color: var(--rl-link-color);
+    color: var(--rl-text-color);
     font-size: 1.4rem;
     cursor: pointer;
   }
@@ -98,13 +92,13 @@ export const styles = css`
 
   .save-button:focus,
   .settings-button:focus {
-    outline: 3px solid lightblue;
+    outline: 3px solid var(--rl-focus-color);
   }
 
   .sidebar-button {
     background: transparent;
-    color: var(--rl-link-color);
-    border: 1px solid var(--rl-link-color);
+    color: var(--rl-text-color);
+    border: 1px solid var(--rl-text-color);
     border-radius: 0.25rem;
     padding: 0.25rem 0.5rem;
     font-size: 0.7rem;
@@ -121,7 +115,7 @@ export const styles = css`
   }
 
   .sidebar-button:focus {
-    outline: 3px solid lightblue;
+    outline: 3px solid var(--rl-focus-color);
   }
 
   search {
@@ -131,16 +125,17 @@ export const styles = css`
 
   input {
     font-size: inherit;
-    border: 1px solid #eee;
+    border: 1px solid var(--rl-border-color);
     border-radius: 0.25rem;
     padding: 0.5rem;
     background: transparent;
     width: 100%;
     margin: 0;
+    color: var(--rl-text-color);
   }
 
   input:focus {
-    outline: 3px solid lightblue;
+    outline: 3px solid var(--rl-focus-color);
     border-color: var(--primary-color);
   }
 
@@ -184,8 +179,8 @@ export const styles = css`
     align-items: center;
     gap: 0.25rem;
     border: 0;
-    background: #e9e9ed;
-    color: var(--rl-link-color);
+    background: var(--rl-tab-bg);
+    color: var(--rl-text-color);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     padding: 0.5rem;
@@ -198,7 +193,7 @@ export const styles = css`
   .sort button:hover,
   .sort button:focus,
   .sort button.active {
-    background: var(--rl-link-hover-bg);
+    background: var(--rl-hover-bg-color);
     color: var(--primary-color);
   }
 
@@ -236,39 +231,17 @@ export const styles = css`
     padding: 0.4rem 0.6rem;
     border-radius: 4px;
     font-size: 0.85rem;
-    background: #fdecea;
-    color: #611a15;
+    background: var(--rl-error-bg);
+    color: var(--rl-error-text);
   }
 
   @media (prefers-color-scheme: dark) {
-    :host {
-      --rl-link-color: #000;
-      --rl-link-hover-bg: #333;
-      --primary-color-focus: #44aa76;
-    }
-    input {
-      background: transparent;
-      color: #000;
-      border-color: #555;
-    }
-    input:focus {
-      border-color: var(--primary-color);
-    }
-    body,
-    main {
-      background: #777;
-      color: #000;
-    }
     .save-button {
-      background: #555;
+      background: var(--rl-bg-color);
     }
     .save-button:hover,
     .save-button:focus {
-      background: #333;
-    }
-    .filter button,
-    .sort button {
-      background: var(--rl-bg-color);
+      background: var(--rl-hover-bg-color);
     }
     .filter button:hover,
     .filter button:focus,
@@ -276,12 +249,7 @@ export const styles = css`
     .sort button:hover,
     .sort button:focus,
     .sort button.active {
-      color: #eee;
-    }
-    .sync-error {
-      background: #4a2320;
-      color: #f8d7d5;
+      color: var(--rl-text-color);
     }
   }
-
 `;

@@ -2,22 +2,11 @@ import { css } from 'lit';
 
 export const styles = css`
   :host {
-    --rl-page-bg-color: #fff;
-    --rl-text-color: #222;
-
     display: block;
     padding: 2em;
     background: var(--rl-page-bg-color);
     color: var(--rl-text-color);
-    font-family: sans-serif;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :host {
-      /* Page chrome, not the --rl-bg-color card/hover surface from theme.styles.ts. */
-      --rl-page-bg-color: #777;
-      --rl-text-color: #eee;
-    }
+    font-family: var(--base-font);
   }
 
   .section {
@@ -47,22 +36,22 @@ export const styles = css`
     font-size: 1em;
     margin-top: 1em;
     background: var(--primary-color);
-    color: white;
+    color: var(--rl-on-accent-color);
     border: none;
     border-radius: 4px;
     cursor: pointer;
   }
 
   button:hover {
-    background: #44aa76;
+    background: var(--primary-color-focus);
   }
 
   button.danger {
-    background: #cc4444;
+    background: var(--rl-danger-color);
   }
 
   button.danger:hover {
-    background: #aa2222;
+    background: var(--rl-danger-color-hover);
   }
 
   details {
@@ -80,12 +69,12 @@ export const styles = css`
 
   @media (prefers-color-scheme: dark) {
     button {
-      background: #555;
-      color: #eee;
+      background: var(--rl-bg-color);
+      color: var(--rl-text-color);
     }
 
     button:hover {
-      background: #333;
+      background: var(--rl-hover-bg-color);
     }
   }
 `;
