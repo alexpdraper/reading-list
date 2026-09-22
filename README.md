@@ -25,7 +25,7 @@ This is a from-scratch rewrite of the original extension — Manifest V3, TypeSc
 
 **New in this version:**
 
-- Compressed, bucketed storage — holds ~1,200+ items instead of the original's hard ~511-item limit
+- Compressed, bucketed storage — holds several hundred+ items instead of the original's hard ~511-item limit, with no per-item key cap
 - Storage Diagnostics (Options → Advanced) to check real usage against the browser's sync quota
 
 **Not carried over:** the original's Firefox-only address-bar toggle icon (`page_action`). Chrome removed that API entirely in Manifest V3, and Firefox has long signaled intent to fold it into the unified `action` API without having done so — not worth building against something already headed for deprecation.

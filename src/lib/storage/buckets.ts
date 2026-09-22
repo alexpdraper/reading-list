@@ -22,14 +22,16 @@ export interface ListItemData {
 //
 // BUCKET_COUNT is deliberately small (not 512): LZ-style compression only
 // pays off when there's redundant text within a single compressed blob
-// (repeated property names, similar URLs, etc). With 512 buckets and a
-// realistic list size, most buckets end up holding only 1-4 items each —
-// too little redundancy to compress well, plus fixed per-blob format
-// overhead on every bucket. Measured against real data: 512 buckets gave
-// ~170 bytes/item (no better than no compression at all, ~600 items/100KB);
-// 40 buckets gives ~68 bytes/item (~1,470 items/100KB) by letting each
-// bucket's blob be big enough for compression to actually help, while
-// staying safely under the 8KB-per-bucket quota.
+// (repeated property names, similar URLs, etc). Too few buckets and
+// individual buckets hit the 8KB-per-bucket quota before the 100KB total is
+// used; too many and each blob is too small for compression to help, plus
+// fixed per-blob overhead multiplies. 40 sits reasonably on that curve, but
+// was tuned against synthetic ~88-byte items - real items run ~250+
+// bytes/item once real URLs/titles are counted (see the "Verified capacity"
+// note in AGENTS.md), and a quick simulation against that realistic sizing
+// suggests something closer to 25 buckets may fit meaningfully more. Not
+// yet changed; re-verify with `rebalanceBucketsIfNeeded()` before touching
+// this constant either way.
 export const BUCKET_COUNT = 40;
 export const BUCKET_KEY_RE = /^b\d+$/;
 export const BUCKET_VERSION_KEY = '__bv';
