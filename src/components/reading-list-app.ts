@@ -144,6 +144,9 @@ export class ReadingListAppElement extends LitElement {
   private _animatingUrls: Set<string> = new Set();
 
   @state()
+  private _revealedUrls: Set<string> | null = null;
+
+  @state()
   private _removingUrls: Set<string> = new Set();
 
   @state()
@@ -190,21 +193,29 @@ export class ReadingListAppElement extends LitElement {
   }
 
   private get _visibleItems(): ListItemData[] {
-    return this._listFilter.visibleItems(this._listItems ?? [], {
+    const visible = this._listFilter.visibleItems(this._listItems ?? [], {
       query: this.searchQuery,
       viewAll: this._viewAll,
       sortOption: this._sortOption,
       sortOrder: this._sortOrder,
       preserveOrder: this._dragReorder.isDragging,
     });
+    return this._revealedUrls === null
+      ? visible
+      : visible.filter((item) => this._revealedUrls!.has(item.url));
   }
 
   private _staggerReveal(items: ListItemData[]) {
     const itemsToAnimate = Math.min(10, items.length);
+    this._revealedUrls = new Set();
     const animateNext = (index: number, waitTime: number) => {
-      if (index >= itemsToAnimate) return;
+      if (index >= itemsToAnimate) {
+        this._revealedUrls = null;
+        return;
+      }
       setTimeout(() => {
         this._animatingUrls = new Set([items[index].url]);
+        this._revealedUrls = new Set([...this._revealedUrls!, items[index].url]);
         const nextWait = Math.trunc(waitTime * ((itemsToAnimate - (index + 1)) / itemsToAnimate));
         animateNext(index + 1, nextWait);
       }, waitTime);
