@@ -5,6 +5,7 @@ export const header = css`
     margin: 0;
     font-size: 1.6rem;
     line-height: 1.25;
+    color: var(--rl-heading-color);
   }
 
   header {
@@ -58,7 +59,7 @@ export const header = css`
 
   .settings-button {
     background: transparent;
-    color: var(--rl-text-color);
+    color: var(--rl-heading-color);
     font-size: 1.4rem;
     cursor: pointer;
   }

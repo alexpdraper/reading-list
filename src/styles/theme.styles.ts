@@ -14,6 +14,7 @@ export const theme = css`
     --rl-border-color: #eee;
     --rl-tab-bg: #e9e9ed;
     --rl-text-color: #555;
+    --rl-heading-color: #555;
     --rl-on-accent-color: #fff;
     --rl-muted-color: #ccc;
 
@@ -46,6 +47,7 @@ export const theme = css`
       --rl-border-color: #555;
       --rl-tab-bg: var(--rl-bg-color);
       --rl-text-color: #eee;
+      --rl-heading-color: #000;
 
       --rl-shadow: 0 1px 1px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
 
