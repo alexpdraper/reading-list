@@ -28,13 +28,10 @@ export const styles = css`
   }
 
 
-  /* Dimming while another item is being edited is handled by
-     reading-list-app's app-wide .editing-overlay, which also blocks clicks
-     to everything it covers - this item just needs to rise above it. */
-  .reading-list-item.editing {
-    position: relative;
-    z-index: 11;
-  }
+  /* Dimming while an item is being edited is handled by reading-list-app's
+     app-wide .editing-overlay (z-index: 10), which also blocks clicks to
+     everything it covers - including the rest of *this* card (background,
+     favicon, buttons). Only .edit-title itself rises above it, below. */
 
   .reading-list-item.shiny {
     background: linear-gradient(
@@ -159,7 +156,9 @@ export const styles = css`
     box-shadow: var(--rl-edit-shadow);
     color: inherit;
     position: relative;
-    z-index: 3;
+    /* Above reading-list-app's .editing-overlay (z-index: 10) - this input
+       is the one thing that stays interactive/undimmed while editing. */
+    z-index: 11;
   }
 
   .edit-title:focus {

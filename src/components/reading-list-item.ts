@@ -112,7 +112,6 @@ export class ReadingListItemElement extends LitElement {
       this._slideout ? 'slideout' : '',
       this.shiny ? 'shiny' : '',
       this._dragging ? 'dragging' : '',
-      this._editing ? 'editing' : '',
     ].join(' ');
 
     return html`

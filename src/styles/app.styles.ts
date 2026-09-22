@@ -39,8 +39,9 @@ export const styles = css`
     color: var(--rl-error-text);
   }
 
-  /* Sits above everything except the item currently being edited (which
-     lifts itself to z-index: 11 - see item.styles.ts).
+  /* Sits above everything, including the card being edited - only its
+     .edit-title input rises above this (z-index: 11 - see item.styles.ts),
+     so the text box is the one thing that stays undimmed/interactive.
      inset: -1rem bleeds past :host's own box to also cover <main>'s
      padding: 1rem in popup.html/sidebar.html - that padding lives outside
      this shadow root, so :host's own bounds alone don't reach it. */
