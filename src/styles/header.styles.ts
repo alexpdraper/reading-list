@@ -42,8 +42,6 @@ export const header = css`
     border: 0;
     border-radius: 9999px;
     text-align: center;
-    /* The glyph's line box carries more space above it than below within
-       this flex item; nudge it down to actually center the ink. */
     padding-bottom: 4px;
   }
 

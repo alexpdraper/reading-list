@@ -11,15 +11,9 @@ import { animations } from '../styles/animations.styles.js';
 export class ReadingListItemElement extends LitElement {
   static override styles = [theme, reset, animations, styles];
 
-  /**
-   * The URL title text.
-   */
   @property()
   name = '';
 
-  /**
-   * The URL to link to.
-   */
   @property({ type: String })
   href = '';
 
@@ -89,9 +83,6 @@ export class ReadingListItemElement extends LitElement {
     return this.href ? new URL(this.href) : null;
   }
 
-  /**
-   * The src for the favicon image.
-   */
   private get favicon() {
     if (!isFirefox && this.favIconUrl) {
       return this.favIconUrl;
@@ -231,10 +222,6 @@ export class ReadingListItemElement extends LitElement {
   }
 
   private _onAnimationEnd(event: AnimationEvent) {
-    // slidein-bounce runs on .item-content for 0.8s, four times longer than
-    // the 0.2s slidein on the row. Clearing the class on slidein would
-    // un-match the child selector and cancel the bounce at 25%, before its
-    // 40% keyframe where it starts moving.
     if (event.animationName === 'slidein-bounce') {
       this._slidein = false;
     } else if (event.animationName === 'slideout') {

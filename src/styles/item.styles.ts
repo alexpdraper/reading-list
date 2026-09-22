@@ -6,7 +6,6 @@ export const styles = css`
     font-size: var(--base-font-size);
     line-height: var(--base-line-height);
 
-    /* clips the slidein transform so it can't scroll the popup */
     display: block;
     overflow: hidden;
   }
@@ -26,12 +25,6 @@ export const styles = css`
   [draggable='true'] {
     cursor: grab;
   }
-
-
-  /* Dimming while an item is being edited is handled by reading-list-app's
-     app-wide .editing-overlay (z-index: 10), which also blocks clicks to
-     everything it covers - including the rest of *this* card (background,
-     favicon, buttons). Only .edit-title itself rises above it, below. */
 
   .reading-list-item.shiny {
     background: linear-gradient(
@@ -156,8 +149,6 @@ export const styles = css`
     box-shadow: var(--rl-edit-shadow);
     color: inherit;
     position: relative;
-    /* Above reading-list-app's .editing-overlay (z-index: 10) - this input
-       is the one thing that stays interactive/undimmed while editing. */
     z-index: 11;
   }
 
@@ -244,8 +235,6 @@ export const styles = css`
   .edit-button:hover .edit-button-content {
     color: var(--rl-on-accent-color);
     transform: scale(2);
-    /* Nudges the pencil glyph, not the circle - the circle's size/position
-       comes from this span's own (fixed) box, unaffected by its padding. */
     padding-bottom: 4px;
     background: var(--rl-muted-color);
   }

@@ -47,7 +47,6 @@ export const animations = css`
   .reading-list-item.slideout {
     margin: 0;
     animation: 0.65s slideout;
-    /* holds the collapsed end state through the async gap before the DOM node is actually removed */
     animation-fill-mode: forwards;
   }
 
