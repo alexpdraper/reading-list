@@ -8,12 +8,14 @@ import {
   ListItemData,
 } from './buckets.js';
 
-// Migrates one bucket at a time - write, verify, remove only that
-// bucket's legacy keys - rather than writing every new bucket before
-// removing any old key. All-at-once would need the whole uncompressed
-// old copy and the whole compressed new copy to fit in the quota at the
-// same time, which can fail even when the final compressed size alone
-// fits fine. Also makes migration resumable if interrupted partway.
+// Groups legacy (one-key-per-item) entries by which bucket they're bound
+// for, then writes one target bucket at a time - write, verify, remove
+// only the legacy keys that moved into it - rather than writing every
+// target bucket before removing any legacy key. All-at-once would need
+// the whole uncompressed legacy copy and the whole compressed new copy to
+// fit in the quota at the same time, which can fail even when the final
+// compressed size alone fits fine. Also makes migration resumable if
+// interrupted partway.
 async function migrateLegacyItems(
   all: Record<string, unknown>,
   legacyKeys: string[],
