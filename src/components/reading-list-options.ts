@@ -3,6 +3,7 @@ import { state } from 'lit/decorators.js';
 import { rl } from '../lib/rl.js';
 import { getSettings, updateSettings, onSettingsChanged } from '../lib/settings.js';
 import { getStorageDiagnostics } from '../lib/storage/diagnostics.js';
+import { ListItemData } from '../lib/storage/buckets.js';
 import { i18n } from '../lib/i18n.js';
 import { styles } from '../styles/options.styles.js';
 import { theme } from '../styles/theme.styles.js';
@@ -128,8 +129,19 @@ export class ReadingListOptions extends LitElement {
     const file = input.files[0];
     try {
       const text = await file.text();
-      const items = JSON.parse(text);
-      if (Array.isArray(items)) {
+      const parsed = JSON.parse(text);
+      // The old extension's export is a raw chrome.storage.sync dump: one
+      // key per item URL, plus a "settings" key - not an array like this
+      // app's own export. Only the URL-keyed entries are reading items.
+      const items: ListItemData[] | null = Array.isArray(parsed)
+        ? parsed
+        : parsed && typeof parsed === 'object'
+          ? Object.entries(parsed as Record<string, ListItemData>)
+              .filter(([key]) => /^https?:\/\//i.test(key))
+              .map(([, value]) => value)
+          : null;
+
+      if (items) {
         await rl.getListItems();
         const { succeeded, firstError, diagnostics } =
           await rl.bulkAddReadingItems(items);
