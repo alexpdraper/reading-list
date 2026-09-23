@@ -9,36 +9,44 @@ import {
 } from './buckets.js';
 
 // One-time migration from the old one-key-per-item layout (where the
-// storage key was the item's own URL) into buckets. New bucket keys are
-// written and verified before any legacy key is removed, so a failure
-// partway through never loses data.
+// storage key was the item's own URL) into buckets. Migrates one bucket at
+// a time - write it, verify it, remove only the legacy keys that just
+// moved into it - rather than writing every new bucket before removing any
+// old key. Doing it all at once means the entire uncompressed old copy and
+// the entire compressed new copy must fit in the quota at the same time,
+// which can itself exceed the quota for a list already near capacity under
+// the old scheme, even though the final compressed size alone would fit
+// easily (confirmed: 250 real-sized items, ~86KB uncompressed, failed to
+// migrate at all this way, even though compressed they're well under
+// quota). Per-bucket bounds that transient overlap to one bucket's worth
+// (<= 8KB) instead of the whole list, and is naturally resumable - if it
+// throws partway through, buckets already migrated stay migrated, and
+// whatever legacy keys remain get picked up again on the next call.
 async function migrateLegacyItems(
   all: Record<string, unknown>,
   legacyKeys: string[],
 ): Promise<void> {
-  const byBucket = new Map<string, ListItemData[]>();
+  const byBucket = new Map<string, { items: ListItemData[]; legacyKeys: string[] }>();
   for (const key of legacyKeys) {
     const item = all[key] as ListItemData;
     const bKey = bucketKey(item.url);
-    const bucket = byBucket.get(bKey) ?? [];
-    bucket.push(item);
-    byBucket.set(bKey, bucket);
+    const entry = byBucket.get(bKey) ?? { items: [], legacyKeys: [] };
+    entry.items.push(item);
+    entry.legacyKeys.push(key);
+    byBucket.set(bKey, entry);
   }
 
-  const toWrite: Record<string, string> = {};
-  for (const [bKey, items] of byBucket) {
-    toWrite[bKey] = encodeBucket(items);
-  }
-  await chrome.storage.sync.set(toWrite);
+  for (const [bKey, { items, legacyKeys: keysForBucket }] of byBucket) {
+    const encoded = encodeBucket(items);
+    await chrome.storage.sync.set({ [bKey]: encoded });
 
-  const check = await chrome.storage.sync.get(Object.keys(toWrite));
-  for (const [bKey, compressed] of Object.entries(toWrite)) {
-    if (check[bKey] !== compressed) {
+    const check = await chrome.storage.sync.get(bKey);
+    if (check[bKey] !== encoded) {
       throw new Error(`Migration verification failed for bucket ${bKey}`);
     }
-  }
 
-  await chrome.storage.sync.remove(legacyKeys);
+    await chrome.storage.sync.remove(keysForBucket);
+  }
 }
 
 // Re-groups all existing items into the current BUCKET_COUNT scheme. Needed
