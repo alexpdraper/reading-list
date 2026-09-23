@@ -42,12 +42,15 @@ export const header = css`
     border: 0;
     border-radius: 9999px;
     text-align: center;
-    padding-bottom: 4px;
   }
 
   .save-button {
     color: var(--rl-on-accent-color);
     background: var(--primary-color);
+  }
+
+  .save-button-nudge {
+    padding-bottom: 4px;
   }
 
   .save-button:hover,
@@ -60,6 +63,7 @@ export const header = css`
     color: var(--rl-heading-color);
     font-size: 1.4rem;
     cursor: pointer;
+    padding-bottom: 4px;
   }
 
   .settings-button:hover,

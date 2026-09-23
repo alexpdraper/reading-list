@@ -261,7 +261,7 @@ export class ReadingListAppElement extends LitElement {
         <div class="header-title">
           <h1>${i18n.getMessage('appName', 'Reading List')}</h1>
           <button
-            class="save-button"
+            class="save-button${isFirefox ? ' save-button-nudge' : ''}"
             id="save-button"
             aria-label=${i18n.getMessage('addPage', 'Add page to Reading List')}
             @click=${this._onSaveButtonClick}
