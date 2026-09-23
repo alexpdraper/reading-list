@@ -8,20 +8,12 @@ import {
   ListItemData,
 } from './buckets.js';
 
-// One-time migration from the old one-key-per-item layout (where the
-// storage key was the item's own URL) into buckets. Migrates one bucket at
-// a time - write it, verify it, remove only the legacy keys that just
-// moved into it - rather than writing every new bucket before removing any
-// old key. Doing it all at once means the entire uncompressed old copy and
-// the entire compressed new copy must fit in the quota at the same time,
-// which can itself exceed the quota for a list already near capacity under
-// the old scheme, even though the final compressed size alone would fit
-// easily (confirmed: 250 real-sized items, ~86KB uncompressed, failed to
-// migrate at all this way, even though compressed they're well under
-// quota). Per-bucket bounds that transient overlap to one bucket's worth
-// (<= 8KB) instead of the whole list, and is naturally resumable - if it
-// throws partway through, buckets already migrated stay migrated, and
-// whatever legacy keys remain get picked up again on the next call.
+// Migrates one bucket at a time - write, verify, remove only that
+// bucket's legacy keys - rather than writing every new bucket before
+// removing any old key. All-at-once would need the whole uncompressed
+// old copy and the whole compressed new copy to fit in the quota at the
+// same time, which can fail even when the final compressed size alone
+// fits fine. Also makes migration resumable if interrupted partway.
 async function migrateLegacyItems(
   all: Record<string, unknown>,
   legacyKeys: string[],
@@ -49,13 +41,11 @@ async function migrateLegacyItems(
   }
 }
 
-// Re-groups all existing items into the current BUCKET_COUNT scheme. Needed
-// whenever BUCKET_COUNT changes (e.g. this session's 512 -> 40 fix): a URL's
-// bucket key is `b${hash(url) % BUCKET_COUNT}`, so changing BUCKET_COUNT
-// means old bucket keys no longer match what addReadingItem/removeReadingItem
-// would compute for the same URL, silently orphaning existing data. New
-// buckets are written (and old ones no longer used by the new scheme are
-// removed) before the version marker is committed.
+// Re-groups all existing items into the current BUCKET_COUNT scheme. A
+// URL's bucket key is `b${hash(url) % BUCKET_COUNT}`, so changing
+// BUCKET_COUNT means old bucket keys no longer match what
+// addReadingItem/removeReadingItem would compute for the same URL,
+// silently orphaning existing data without this.
 async function rebalanceBucketsIfNeeded(
   all: Record<string, unknown>,
 ): Promise<boolean> {
