@@ -32,6 +32,7 @@ graph TD
         Browser["browser.ts"]
         Review["review.ts"]
         I18n["i18n.ts"]
+        BuildInfo["build-info.ts"]
     end
 
     subgraph StorageLib["src/lib/storage"]
@@ -71,6 +72,7 @@ graph TD
     BG -.-> Settings
     App -.-> I18n
     OptComp -.-> I18n
+    Diagnostics -.-> BuildInfo
 
     RL --> Buckets
     RL --> Migrations
