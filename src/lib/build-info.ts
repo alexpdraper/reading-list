@@ -1,3 +1,4 @@
-// Manually bumped for now so a stale-reload can be told apart from a real
-// CSS/behavior problem. Switch to the manifest version at release time.
-export const BUILD_TAG = 'debug-4';
+// Read live from the running extension's own manifest, so it can never
+// drift out of sync with the real version and updates automatically on
+// every version bump.
+export const BUILD_TAG = chrome?.runtime?.getManifest?.().version ?? 'unknown';
