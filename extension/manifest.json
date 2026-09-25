@@ -29,7 +29,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "leetcat@cs.ubc.ca",
+      "id": "reading-list-motion-spike@reading-list.local",
       "strict_min_version": "140.0",
       "data_collection_permissions": {
         "required": ["none"]

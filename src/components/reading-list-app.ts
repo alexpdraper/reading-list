@@ -21,24 +21,26 @@ import { theme } from '../styles/theme.styles.js';
 import { reset } from '../styles/reset.styles.js';
 import './reading-list-item.js';
 
-const ITEM_IN_KEYFRAMES: Keyframe[] = [
-  { transform: 'translateX(100%) scaleY(0)', opacity: 0, offset: 0 },
-  { transform: 'translateX(100%) scaleY(0)', opacity: 0, offset: 0.4 },
-  { transform: 'translateX(30px) scaleY(1)', opacity: 1, offset: 0.5 },
-  { transform: 'translateX(0) scaleY(1)', opacity: 1, offset: 0.6 },
-  { transform: 'translateX(35px) scaleY(1)', opacity: 1, offset: 0.8 },
-  { transform: 'translateX(0) scaleY(1)', opacity: 1, offset: 1 },
+// Matches the original CSS `slidein`/`slideout` keyframes (src/styles/animations.styles.ts
+// on v3_beta): only the outer card animates on exit, and on entry it's a quick,
+// non-bouncy reveal - the bounce lives entirely on the inner .item-content
+// (see CONTENT_IN_KEYFRAMES in reading-list-item.ts), running at its own,
+// slower pace at the same time.
+const CARD_IN_KEYFRAMES: Keyframe[] = [
+  { maxHeight: '0px', transform: 'translateX(100%) scaleY(0)', offset: 0 },
+  { maxHeight: '100px', offset: 0.8 },
+  { transform: 'translateX(0) scaleY(1)', offset: 1 },
 ];
 
-const ITEM_OUT_KEYFRAMES: Keyframe[] = [
-  { transform: 'translateX(0) scaleY(1)', opacity: 1, offset: 0 },
-  { transform: 'translateX(0) scaleY(0.4)', opacity: 0.6, offset: 0.4 },
-  { transform: 'translateX(100%) scaleY(0)', opacity: 0, offset: 1 },
+const CARD_OUT_KEYFRAMES: Keyframe[] = [
+  { maxHeight: '100px', transform: 'translateX(0) scaleY(1)', offset: 0 },
+  { maxHeight: '0px', offset: 0.4 },
+  { transform: 'translateX(100%) scaleY(0)', offset: 1 },
 ];
 
 const ITEM_ENTER_EXIT_TIMING: KeyframeAnimationOptions = {
-  duration: 400,
-  easing: 'ease-out',
+  duration: 220,
+  easing: 'ease',
 };
 
 const ITEM_DRAG_FLIP_TIMING: KeyframeAnimationOptions = {
@@ -63,7 +65,13 @@ export class ReadingListAppElement extends LitElement {
         this._reviewItem = item;
       });
       if (this._animateItems) {
-        this._staggerReveal(listItems);
+        const revealOrder = this._listFilter.visibleItems(listItems, {
+          query: '',
+          viewAll: this._viewAll,
+          sortOption: this._sortOption,
+          sortOrder: this._sortOrder,
+        });
+        this._staggerReveal(revealOrder);
       }
     }).catch((err) => {
       console.error('Failed to load reading list', err);
@@ -206,8 +214,8 @@ export class ReadingListAppElement extends LitElement {
       keyframeOptions: this._dragReorder.isDragging
         ? ITEM_DRAG_FLIP_TIMING
         : ITEM_ENTER_EXIT_TIMING,
-      in: ITEM_IN_KEYFRAMES,
-      out: ITEM_OUT_KEYFRAMES,
+      in: CARD_IN_KEYFRAMES,
+      out: CARD_OUT_KEYFRAMES,
       skipInitial: true,
       disabled: this._dragReorder.draggedUrl === url,
     };
@@ -345,6 +353,7 @@ export class ReadingListAppElement extends LitElement {
               .href=${this._reviewItem.url}
               .favIconUrl=${this._reviewItem.favIconUrl}
               .shiny=${true}
+              .animateItems=${this._animateItems}
               .locked=${this._editingUrl !== null}
               @delete-item=${this._onDismissReview}
             ></reading-list-item>`
@@ -358,6 +367,7 @@ export class ReadingListAppElement extends LitElement {
               .name=${listItem.title}
               .href=${listItem.url}
               .favIconUrl=${listItem.favIconUrl}
+              .animateItems=${this._animateItems}
               .reorderable=${!this._sortOption && !this.searchQuery}
               .locked=${this._editingUrl !== null && this._editingUrl !== listItem.url}
               @delete-item=${this._onDeleteItemClicked}
