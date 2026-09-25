@@ -33,12 +33,14 @@ graph TD
         Review["review.ts"]
         I18n["i18n.ts"]
         BuildInfo["build-info.ts"]
+        DownloadJson["download-json.ts"]
     end
 
     subgraph StorageLib["src/lib/storage"]
         Buckets["buckets.ts<br/>hash, codec, read/write"]
-        Migrations["migrations.ts<br/>legacy + rebalance"]
+        Migrations["migrations.ts<br/>legacy migration + rebalance,<br/>both with escalation"]
         Diagnostics["diagnostics.ts"]
+        LocalBackup["local-backup.ts<br/>chrome.storage.local backup + last load error"]
     end
 
     BG["background.ts<br/>service worker"]
@@ -77,7 +79,11 @@ graph TD
     RL --> Buckets
     RL --> Migrations
     Migrations --> Buckets
+    Migrations --> LocalBackup
     Diagnostics --> Buckets
+    Diagnostics --> LocalBackup
+    OptComp --> LocalBackup
+    OptComp --> DownloadJson
     Buckets --> Storage
     Settings --> Storage
 
@@ -94,8 +100,8 @@ Three HTML entry points, each mounting Lit components:
 Source (`src/`):
 
 - **`src/background.ts`** — Manifest V3 service worker: context menu ("Add page to Reading List"), badge sync on tab activate/update, no persistent background context
-- **`src/components/reading-list-app.ts`** — main list UI: search/filter/sort, add-current-page button, drag-and-drop reordering, staggered reveal animation, the edit-mode dimming overlay. `render()` is split into `_renderHeader()`/`_renderSearch()`/`_renderControls()`/`_renderList()`, one private method per seam — keep new UI regions in their own method rather than growing one of these or reinflating a single monolithic `render()`.
-- **`src/components/reading-list-options.ts`** — settings page: default-behavior checkboxes, export/import, Storage Diagnostics, Clear Reading List
+- **`src/components/reading-list-app.ts`** — main list UI: search/filter/sort, add-current-page button, drag-and-drop reordering, staggered reveal animation, the edit-mode dimming overlay, the `_loadError` banner shown when the initial load fails (see Storage architecture). `render()` is split into `_renderHeader()`/`_renderSearch()`/`_renderControls()`/`_renderList()`, one private method per seam — keep new UI regions in their own method rather than growing one of these or reinflating a single monolithic `render()`.
+- **`src/components/reading-list-options.ts`** — settings page: default-behavior checkboxes, export/import, Storage Diagnostics, "Download Local Backup", Clear Reading List
 - **`src/components/reading-list-item.ts`** — a single list entry: inline title editing, slidein/slideout animations, delete/edit buttons
 - **`src/styles/`** — every `css` stylesheet, deliberately kept separate from `src/components/` and named for **what each file styles, not which component imports it** (mirrors the pre-rewrite app's `src/style/base/*.styl` split more than a 1:1 file-per-component scheme would). Nine files, composed into components as needed via `static override styles = [...]`:
   - `theme.styles.ts` (below) and `reset.styles.ts` (box-sizing reset + the shared `:focus-visible` outline) go into **every** component.
@@ -105,9 +111,11 @@ Source (`src/`):
 - **`src/styles/theme.styles.ts`** — **the single source of every color, shadow and shared typography value in the app** (`--rl-bg-color`, `--rl-page-bg-color`, `--rl-text-color`, `--primary-color`, `--rl-shadow`, `--rl-focus-color`, etc.), light and dark. Composed into every Shadow-DOM component as `static override styles = [theme, styles]`. **No component's own `*.styles.ts` may define a CSS custom property or a hardcoded color/hex/rgba literal** (`currentColor` and `transparent` are fine, they aren't colors to theme) — add a new token to `theme.styles.ts` and reference it with `var(...)` instead, even for a one-off/decorative color. This used to not be true — components each carried their own local, independently-drifting color variables (the options page alone had a low-contrast dark-mode bug from this) — the whole point of consolidating was a single place to fix a color and a single place to look for its value.
 - Two files sit **outside every shadow root** and so can't `import` `theme.styles.ts` at all: `extension/shell.css` (the `popup.html`/`sidebar.html` page-shell CSS) and `extension/options.html`'s inline `<style>`. Both carry a literal, hand-duplicated copy of the relevant `theme.styles.ts` values with a comment pointing back to it — if you change a token in `theme.styles.ts` that's also used there (currently just the page background / text color), update both by hand. There's no build step tying them together.
 - **`src/lib/rl.ts`** — the `RL` in-memory cache and item CRUD (see Storage architecture below)
-- **`src/lib/storage/buckets.ts`** — bucket codec: hashing, keys, compress/decompress, read/write, and `ListItemData`
-- **`src/lib/storage/migrations.ts`** — legacy one-key-per-item migration and the bucket-count rebalance
-- **`src/lib/storage/diagnostics.ts`** — `getStorageDiagnostics()`, behind the Options → Advanced button
+- **`src/lib/storage/buckets.ts`** — bucket codec: hashing, keys, compress/decompress, read/write, `ListItemData`, and `bucketCountForItemCount()` (the bucket count is no longer a fixed constant — see Storage architecture)
+- **`src/lib/storage/migrations.ts`** — legacy one-key-per-item migration and the bucket-count rebalance, both with retry-on-failure escalation (see Storage architecture)
+- **`src/lib/storage/local-backup.ts`** — `saveLocalBackup()`/`getLocalBackup()` and `saveLoadError()`/`getLoadError()`, both backed by `chrome.storage.local` (10MB quota, a separate area from `chrome.storage.sync`) so they survive a `sync` quota failure
+- **`src/lib/storage/diagnostics.ts`** — `getStorageDiagnostics()`, behind the Options → Advanced button, now also reports the last captured load error
+- **`src/lib/download-json.ts`** — `downloadJson(filename, data)`, the shared Blob-and-`<a download>` mechanics behind Export and "Download Local Backup"
 - **`src/lib/settings.ts`** — `Settings`, `DEFAULT_SETTINGS`, `getSettings()`, `updateSettings()`, and `onSettingsChanged()` (see Cross-context sync)
 - **`src/lib/list-sync.ts`** — the "list changed" ping that keeps contexts in step (see Cross-context sync)
 - **`src/lib/add-item.ts`** — build an item, add it, log failure, sync the badge; shared by the popup and the context menu
@@ -116,7 +124,7 @@ Source (`src/`):
 - **`src/lib/browser.ts`** — Firefox/Chrome detection, `getActiveTab()`, tab-opening helper
 - **`src/lib/review.ts`** — synthetic "leave a review" nag list item (shown once, after 6+ saved items)
 - **`src/lib/i18n.ts`** — thin wrapper over `chrome.i18n.getMessage`, backed by `_locales/`
-- **`src/lib/build-info.ts`** — `BUILD_TAG`, a one-line marker surfaced as `Build: ...` in Storage Diagnostics, purely so a stale/un-reloaded extension instance can be told apart from a real bug while debugging (this cost real time once — a popup instance kept open across an extension reload kept silently running old code). Bump it by hand on any build you want to visibly confirm was actually loaded; switch it to the manifest version at release time.
+- **`src/lib/build-info.ts`** — `BUILD_TAG`, read live from `chrome.runtime.getManifest().version`, surfaced as `Build: ...` in Storage Diagnostics. Exists so a stale/un-reloaded extension instance can be told apart from a real bug while debugging (this cost real time once — a popup instance kept open across an extension reload kept silently running old code). Reading it live from the manifest means it can't drift out of sync and updates automatically on every version bump.
 
 `extension/shell.css` holds the page-shell CSS (`:root` tokens, reset, `body` typography, dark mode) shared by `popup.html` and `sidebar.html`, which are otherwise identical apart from the popup's fixed width and the `body` class.
 
@@ -126,17 +134,19 @@ Source (`src/`):
 
 Items are **not** stored one key per bookmark. `chrome.storage.sync`/`browser.storage.sync` cap the item count at `MAX_ITEMS = 512` **keys**, regardless of value size — storing `{ [item.url]: item }` per bookmark (the original design) hard-caps the list at ~511 items even when the ~100KB byte quota has headroom left.
 
-Instead, items are grouped into a fixed number of **hashed buckets** (`BUCKET_COUNT = 40`, key format `b${hash(url) % 40}`), each holding a compressed array of items. This removes the per-item key cap; the real ceiling becomes the ~100KB total byte quota.
+Instead, items are grouped into **hashed buckets** (key format `b${hash(url) % bucketCount}`), each holding a compressed array of items. This removes the per-item key cap; the real ceiling becomes the ~100KB total byte quota.
 
-**Verified capacity is ~325 real-world items, not the ~1,200 once estimated.** That earlier number was based on synthetic test data averaging ~140 bytes/item (short, clean URLs, no query strings). Real saved items run closer to ~250 bytes/item raw once real URLs (search queries, tracking parameters) and real titles are counted — calibrated against an actual user's exported reading list. Importing a realistically-sized 1,100-item file gets **325 items** in before hitting the quota — confirmed identically in both Chrome and Firefox (ruling out a cross-browser quota-enforcement difference; an earlier theory that Firefox enforces quota more loosely didn't hold up once the same file was tested in both browsers instead of comparing against an old, much lighter synthetic file). `Storage Diagnostics` at that point: 95,432 of 102,400 bytes, 40/40 buckets used, largest bucket 6,142/8,192 bytes — **~294 bytes/item post-compression**, not the ~68 bytes/item the `BUCKET_COUNT` rationale below was calibrated against. **325 is the number to design and communicate around**, not ~1,200. Two caveats: this reflects `bulkAddReadingItems`'s batch-of-25 stop-on-first-failure behavior (325 = 13 full batches), so the true byte-level ceiling is somewhat higher and one-at-a-time adds (not bulk import) aren't subject to the same batch-rounding; and `BUCKET_COUNT = 40` was tuned for the old, lighter synthetic data — a quick simulation against realistic-sized data suggests `BUCKET_COUNT` closer to 25 might fit meaningfully more (a real but modest gain, not enough alone to approach the old ~1,200 estimate) — not yet changed, worth a follow-up if squeezing out more capacity matters.
+**The bucket count is not a fixed constant** (it used to be, `BUCKET_COUNT = 40` — see "A real quota-during-migration bug" below for why that changed). `bucketCountForItemCount()` in `buckets.ts` picks a starting guess from the current item count — `MIN_BUCKET_COUNT` (25) up to 150 items, 30 up to 250, 35 beyond that — and `migrations.ts` escalates up `BUCKET_COUNT_LADDER` (`[25, 30, 35, 40]`) if that guess's bucket write actually fails, rather than trusting the guess as final. Every size tier's starting guess deliberately stops one rung short of `MAX_BUCKET_COUNT` (40), so there's always at least one rung of real escalation room above it — see that section for the real collision that motivated this. The bucket count actually in effect is versioned via the `__bv` storage key, same as before; `rl.ts` caches it (`this.bucketCount`, refreshed on every load) so every mutator computes bucket keys consistently with whatever the last load settled on.
+
+**Verified capacity is ~325 real-world items, not the ~1,200 once estimated.** That earlier number was based on synthetic test data averaging ~140 bytes/item (short, clean URLs, no query strings). Real saved items run closer to ~250 bytes/item raw once real URLs (search queries, tracking parameters) and real titles are counted — calibrated against an actual user's exported reading list. Importing a realistically-sized 1,100-item file gets **325 items** in before hitting the quota — confirmed identically in both Chrome and Firefox (ruling out a cross-browser quota-enforcement difference; an earlier theory that Firefox enforces quota more loosely didn't hold up once the same file was tested in both browsers instead of comparing against an old, much lighter synthetic file). `Storage Diagnostics` at that point: 95,432 of 102,400 bytes, 40/40 buckets used, largest bucket 6,142/8,192 bytes — **~294 bytes/item post-compression**, not the ~68 bytes/item the original fixed-`BUCKET_COUNT` rationale was calibrated against. **325 is the number to design and communicate around**, not ~1,200. One caveat: this reflects `bulkAddReadingItems`'s batch-of-25 stop-on-first-failure behavior (325 = 13 full batches), so the true byte-level ceiling is somewhat higher and one-at-a-time adds (not bulk import) aren't subject to the same batch-rounding.
 
 **Bucketing + compression is confirmed to meaningfully help, independent of the ~325 vs. ~1,200 estimate mixup above.** A throwaway experiment branch (`flat-storage-experiment`) reverted `rl.ts` to the pre-bucketing scheme (one `chrome.storage.sync` key per item URL, no compression) and imported the exact same realistically-sized fixture used for the 325 result. Result: **225 items**, matching a byte-math prediction made before the test ran. So bucketing+compression is a real **~44% capacity win** (225 → 325) over flat storage at realistic item sizes, not an illusion created by the synthetic-data overestimate — it just helps less dramatically than the old ~1,200 figure implied. Worth knowing if `BUCKET_COUNT` or the storage scheme itself is ever reconsidered: the comparison data point exists, even though that branch itself was never merged.
 
 ```mermaid
 flowchart LR
     Item["item { url, title, ... }"]
-    Hash["hashUrl(url) % 40<br/>FNV-1a"]
-    Key["bucket key: b0 .. b39"]
+    Hash["hashUrl(url) % bucketCount<br/>FNV-1a"]
+    Key["bucket key: b0 .. b(bucketCount-1)"]
     Merge["merge into that bucket's<br/>current item array"]
     Compress["JSON.stringify<br/>+ lz-string.compressToBase64"]
     Write["chrome.storage.sync.set<br/>one key per touched bucket"]
@@ -147,11 +157,12 @@ flowchart LR
 Two non-obvious things to know before touching this code:
 
 1. **Compression must be `compressToBase64`, not `compressToUTF16`.** `lz-string`'s `compressToUTF16` packs data into high-value UTF-16 code points to maximize density *per code unit* — but `chrome.storage.sync`/`browser.storage.sync` measure quota usage in real **UTF-8 bytes** (however they serialize for sync/persistence), and those code points mostly cost 3 bytes each in UTF-8. In practice this made `compressToUTF16` output use **~2.8x more real storage** than its JS string `.length` suggested — bad enough that it was no better than storing uncompressed JSON. `compressToBase64` is ASCII-only (1 byte per character), so it doesn't have this blowup, and nets a genuine ~35-40% size reduction. `decodeBucket()` tries base64 first and falls back to the UTF16 decoder, so buckets written before this fix still read correctly.
-2. **`BUCKET_COUNT` must stay small enough that each bucket holds many items.** LZ-style compression only pays off when there's redundant text within one blob (repeated property names, similar URLs). At 512 buckets, most buckets held only 1-4 items each — too little redundancy to compress well, plus fixed per-blob format overhead on every bucket. 40 buckets was chosen empirically as the point where each bucket's blob is big enough for compression to help while staying safely under the 8KB-per-bucket quota (see the byte-math comment above `BUCKET_COUNT` in `rl.ts` for the numbers). If `BUCKET_COUNT` needs to change again, bump the version and rely on the rebalance migration below — don't just edit the constant.
+2. **The bucket count must stay small enough that each bucket holds many items.** LZ-style compression only pays off when there's redundant text within one blob (repeated property names, similar URLs). At 512 buckets, most buckets held only 1-4 items each — too little redundancy to compress well, plus fixed per-blob format overhead on every bucket. The `[25, 30, 35, 40]` ladder was chosen empirically as the range where each bucket's blob is big enough for compression to help while staying safely under the 8KB-per-bucket quota. If the ladder's values need to change again, that's safe — `rebalanceBuckets()` (below) re-groups everything under whatever count is actually settled on.
 
-**Migrations run automatically inside `getListItems()`** (via `loadAllBucketStorage()`), in order:
-1. `migrateLegacyItems()` — one-time move from the original one-key-per-URL layout into buckets, for anyone updating from before bucketing existed. Verifies the new bucket keys were written correctly before removing the old ones.
-2. `rebalanceBucketsIfNeeded()` — versioned via a `__bv` storage key holding the `BUCKET_COUNT` last used. If it doesn't match the current `BUCKET_COUNT`, all existing items are re-read (works regardless of the old scheme, since it just scans any `b\d+` key), re-grouped under the current scheme, and old bucket keys no longer used by the new scheme are deleted. This is what makes changing `BUCKET_COUNT` safe.
+**Migrations run automatically inside `getListItems()`** (via `getItemsRemote()` → `loadAllBuckets()` in `migrations.ts`), in order:
+1. **`saveLocalBackup()`** — if any legacy (pre-bucketing) items exist, snapshot them to `chrome.storage.local` *before* attempting anything else, unconditionally, every time. If this write itself fails, migration is skipped entirely rather than attempted blind — see "A real quota-during-migration bug" below.
+2. **`migrateLegacyItems()`** — one-time move from the original one-key-per-URL layout into buckets, for anyone updating from before bucketing existed. Verifies each bucket's new key was written correctly before removing the legacy keys that moved into it, one bucket at a time (not all-at-once — see the caution below about why). Retried at the next rung of `BUCKET_COUNT_LADDER` if a bucket write fails; each retry re-reads whichever legacy keys are still unmigrated, since earlier buckets from a failed attempt may have already succeeded.
+3. **`rebalanceBuckets()`** — versioned via the `__bv` storage key holding the bucket count last used. If it doesn't match `bucketCountForItemCount()`'s current guess for the actual item count, all existing items are re-read (works regardless of the old scheme, since it just scans any `b\d+` key), re-grouped, and written in one atomic `set()` call. Also retried up the ladder on failure, same as migration.
 
 **Never loop a per-item write.** Each `addReadingItem`/`updateReadingItem` is its own `chrome.storage.sync.set()` call, and `storage.sync` rate-limits writes. Even at the realistic few-hundred-item capacity this design allows (see above), `for (item of items) await rl.updateReadingItem(...)` means hundreds of sequential writes. This shape has appeared twice: in `importList()` and in drag-reorder. Both now group items by bucket and write each bucket once — `rl.bulkAddReadingItems(items)` (chunked) and `rl.reorderItems(urls)` (a single `set()`). Reuse `groupItemsByBucket()` rather than adding a third copy of that logic.
 
@@ -167,6 +178,19 @@ A caution from getting this wrong once: an import failing partway through with `
 
 **The old-extension → this-extension auto-update path is verified safe.** A real user's exported `chrome.storage.sync` from the pre-rewrite (`reading-list-old`, Manifest V2) extension — one key per item URL, a separate `settings` key, matching old's actual write shape confirmed by reading its source — was seeded into the mocked storage from `AGENTS.md`'s established Node-script pattern and run through `getListItems()`. Result: all items survive with every field intact, `settings` is left completely untouched (`legacyKeys` detection in `migrations.ts` is `/^https?:\/\//i`, which `settings` never matches), legacy per-URL keys are removed only after the new bucket keys are written and verified, and a second `getListItems()` call is a no-op (no re-migration, no duplication). Also verified: an item missing `index`/`viewed` entirely (both are optional on `ListItemData`) migrates without error, for any install old enough to predate those fields. This test used real personal browsing history from one export, so neither the fixture nor the script were committed — same as every other Node-script verification this session, which stayed in the scratchpad rather than the repo. Re-derive it the same way (real or synthetic seed data, mocked `chrome.storage.sync`, dynamically `import()` the compiled `rl.js`) before ever changing `migrateLegacyItems()` or the legacy-key detection regex. Cross-checked live in a real Firefox install too: seeded a bare old-shaped item (no `index`/`viewed`) plus a `settings` key via the popup's own devtools console, reopened the popup, and confirmed the item rendered correctly, `chrome.storage.sync` held exactly `__bv` + one `b<N>` bucket key + the untouched `settings` key, and the legacy URL key was gone.
 
+### A real quota-during-migration bug, the investigation, and the fix (3.2)
+
+A real user reported (by email) that after updating, their list showed empty, Add and Export did nothing, and there was no error anywhere. Root cause: `migrateLegacyItems()`'s bucket writes had no error handling, so a `QuotaExceededError` on any one bucket propagated as an uncaught rejection through `getListItems()` — silently breaking the list view, Add, and (at the time) Export together, with nothing surfaced anywhere. Never confirmed which exact mechanism hit their specific account, since no diagnostics were collected before the fix shipped (see the statistics paragraph below for why "a single bucket organically overflowing" is a poor bet as their actual cause, even though it's what all of the work below defends against).
+
+**Real per-bucket collisions are astronomically rare to happen organically, don't build more defense than this class of bug deserves.** A single bucket exceeds its real 8192-byte cap around 104+ realistic items (varies with how compressible the content is). At the real-world average load (~8 items/bucket at the documented 325-item capacity), the Poisson-tail probability of any bucket organically reaching that is on the order of 10⁻⁷⁵ to 10⁻⁹⁵ — for scale, the observable universe has roughly 10⁸⁰ atoms. Confirmed this is genuinely that improbable, not a modeling error, by trying to construct a failing test case: it took deliberately reverse-engineering `hashUrl()`/`bucketKey()` in a standalone script and brute-forcing thousands of candidate URLs to find ones that hash into the same bucket (see "To deliberately reproduce a single-bucket collision" under Build and Development) — no organic dataset does this by accident. A dynamic bucket count that grows with list size (an earlier idea considered here) doesn't change this calculus either — it's a compression tuning, not a collision defense, and was documented as such rather than removed once that was clear. The real, durable fix is what shipped: make a real failure (however it happens) recoverable and diagnosable, not try to make the failure itself impossible.
+
+**The fix, in the order it actually runs (`migrations.ts`, `local-backup.ts`):**
+1. **Back up to `chrome.storage.local` first, unconditionally, every time there's legacy data to convert** — before migration is ever attempted, success or failure. `chrome.storage.local` has a 10MB quota, a completely separate area from the ~100KB `sync` quota that's failing, so the backup is unaffected by whatever's about to go wrong. If this backup write itself fails (rare, but checked), migration is skipped entirely rather than attempted blind — `loadAllBuckets()` throws immediately with a message telling the user to export from Options, and nothing in `sync` storage gets touched.
+2. **Escalate up `BUCKET_COUNT_LADDER` on an actual write failure**, not just accept the size-based guess (see the Storage architecture intro above). Verified against a real 150-item, single-bucket collision and a real 300-item one: both resolve cleanly by retrying at the next rung, with zero data loss or duplication either way.
+3. **If the ladder is genuinely exhausted, fail loud, not silent.** `saveLoadError()` records the real error (name, message, timestamp) to `chrome.storage.local`; `reading-list-app.ts` catches the rejection from its constructor's `Promise.all(...)` and sets `_loadError`, rendering a banner that says conversion failed and points at Options — deliberately **no button in the popup itself**, redirecting to Options → Advanced instead, since that's also where the "Download Local Backup" button lives and duplicating it in two places wasn't worth it.
+4. **`getItemsReadOnly()` (`migrations.ts`) bypasses migration and rebalancing entirely** — reads whatever's in storage as-is (decoded buckets plus any still-unmigrated legacy items), no writes, can't fail the way `getItemsRemote()` can. `exportList()` in `reading-list-options.ts` uses this instead of `rl.getListItems()`, so Export works even while the list view is broken. "Download Local Backup" (Options → Advanced) prefers the `chrome.storage.local` snapshot from step 1 and falls back to this if none exists.
+5. **`getStorageDiagnostics()` reports the last captured load error** alongside its existing item/bucket/byte counts, so "what actually broke" is answerable from the UI instead of requiring a console.
+
 ## Cross-context sync
 
 The popup, sidebar, options page and service worker are separate page contexts. Each loads its own copy of the modules, so each has its own `RL` singleton with its own `this.list`. Nothing about `chrome.storage.sync` notifies one context that another wrote, so without explicit syncing a write in one leaves every other stale — most visibly in Firefox, where the sidebar stays open while you browse.
@@ -181,7 +205,7 @@ Two mechanisms, deliberately different:
 
 A delta version was built and measured (broadcasting `add`/`remove`/`update`/`reload` and applying each to the cache). It avoided the re-read, but it was ~50% more code and, more importantly, a mutator that forgot to broadcast would drift silently and permanently. With the ping there is one message shape and one code path, and a missed broadcast self-heals the next time anything else changes. That robustness is the reason for the choice, not the line count.
 
-The cost is real but small: a full `get(null)` plus decompressing all 40 buckets per change, in non-originating contexts only — measured at ~10ms median (23ms worst case) for 1,000 items. Don't "optimize" this back into deltas without a measured reason.
+The cost is real but small: a full `get(null)` plus decompressing every bucket per change, in non-originating contexts only — measured at ~10ms median (23ms worst case) for 1,000 items. Don't "optimize" this back into deltas without a measured reason.
 
 ### Traps in this area
 
@@ -210,8 +234,26 @@ npx tsc --noEmit         # Fast typecheck only, skips the Rollup bundle step —
 There is no automated test suite (`npm test` is a stub). For logic that touches `chrome.storage.sync` (`rl.ts` and `lib/storage/`), the established pattern is: compile with `npm run build`, then run a small Node script that sets `globalThis.chrome.storage.sync` to an in-memory mock (get/set/remove/clear/getBytesInUse) and dynamically `import()`s the compiled output under `extension/scripts/lib/` directly — no browser needed.
 
 Two things make these mocks worth writing carefully:
-- **Enforce the real quotas.** A mock that also enforces `QUOTA_BYTES`, `QUOTA_BYTES_PER_ITEM` and the write-rate limit (throwing the same `QuotaExceededError` shape) is what caught both the bucket-count and compression-encoding bugs. A permissive mock passes and hides real quota problems.
+- **Enforce the real quotas.** A mock that also enforces `QUOTA_BYTES`, `QUOTA_BYTES_PER_ITEM` and the write-rate limit (throwing the same `QuotaExceededError` shape) is what caught both the bucket-count and compression-encoding bugs. A permissive mock passes and hides real quota problems. Mock `chrome.storage.local` too (a second, separate in-memory store, no quota enforcement needed since 10MB is never realistically hit) whenever the code under test touches `local-backup.ts`.
 - **Count `set()` calls.** Asserting on the number of write operations is how the per-item-write bugs above get caught before they ship.
+
+**To deliberately reproduce a single-bucket collision** (not something that happens with organic data — see "A real quota-during-migration bug" above): replicate `hashUrl()`/`bucketKey()` from `buckets.ts` in a standalone script, then brute-force-generate candidate URLs (varying a counter) and keep only the ones whose hash lands on a specific target bucket at a specific bucket count. Expect to scan thousands of candidates to find ~100+ matches, since the hash spreads close to uniformly. Always verify the resulting fixture against the *real* compiled `encodeBucket()` (not an estimate) before trusting it — compression ratio varies a lot with how repetitive the URLs/titles are, so a fixture that overflows at one bucket count with one content style may not with another; recompute rather than assume.
+
+### Testing a real browser update flow (old version → broken → fixed)
+
+For anything touching migration, this is the only way to catch what Node mocks can't: real `chrome.storage.sync`/`browser.storage.sync` behavior, real extension-update semantics, and whether a fix actually shows up correctly in the UI, not just returns the right data.
+
+**Folder convention** (gitignored, not committed): `tmp/test/firefox-test/` and `tmp/test/chrome-test/`, each with `old/`, `before-fix/`, `new/`, and an empty `live-test/` that gets overwritten and reloaded at each step rather than re-picking a folder every time:
+```bash
+rm -rf tmp/test/firefox-test/live-test/* && cp -R tmp/test/firefox-test/new/. tmp/test/firefox-test/live-test/
+```
+Load/reload `live-test/` itself in the browser, never `old/`/`before-fix/`/`new/` directly, so those stay clean reference copies you can re-copy from at any point without rebuilding.
+
+**Firefox**: `old/` is the real `reading-list-old` (Manifest V2) build. `before-fix/` and `new/` are this repo built at different points (e.g. `git worktree add --detach <path> <commit-or-branch>` to build an older commit without touching the current branch's uncommitted work, then remove the worktree after copying `build/` out). All three need the **same** `browser_specific_settings.gecko.id` in their `manifest.json` (a dedicated test-only id, never the real published one) — Firefox's `storage.sync` is scoped per extension id, so a mismatched id means each load is treated as a separate, unrelated extension and there's nothing to migrate. A temporary/unpacked Firefox install needs this id explicitly set at all (`storage.sync` silently doesn't work otherwise).
+
+**Chrome**: current Chrome refuses to load real Manifest V2 at all ("Cannot install extension because it uses an unsupported manifest version"), so there's no real "old" build to test against directly — use this repo's own historical `v3` branch (early MV3, pre-bucketing, same flat one-key-per-item storage the real old extension used) as the stand-in, again via a `git worktree` build. Chrome's unpacked-extension id is stable per folder path across "Reload," so no manifest id juggling is needed there.
+
+**Always do a full remove-and-reload**, not a soft "Reload," when swapping `live-test/`'s contents — both browsers can keep a previously-opened popup's old JS running across a same-folder reload (a real, repeatedly-hit trap this session), which looks exactly like a code change not having taken effect.
 
 ### Full package + verify workflow
 
