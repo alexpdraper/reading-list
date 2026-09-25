@@ -42,6 +42,9 @@ export class ReadingListAppElement extends LitElement {
       if (this._animateItems) {
         this._staggerReveal(listItems);
       }
+    }).catch((err) => {
+      console.error('Failed to load reading list', err);
+      this._loadError = true;
     });
   }
 
@@ -170,6 +173,9 @@ export class ReadingListAppElement extends LitElement {
   @state()
   private _syncError = false;
 
+  @state()
+  private _loadError = false;
+
   private _syncErrorTimer?: ReturnType<typeof setTimeout>;
 
   private _remoteChangeGeneration = 0;
@@ -231,6 +237,14 @@ export class ReadingListAppElement extends LitElement {
             ${i18n.getMessage(
               'syncFailed',
               "Couldn't save that change. It may not appear on your other devices.",
+            )}
+          </p>`
+        : ''}
+      ${this._loadError
+        ? html`<p class="sync-error" role="status" aria-live="polite">
+            ${i18n.getMessage(
+              'loadFailed',
+              'Converting your reading list to the new format failed. Your saved pages are still safe in storage — open Options (the gear icon above) → Advanced to download a backup.',
             )}
           </p>`
         : ''}

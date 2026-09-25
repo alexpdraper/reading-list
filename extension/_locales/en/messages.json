@@ -91,6 +91,10 @@
     "message": "Couldn't save that change. It may not appear on your other devices.",
     "description": "Shown briefly when a reading list write (e.g. reordering) fails to save."
   },
+  "loadFailed": {
+    "message": "Converting your reading list to the new format failed. Your saved pages are still safe in storage — open Options (the gear icon above) → Advanced to download a backup.",
+    "description": "Shown when the initial reading list load fails, e.g. a storage quota error during the one-time migration from the old extension."
+  },
   "theme": {
     "message": "Theme:",
     "description": "The label for the theme option."

@@ -3,6 +3,9 @@ import { state } from 'lit/decorators.js';
 import { rl } from '../lib/rl.js';
 import { getSettings, updateSettings, onSettingsChanged } from '../lib/settings.js';
 import { getStorageDiagnostics } from '../lib/storage/diagnostics.js';
+import { getItemsReadOnly } from '../lib/storage/migrations.js';
+import { getLocalBackup } from '../lib/storage/local-backup.js';
+import { downloadJson } from '../lib/download-json.js';
 import { ListItemData } from '../lib/storage/buckets.js';
 import { i18n } from '../lib/i18n.js';
 import { styles } from '../styles/options.styles.js';
@@ -79,6 +82,7 @@ export class ReadingListOptions extends LitElement {
         <summary>Advanced</summary>
         <div>
           <button @click=${this._onDiagnosticsClick}>Storage Diagnostics</button>
+          <button @click=${this._onDownloadLocalBackupClick}>Download Local Backup</button>
           <button class="danger" @click=${this._onResetClick}>
             ${i18n.getMessage('clearData', 'Clear Reading List')}
           </button>
@@ -116,6 +120,15 @@ export class ReadingListOptions extends LitElement {
 
   async _onDiagnosticsClick() {
     alert(await getStorageDiagnostics());
+  }
+
+  async _onDownloadLocalBackupClick() {
+    const backup = await getLocalBackup();
+    if (!backup) {
+      alert('No local backup found yet. One is saved automatically before the extension migrates data from an older version.');
+      return;
+    }
+    downloadJson('reading-list-backup.json', backup.items);
   }
 
   openImportDialog() {
@@ -165,18 +178,8 @@ export class ReadingListOptions extends LitElement {
   }
 
   async exportList() {
-    const data = await rl.getListItems();
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'reading-list.json';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }, 100);
+    const data = await getItemsReadOnly();
+    downloadJson('reading-list.json', data);
   }
 }
 

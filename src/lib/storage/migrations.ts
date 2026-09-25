@@ -7,6 +7,7 @@ import {
   encodeBucket,
   ListItemData,
 } from './buckets.js';
+import { saveLocalBackup, saveLoadError } from './local-backup.js';
 
 // Groups legacy (one-key-per-item) entries by which bucket they're bound
 // for, then writes one target bucket at a time - write, verify, remove
@@ -88,13 +89,29 @@ async function loadAllBucketStorage(): Promise<Record<string, unknown>> {
   let all = await chrome.storage.sync.get(null);
 
   const legacyKeys = Object.keys(all).filter((k) => /^https?:\/\//i.test(k));
-  if (legacyKeys.length > 0) {
-    await migrateLegacyItems(all, legacyKeys);
-    all = await chrome.storage.sync.get(null);
-  }
 
-  if (await rebalanceBucketsIfNeeded(all)) {
-    all = await chrome.storage.sync.get(null);
+  try {
+    if (legacyKeys.length > 0) {
+      try {
+        await saveLocalBackup(legacyKeys.map((k) => all[k] as ListItemData));
+      } catch (err) {
+        const reason = err instanceof Error ? err.message : String(err);
+        throw new Error(
+          `Skipped converting your reading list: couldn't save a safety backup first (${reason}). ` +
+            `Your data hasn't been touched - export it from Options, then reopen this page.`,
+        );
+      }
+
+      await migrateLegacyItems(all, legacyKeys);
+      all = await chrome.storage.sync.get(null);
+    }
+
+    if (await rebalanceBucketsIfNeeded(all)) {
+      all = await chrome.storage.sync.get(null);
+    }
+  } catch (err) {
+    await saveLoadError(err).catch(() => {});
+    throw err;
   }
 
   return all;
@@ -107,5 +124,24 @@ export const getItemsRemote = async (): Promise<ListItemData[]> => {
     if (!BUCKET_KEY_RE.test(key)) continue;
     listItems.push(...decodeBucket(all[key]));
   }
+  return listItems;
+};
+
+// Reads whatever is in storage as-is - already-bucketed items plus any
+// still-unmigrated legacy items - without running migrateLegacyItems() or
+// rebalanceBucketsIfNeeded(). A failed migration write (e.g. QuotaExceededError)
+// can leave getItemsRemote() permanently throwing, but export shouldn't need a
+// successful write to read data that's already sitting safely in storage.
+export const getItemsReadOnly = async (): Promise<ListItemData[]> => {
+  const all = await chrome.storage.sync.get(null);
+  const listItems: ListItemData[] = [];
+  for (const key in all) {
+    if (BUCKET_KEY_RE.test(key)) {
+      listItems.push(...decodeBucket(all[key]));
+    } else if (/^https?:\/\//i.test(key)) {
+      listItems.push(all[key] as ListItemData);
+    }
+  }
+  listItems.sort((a, b) => b.addedAt - a.addedAt);
   return listItems;
 };

@@ -1,5 +1,6 @@
 import { BUCKET_COUNT, BUCKET_KEY_RE, decodeBucket, utf8ByteLength } from './buckets.js';
 import { BUILD_TAG } from '../build-info.js';
+import { getLoadError } from './local-backup.js';
 
 export async function getStorageDiagnostics(): Promise<string> {
   const all = await chrome.storage.sync.get(null);
@@ -34,6 +35,8 @@ export async function getStorageDiagnostics(): Promise<string> {
   const quotaBytes = chrome.storage.sync.QUOTA_BYTES ?? 102400;
   const quotaBytesPerItem = chrome.storage.sync.QUOTA_BYTES_PER_ITEM ?? 8192;
 
+  const loadError = await getLoadError();
+
   return [
     `Build: ${BUILD_TAG}`,
     `Items: ${itemCount}`,
@@ -41,5 +44,8 @@ export async function getStorageDiagnostics(): Promise<string> {
     `Bytes in use (browser-reported): ${bytesInUse} / ${quotaBytes}`,
     `Bytes in use (manual estimate): ${manualBytes} / ${quotaBytes}`,
     `Largest bucket: ${largestBucketKey || 'n/a'} at ${largestBucketBytes} bytes / ${quotaBytesPerItem}`,
+    loadError
+      ? `Last load error: ${loadError.name}: ${loadError.message} (at ${new Date(loadError.occurredAt).toISOString()})`
+      : 'Last load error: none',
   ].join('\n');
 }
