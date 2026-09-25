@@ -1,5 +1,6 @@
 import { LitElement, html, PropertyValues } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
+import { animate } from '@lit-labs/motion';
 import { customElement, state } from 'lit/decorators.js';
 import { i18n } from '../lib/i18n.js';
 import { rl } from '../lib/rl.js';
@@ -20,8 +21,30 @@ import { theme } from '../styles/theme.styles.js';
 import { reset } from '../styles/reset.styles.js';
 import './reading-list-item.js';
 
-// Slightly past the 0.65s slideout animation (item.styles.ts).
-const REMOTE_REMOVE_TIMEOUT_MS = 850;
+const ITEM_IN_KEYFRAMES: Keyframe[] = [
+  { transform: 'translateX(100%) scaleY(0)', opacity: 0, offset: 0 },
+  { transform: 'translateX(100%) scaleY(0)', opacity: 0, offset: 0.4 },
+  { transform: 'translateX(30px) scaleY(1)', opacity: 1, offset: 0.5 },
+  { transform: 'translateX(0) scaleY(1)', opacity: 1, offset: 0.6 },
+  { transform: 'translateX(35px) scaleY(1)', opacity: 1, offset: 0.8 },
+  { transform: 'translateX(0) scaleY(1)', opacity: 1, offset: 1 },
+];
+
+const ITEM_OUT_KEYFRAMES: Keyframe[] = [
+  { transform: 'translateX(0) scaleY(1)', opacity: 1, offset: 0 },
+  { transform: 'translateX(0) scaleY(0.4)', opacity: 0.6, offset: 0.4 },
+  { transform: 'translateX(100%) scaleY(0)', opacity: 0, offset: 1 },
+];
+
+const ITEM_ENTER_EXIT_TIMING: KeyframeAnimationOptions = {
+  duration: 400,
+  easing: 'ease-out',
+};
+
+const ITEM_DRAG_FLIP_TIMING: KeyframeAnimationOptions = {
+  duration: 180,
+  easing: 'ease',
+};
 
 @customElement('reading-list-app')
 export class ReadingListAppElement extends LitElement {
@@ -86,55 +109,9 @@ export class ReadingListAppElement extends LitElement {
 
   private async _onRemoteChange() {
     const generation = ++this._remoteChangeGeneration;
-    const previous = this._listItems ?? [];
     const items = await rl.getListItems();
-    // A superseded invocation never writes _listItems, so the next
-    // invocation's `previous` (captured fresh at its own start) is always
-    // the last state actually applied, not a stale one.
     if (generation !== this._remoteChangeGeneration) return;
-
-    const previousUrls = new Set(previous.map((item) => item.url));
-    const nextUrls = new Set(items.map((item) => item.url));
-
-    const removed = previous.filter((item) => !nextUrls.has(item.url));
-    const removedVisible = this._animateItems
-      ? removed.filter((item) =>
-          this._visibleItems.some((visible) => visible.url === item.url),
-        )
-      : [];
-    const added = items.filter((item) => !previousUrls.has(item.url));
-
-    this._listItems = [...items, ...removedVisible];
-
-    if (removedVisible.length > 0) {
-      this._removingUrls = new Set([
-        ...this._removingUrls,
-        ...removedVisible.map((item) => item.url),
-      ]);
-      for (const item of removedVisible) {
-        setTimeout(() => this._finishRemoval(item.url), REMOTE_REMOVE_TIMEOUT_MS);
-      }
-    }
-
-    if (this._animateItems && added.length > 0) {
-      this._animatingUrls = new Set(added.map((item) => item.url));
-    }
-  }
-
-  private _finishRemoval(url: string) {
-    if (!this._removingUrls.has(url)) return;
-    this._removingUrls = new Set(
-      [...this._removingUrls].filter((removingUrl) => removingUrl !== url),
-    );
-    this._listItems = (this._listItems ?? []).filter((item) => item.url !== url);
-  }
-
-  private _onRemoteRemoveAnimationEnd(event: Event) {
-    this._finishRemoval((event.target as ReadingListItemElement).href);
-  }
-
-  override updated() {
-    if (this._animatingUrls.size > 0) this._animatingUrls = new Set();
+    this._listItems = items;
   }
 
   @state()
@@ -144,13 +121,7 @@ export class ReadingListAppElement extends LitElement {
   searchQuery = '';
 
   @state()
-  private _animatingUrls: Set<string> = new Set();
-
-  @state()
   private _revealedUrls: Set<string> | null = null;
-
-  @state()
-  private _removingUrls: Set<string> = new Set();
 
   @state()
   private _reviewItem: ListItemData | null = null;
@@ -220,13 +191,26 @@ export class ReadingListAppElement extends LitElement {
         return;
       }
       setTimeout(() => {
-        this._animatingUrls = new Set([items[index].url]);
         this._revealedUrls = new Set([...this._revealedUrls!, items[index].url]);
         const nextWait = Math.trunc(waitTime * ((itemsToAnimate - (index + 1)) / itemsToAnimate));
         animateNext(index + 1, nextWait);
       }, waitTime);
     };
     animateNext(0, 150);
+  }
+
+  private _itemMotionOptions(url: string) {
+    if (!this._animateItems) return { disabled: true };
+    return {
+      properties: ['top'],
+      keyframeOptions: this._dragReorder.isDragging
+        ? ITEM_DRAG_FLIP_TIMING
+        : ITEM_ENTER_EXIT_TIMING,
+      in: ITEM_IN_KEYFRAMES,
+      out: ITEM_OUT_KEYFRAMES,
+      skipInitial: true,
+      disabled: this._dragReorder.draggedUrl === url,
+    };
   }
 
   override render() {
@@ -353,15 +337,14 @@ export class ReadingListAppElement extends LitElement {
         @dragend=${this._dragReorder.onDragEnd}
         @edit-start=${this._onEditStart}
         @edit-end=${this._onEditEnd}
-        @remove-animation-end=${this._onRemoteRemoveAnimationEnd}
       >
         ${this._reviewItem
           ? html`<reading-list-item
+              ${animate(this._itemMotionOptions(this._reviewItem.url))}
               .name=${this._reviewItem.title}
               .href=${this._reviewItem.url}
               .favIconUrl=${this._reviewItem.favIconUrl}
               .shiny=${true}
-              .animateItems=${this._animateItems}
               .locked=${this._editingUrl !== null}
               @delete-item=${this._onDismissReview}
             ></reading-list-item>`
@@ -371,12 +354,10 @@ export class ReadingListAppElement extends LitElement {
           (item) => item.url,
           (listItem) =>
             html`<reading-list-item
+              ${animate(this._itemMotionOptions(listItem.url))}
               .name=${listItem.title}
               .href=${listItem.url}
               .favIconUrl=${listItem.favIconUrl}
-              .isNew=${this._animatingUrls.has(listItem.url)}
-              .removing=${this._removingUrls.has(listItem.url)}
-              .animateItems=${this._animateItems}
               .reorderable=${!this._sortOption && !this.searchQuery}
               .locked=${this._editingUrl !== null && this._editingUrl !== listItem.url}
               @delete-item=${this._onDeleteItemClicked}
@@ -451,7 +432,6 @@ export class ReadingListAppElement extends LitElement {
     const listItem = await addReadingItemAndSyncBadge(url, title, favIconUrl);
     if (!listItem) return;
 
-    if (this._animateItems) this._animatingUrls = new Set([url]);
     this._listItems = [
       listItem,
       ...this._listItems.filter((item) => item.url !== url),

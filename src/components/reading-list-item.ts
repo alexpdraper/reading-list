@@ -5,11 +5,10 @@ import { isFirefox, openLink } from '../lib/browser.js';
 import { styles } from '../styles/item.styles.js';
 import { theme } from '../styles/theme.styles.js';
 import { reset } from '../styles/reset.styles.js';
-import { animations } from '../styles/animations.styles.js';
 
 @customElement('reading-list-item')
 export class ReadingListItemElement extends LitElement {
-  static override styles = [theme, reset, animations, styles];
+  static override styles = [theme, reset, styles];
 
   @property()
   name = '';
@@ -20,32 +19,14 @@ export class ReadingListItemElement extends LitElement {
   @property({ type: String })
   favIconUrl?: string;
 
-  @property({ type: Boolean, attribute: false })
-  isNew = false;
-
-  @property({ type: Boolean, attribute: false })
-  removing = false;
-
   @property({ type: Boolean })
   shiny = false;
-
-  @property({ type: Boolean })
-  animateItems = true;
 
   @property({ type: Boolean })
   locked = false;
 
   @property({ type: Boolean })
   reorderable = true;
-
-  @state()
-  private _slidein = false;
-
-  @state()
-  private _slideout = false;
-
-  @state()
-  private _localDelete = false;
 
   @state()
   private _dragging = false;
@@ -58,19 +39,6 @@ export class ReadingListItemElement extends LitElement {
 
   @query('.edit-title')
   private _editInput?: HTMLInputElement;
-
-  override willUpdate(changedProperties: PropertyValues<this>) {
-    if (changedProperties.has('isNew') && this.isNew) {
-      this._slidein = true;
-    }
-    if (changedProperties.has('removing') && this.removing) {
-      if (this.animateItems) {
-        this._slideout = true;
-      } else {
-        this._dispatchRemoveAnimationEnd();
-      }
-    }
-  }
 
   override updated(changedProperties: PropertyValues<this>) {
     if (changedProperties.has('_editing') && this._editing) {
@@ -99,8 +67,6 @@ export class ReadingListItemElement extends LitElement {
   override render() {
     const classes = [
       'reading-list-item',
-      this._slidein ? 'slidein' : '',
-      this._slideout ? 'slideout' : '',
       this.shiny ? 'shiny' : '',
       this._dragging ? 'dragging' : '',
     ].join(' ');
@@ -109,7 +75,6 @@ export class ReadingListItemElement extends LitElement {
       <div
         class=${classes}
         draggable=${this.reorderable && !this.shiny && !this._editing && !this.locked}
-        @animationend=${this._onAnimationEnd}
         @dragstart=${this._onDragStart}
         @dragend=${() => (this._dragging = false)}
       >
@@ -213,35 +178,8 @@ export class ReadingListItemElement extends LitElement {
   }
 
   private _onDeleteClick() {
-    if (this.animateItems) {
-      this._localDelete = true;
-      this._slideout = true;
-    } else {
-      this._dispatchDelete();
-    }
-  }
-
-  private _onAnimationEnd(event: AnimationEvent) {
-    if (event.animationName === 'slidein-bounce') {
-      this._slidein = false;
-    } else if (event.animationName === 'slideout') {
-      if (this._localDelete) {
-        this._dispatchDelete();
-      } else {
-        this._dispatchRemoveAnimationEnd();
-      }
-    }
-  }
-
-  private _dispatchDelete() {
     this.dispatchEvent(
       new Event('delete-item', { bubbles: true, composed: true }),
-    );
-  }
-
-  private _dispatchRemoveAnimationEnd() {
-    this.dispatchEvent(
-      new Event('remove-animation-end', { bubbles: true, composed: true }),
     );
   }
 
