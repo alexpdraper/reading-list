@@ -23,25 +23,30 @@ export interface ListItemData {
 // picks the smallest count that suits the list's current size. But a
 // size-based guess alone can't catch an actual collision - a list stuck at,
 // say, 150 items whose URLs happen to cluster badly into one bucket would
-// keep computing the same "30 is enough" answer forever, even while that one
-// bucket is actually failing. BUCKET_COUNT_LADDER exists for that: when a
-// bucket write actually fails (migrations.ts), the caller retries at the next
-// count up the ladder instead of accepting the size-based guess as final.
-export const MIN_BUCKET_COUNT = 30;
+// keep computing the same answer forever, even while that one bucket is
+// actually failing. BUCKET_COUNT_LADDER exists for that: when a bucket write
+// actually fails (migrations.ts), the caller retries at the next count up the
+// ladder instead of accepting the size-based guess as final.
+//
+// Every size tier below deliberately stops one rung short of MAX_BUCKET_COUNT,
+// so every list size keeps at least one rung of real escalation room above its
+// starting guess - a list whose size alone would otherwise start already at
+// the ceiling has nowhere left to retry if that specific guess collides.
+export const MIN_BUCKET_COUNT = 25;
 export const MAX_BUCKET_COUNT = 40;
-export const BUCKET_COUNT_LADDER = [30, 35, 40];
+export const BUCKET_COUNT_LADDER = [25, 30, 35, 40];
 export const BUCKET_KEY_RE = /^b\d+$/;
 export const BUCKET_VERSION_KEY = '__bv';
 
 // Starting guess, not a guarantee - see BUCKET_COUNT_LADDER above for what
 // happens when this guess turns out to be wrong for the actual data. 150 and
-// 250 are chosen so a list only reaches MAX_BUCKET_COUNT (today's unchanged
-// value) once it's already approaching the documented ~325-item real
-// capacity ceiling.
+// 250 are chosen so a list only reaches 35 (one rung below MAX_BUCKET_COUNT)
+// once it's already approaching the documented ~325-item real capacity
+// ceiling, keeping the top rung free for escalation.
 export function bucketCountForItemCount(itemCount: number): number {
   if (itemCount <= 150) return MIN_BUCKET_COUNT;
-  if (itemCount <= 250) return 35;
-  return MAX_BUCKET_COUNT;
+  if (itemCount <= 250) return 30;
+  return 35;
 }
 
 function hashUrl(url: string, bucketCount: number): number {
