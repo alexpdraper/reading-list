@@ -2,6 +2,7 @@ import {
   bucketKey,
   encodeBucket,
   ListItemData,
+  MIN_BUCKET_COUNT,
   readBucket,
   utf8ByteLength,
   writeBucket,
@@ -22,6 +23,7 @@ function normalizeItemForStorage(item: ListItemData): ListItemData {
 
 class RL {
   private list: ListItemData[] = [];
+  private bucketCount: number = MIN_BUCKET_COUNT;
   private initialized = false;
   private subscribers = new Set<() => void>();
   private reloadGeneration = 0;
@@ -36,7 +38,9 @@ class RL {
   }
 
   private async fetchItems(): Promise<ListItemData[]> {
-    const items = chrome ? await getItemsRemote() : [];
+    if (!chrome) return [];
+    const { items, bucketCount } = await getItemsRemote();
+    this.bucketCount = bucketCount;
     items.sort((a, b) => b.addedAt - a.addedAt);
     return items;
   }
@@ -77,11 +81,11 @@ class RL {
   private groupItemsByBucket(items: ListItemData[]): Map<string, ListItemData[]> {
     const byBucket = new Map<string, ListItemData[]>();
     for (const item of items) {
-      const key = bucketKey(item.url);
+      const key = bucketKey(item.url, this.bucketCount);
       if (!byBucket.has(key)) {
         byBucket.set(
           key,
-          this.list.filter((existing) => bucketKey(existing.url) === key),
+          this.list.filter((existing) => bucketKey(existing.url, this.bucketCount) === key),
         );
       }
       const bucket = byBucket.get(key)!;
@@ -96,7 +100,7 @@ class RL {
     if (!this.initialized) await this.getListItems();
     listItem = normalizeItemForStorage(listItem);
     listItem = { ...listItem, index: this.minExistingIndex() - 1 };
-    const key = bucketKey(listItem.url);
+    const key = bucketKey(listItem.url, this.bucketCount);
     const bucket = await readBucket(key);
     await writeBucket(key, [
       listItem,
@@ -200,7 +204,7 @@ class RL {
 
   async removeReadingItem(url: string): Promise<boolean> {
     if (!this.initialized) await this.getListItems();
-    const key = bucketKey(url);
+    const key = bucketKey(url, this.bucketCount);
     const bucket = await readBucket(key);
     try {
       await writeBucket(
@@ -225,7 +229,7 @@ class RL {
       );
       if (isNoop) return;
       const updatedItem = { ...item, ...updates };
-      const key = bucketKey(url);
+      const key = bucketKey(url, this.bucketCount);
       const bucket = await readBucket(key);
       await writeBucket(
         key,

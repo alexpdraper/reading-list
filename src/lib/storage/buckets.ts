@@ -13,41 +13,49 @@ export interface ListItemData {
   index?: number;
 }
 
-// Items are grouped into a fixed number of storage keys ("buckets") instead
-// of one key per item. chrome.storage.sync caps the item COUNT at 512 keys
-// regardless of their size, so storing one key per bookmark hard-caps the
-// list at 512 entries. Hashing each URL into one of BUCKET_COUNT buckets and
-// storing a compressed array of items per bucket removes that per-item key
-// limit; the effective cap becomes the ~100KB total byte quota instead.
+// Items are grouped into a variable number of storage keys ("buckets")
+// instead of one key per item, so chrome.storage.sync's 512-key cap never
+// limits the list - see AGENTS.md's Storage architecture section for the
+// full rationale and the "Verified capacity" numbers this was tuned against.
 //
-// BUCKET_COUNT is deliberately small (not 512): LZ-style compression only
-// pays off when there's redundant text within a single compressed blob
-// (repeated property names, similar URLs, etc). Too few buckets and
-// individual buckets hit the 8KB-per-bucket quota before the 100KB total is
-// used; too many and each blob is too small for compression to help, plus
-// fixed per-blob overhead multiplies. 40 sits reasonably on that curve, but
-// was tuned against synthetic ~88-byte items - real items run ~250+
-// bytes/item once real URLs/titles are counted (see the "Verified capacity"
-// note in AGENTS.md), and a quick simulation against that realistic sizing
-// suggests something closer to 25 buckets may fit meaningfully more. Not
-// yet changed; re-verify with `rebalanceBucketsIfNeeded()` before touching
-// this constant either way.
-export const BUCKET_COUNT = 40;
+// The bucket count isn't fixed: fewer, fuller buckets compress better (LZ
+// compression needs redundant text within one blob), so bucketCountForItemCount
+// picks the smallest count that suits the list's current size. But a
+// size-based guess alone can't catch an actual collision - a list stuck at,
+// say, 150 items whose URLs happen to cluster badly into one bucket would
+// keep computing the same "30 is enough" answer forever, even while that one
+// bucket is actually failing. BUCKET_COUNT_LADDER exists for that: when a
+// bucket write actually fails (migrations.ts), the caller retries at the next
+// count up the ladder instead of accepting the size-based guess as final.
+export const MIN_BUCKET_COUNT = 30;
+export const MAX_BUCKET_COUNT = 40;
+export const BUCKET_COUNT_LADDER = [30, 35, 40];
 export const BUCKET_KEY_RE = /^b\d+$/;
 export const BUCKET_VERSION_KEY = '__bv';
 
-function hashUrl(url: string): number {
+// Starting guess, not a guarantee - see BUCKET_COUNT_LADDER above for what
+// happens when this guess turns out to be wrong for the actual data. 150 and
+// 250 are chosen so a list only reaches MAX_BUCKET_COUNT (today's unchanged
+// value) once it's already approaching the documented ~325-item real
+// capacity ceiling.
+export function bucketCountForItemCount(itemCount: number): number {
+  if (itemCount <= 150) return MIN_BUCKET_COUNT;
+  if (itemCount <= 250) return 35;
+  return MAX_BUCKET_COUNT;
+}
+
+function hashUrl(url: string, bucketCount: number): number {
   // FNV-1a
   let hash = 0x811c9dc5;
   for (let i = 0; i < url.length; i++) {
     hash ^= url.charCodeAt(i);
     hash = Math.imul(hash, 0x01000193);
   }
-  return (hash >>> 0) % BUCKET_COUNT;
+  return (hash >>> 0) % bucketCount;
 }
 
-export function bucketKey(url: string): string {
-  return `b${hashUrl(url)}`;
+export function bucketKey(url: string, bucketCount: number): string {
+  return `b${hashUrl(url, bucketCount)}`;
 }
 
 export function decodeBucket(raw: unknown): ListItemData[] {
