@@ -1,5 +1,4 @@
-import { ListItemData, loadItems, saveItems, clearItems } from './buckets.js';
-import { broadcastListChange, onListChange } from './list-sync.js';
+import { ListItemData, loadItems, saveItems, clearItems, onItemsChanged } from './buckets.js';
 
 // data: favicons (e.g. Gmail) can exceed a bucket's 8KB quota, so they're
 // stripped before storing.
@@ -19,7 +18,7 @@ class RL {
   private reloadGeneration = 0;
 
   constructor() {
-    onListChange(() => void this.reloadFromRemoteChange());
+    onItemsChanged(() => void this.reloadFromRemoteChange());
   }
 
   subscribe(callback: (list: ListItemData[]) => void): () => void {
@@ -74,7 +73,6 @@ class RL {
   private async persist(touchedUrls: string[]): Promise<{ ok: boolean; error?: unknown }> {
     try {
       await saveItems(this.list, touchedUrls);
-      broadcastListChange();
       return { ok: true };
     } catch (error) {
       console.error('Failed to save reading list', error);
@@ -198,7 +196,6 @@ class RL {
     await clearItems();
     this.list = [];
     this.initialized = true;
-    broadcastListChange();
   }
 }
 

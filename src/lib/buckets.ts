@@ -38,6 +38,27 @@ function bucketCountForItemCount(itemCount: number): number {
   return 35;
 }
 
+const REMOVED_BY_THIS_CONTEXT = Symbol('removed-by-this-context');
+const lastWrittenByThisContext = new Map<string, string | typeof REMOVED_BY_THIS_CONTEXT>();
+
+function recordOwnWrites(toSet: Record<string, string>, toRemove: string[]): void {
+  for (const [key, value] of Object.entries(toSet)) lastWrittenByThisContext.set(key, value);
+  for (const key of toRemove) lastWrittenByThisContext.set(key, REMOVED_BY_THIS_CONTEXT);
+}
+
+async function syncSet(toSet: Record<string, string | number>): Promise<void> {
+  const stringValues: Record<string, string> = {};
+  for (const [key, value] of Object.entries(toSet)) stringValues[key] = String(value);
+  recordOwnWrites(stringValues, []);
+  await chrome.storage.sync.set(toSet);
+}
+
+async function syncRemove(keys: string[]): Promise<void> {
+  if (keys.length === 0) return;
+  recordOwnWrites({}, keys);
+  await chrome.storage.sync.remove(keys);
+}
+
 function hashUrl(url: string, bucketCount: number): number {
   let hash = 0x811c9dc5;
   for (let i = 0; i < url.length; i++) {
@@ -127,8 +148,8 @@ async function migrateLegacyItems(
   }
 
   for (const [bKey, { items, legacyKeys: keysForBucket }] of byBucket) {
-    await chrome.storage.sync.set({ [bKey]: encodeBucket(items) });
-    await chrome.storage.sync.remove(keysForBucket);
+    await syncSet({ [bKey]: encodeBucket(items) });
+    await syncRemove(keysForBucket);
   }
 }
 
@@ -149,13 +170,11 @@ async function rebalanceBuckets(
   for (const [key, bucketItems] of byBucket) {
     toWrite[key] = encodeBucket(bucketItems);
   }
-  await chrome.storage.sync.set(toWrite);
+  await syncSet(toWrite);
 
   const newKeys = new Set(Object.keys(toWrite));
   const staleKeys = oldBucketKeys.filter((k) => !newKeys.has(k));
-  if (staleKeys.length > 0) {
-    await chrome.storage.sync.remove(staleKeys);
-  }
+  await syncRemove(staleKeys);
 }
 
 interface LoadResult {
@@ -239,11 +258,13 @@ export async function saveItems(all: ListItemData[], touchedUrls: string[]): Pro
     else toSet[key] = encodeBucket(items);
   }
 
-  if (Object.keys(toSet).length > 0) await chrome.storage.sync.set(toSet);
-  if (toRemove.length > 0) await chrome.storage.sync.remove(toRemove);
+  if (Object.keys(toSet).length > 0) await syncSet(toSet);
+  await syncRemove(toRemove);
 }
 
 export async function clearItems(): Promise<void> {
+  const all = await chrome.storage.sync.get(null);
+  recordOwnWrites({}, Object.keys(all));
   await chrome.storage.sync.clear();
 }
 
@@ -261,10 +282,21 @@ export async function readItemsReadOnly(): Promise<ListItemData[]> {
   return listItems;
 }
 
+function isSelfCausedChange(key: string, change: chrome.storage.StorageChange): boolean {
+  const lastWritten = lastWrittenByThisContext.get(key);
+  return 'newValue' in change ? lastWritten === change.newValue : lastWritten === REMOVED_BY_THIS_CONTEXT;
+}
+
 export function onItemsChanged(callback: () => void): () => void {
-  const listener = (changes: Record<string, unknown>, areaName: string) => {
+  const listener = (
+    changes: { [key: string]: chrome.storage.StorageChange },
+    areaName: string,
+  ) => {
     if (areaName !== 'sync') return;
-    if (Object.keys(changes).some((key) => BUCKET_KEY_RE.test(key))) callback();
+    const bucketChanges = Object.entries(changes).filter(([key]) => BUCKET_KEY_RE.test(key));
+    if (bucketChanges.length === 0) return;
+    const allSelfCaused = bucketChanges.every(([key, change]) => isSelfCausedChange(key, change));
+    if (!allSelfCaused) callback();
   };
   chrome.storage.onChanged.addListener(listener);
   return () => chrome.storage.onChanged.removeListener(listener);
