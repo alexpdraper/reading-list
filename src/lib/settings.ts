@@ -19,7 +19,7 @@ export const DEFAULT_SETTINGS: Required<Settings> = {
 };
 
 export async function getSettings(): Promise<Required<Settings>> {
-  const stored = await chrome.storage.sync.get('settings');
+  const stored = await chrome.storage.sync.get<{ settings?: Settings }>('settings');
   return { ...DEFAULT_SETTINGS, ...stored.settings };
 }
 
@@ -38,7 +38,7 @@ export function onSettingsChanged(
     areaName: string,
   ) => {
     if (areaName !== 'sync' || !('settings' in changes)) return;
-    callback({ ...DEFAULT_SETTINGS, ...changes.settings.newValue });
+    callback({ ...DEFAULT_SETTINGS, ...(changes.settings.newValue as Settings | undefined) });
   };
   chrome.storage.onChanged.addListener(listener);
   return () => chrome.storage.onChanged.removeListener(listener);
