@@ -60,17 +60,16 @@ const MIGRATION_LOG_KEY = 'lastMigration';
 export interface MigrationLog {
   startedAt: number;
   finishedAt?: number;
+  // Finishing a conversion an earlier load started but didn't complete.
+  resumed: boolean;
   legacyItems: number;
   legacyBytes: number;
   // Length of the whole serialized storage object, which is what Firefox
   // actually enforces QUOTA_BYTES against (getBytesInUse() is smaller).
   serializedBytesBefore: number;
-  bucketCountsTried: number[];
-  writes: number;
-  failedWrites: number;
-  removes: number;
-  splits: number;
-  swaps: number;
+  bucketCount?: number;
+  // The bucket write failed and the legacy keys were written back.
+  restored?: boolean;
   outcome: 'succeeded' | 'failed';
   error?: string;
 }
@@ -82,4 +81,28 @@ export async function saveMigrationLog(log: MigrationLog): Promise<void> {
 export async function getMigrationLog(): Promise<MigrationLog | null> {
   const stored = await chrome.storage.local.get(MIGRATION_LOG_KEY);
   return (stored[MIGRATION_LOG_KEY] as MigrationLog | undefined) ?? null;
+}
+
+// Set between removing legacy keys from sync and writing their buckets, the
+// only window where some items exist only in the local backup. A load that
+// finds it set finishes the conversion from the backup.
+const CONVERSION_PENDING_KEY = 'conversionPending';
+
+export async function setConversionPending(): Promise<void> {
+  await chrome.storage.local.set({
+    [CONVERSION_PENDING_KEY]: { since: Date.now() },
+  });
+}
+
+export async function clearConversionPending(): Promise<void> {
+  await chrome.storage.local.remove(CONVERSION_PENDING_KEY);
+}
+
+export async function getConversionPending(): Promise<{
+  since: number;
+} | null> {
+  const stored = await chrome.storage.local.get(CONVERSION_PENDING_KEY);
+  return (
+    (stored[CONVERSION_PENDING_KEY] as { since: number } | undefined) ?? null
+  );
 }

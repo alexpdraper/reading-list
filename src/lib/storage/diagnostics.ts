@@ -9,7 +9,12 @@ import {
   utf8ByteLength,
 } from './buckets.js';
 import { BUILD_TAG } from '../build-info.js';
-import { getLoadError, getLocalBackup, getMigrationLog } from './local-backup.js';
+import {
+  getConversionPending,
+  getLoadError,
+  getLocalBackup,
+  getMigrationLog,
+} from './local-backup.js';
 
 const iso = (ms: number) => new Date(ms).toISOString();
 
@@ -207,6 +212,7 @@ export async function getStorageDiagnostics(): Promise<string> {
   const loadError = await getLoadError();
   const migration = await getMigrationLog();
   const backup = await getLocalBackup();
+  const pending = await getConversionPending();
   const targetBucketCount = bucketCountForItemCount(itemCount);
 
   return [
@@ -229,13 +235,14 @@ export async function getStorageDiagnostics(): Promise<string> {
       ? `Local backup: ${backup.items.length} items (saved ${iso(backup.savedAt)})`
       : 'Local backup: none',
     migration
-      ? `Last conversion: ${migration.outcome} at ${iso(migration.finishedAt ?? migration.startedAt)} - ` +
-        `${migration.legacyItems} items, ${migration.legacyBytes} bytes, ` +
-        `${migration.serializedBytesBefore} serialized before; bucket counts tried ${migration.bucketCountsTried.join('/') || 'none'}; ` +
-        `${migration.writes} writes, ${migration.failedWrites} failed, ${migration.removes} removes, ` +
-        `${migration.splits} splits, ${migration.swaps} swaps` +
+      ? `Last conversion: ${migration.outcome}${migration.resumed ? ' (resumed)' : ''} at ` +
+        `${iso(migration.finishedAt ?? migration.startedAt)} - ${migration.legacyItems} items, ` +
+        `${migration.legacyBytes} bytes, ${migration.serializedBytesBefore} serialized before; ` +
+        `bucket count ${migration.bucketCount ?? 'n/a'}` +
+        (migration.restored ? '; old-format items restored after failed write' : '') +
         (migration.error ? `; error ${migration.error}` : '')
       : 'Last conversion: none',
+    `Conversion pending (interrupted): ${pending ? `yes, since ${iso(pending.since)}` : 'no'}`,
     loadError
       ? `Last load error: ${loadError.name}: ${loadError.message} (at ${iso(loadError.occurredAt)})` +
         (loadError.resolvedAt ? ` - resolved, loaded fine at ${iso(loadError.resolvedAt)}` : '')
