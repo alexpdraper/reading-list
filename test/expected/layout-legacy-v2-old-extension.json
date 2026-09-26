@@ -1,0 +1,58 @@
+{
+  "bucketVersion": 25,
+  "bucketKeys": [
+    "b3",
+    "b4",
+    "b6",
+    "b8",
+    "b9",
+    "b11",
+    "b12",
+    "b16",
+    "b21",
+    "b22",
+    "b24"
+  ],
+  "itemUrlsByBucket": {
+    "b3": [
+      "https://forum.oldreader.test/t/reading-list-workflows/482"
+    ],
+    "b4": [
+      "https://docs.oldreader.test/guide/badge-icons",
+      "https://docs.oldreader.test/guide/sync-storage-limits"
+    ],
+    "b6": [
+      "https://shop.oldreader.test/reviews/usb-c-docks",
+      "https://wiki.oldreader.test/wiki/Service_workers"
+    ],
+    "b8": [
+      "https://wiki.oldreader.test/wiki/Context_menus"
+    ],
+    "b9": [
+      "https://blog.oldreader.test/posts/manifest-v2-migration-notes"
+    ],
+    "b11": [
+      "https://news.oldreader.test/2019/07/03/offline-first-apps"
+    ],
+    "b12": [
+      "https://forum.oldreader.test/t/dark-mode-requests/501",
+      "https://shop.oldreader.test/reviews/mechanical-keyboards-2019"
+    ],
+    "b16": [
+      "https://docs.oldreader.test/guide/import-export"
+    ],
+    "b21": [
+      "https://blog.oldreader.test/posts/why-we-rewrote-our-sidebar",
+      "https://news.oldreader.test/2019/06/12/browser-extensions-then-and-now"
+    ],
+    "b22": [
+      "https://news.oldreader.test/2019/08/14/link-sharing-etiquette"
+    ],
+    "b24": [
+      "https://blog.oldreader.test/posts/testing-storage-quotas"
+    ]
+  },
+  "otherKeys": [
+    "settings"
+  ]
+}

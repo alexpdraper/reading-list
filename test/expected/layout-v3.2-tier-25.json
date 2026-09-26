@@ -1,0 +1,183 @@
+{
+  "bucketVersion": 25,
+  "bucketKeys": [
+    "b0",
+    "b1",
+    "b2",
+    "b3",
+    "b4",
+    "b5",
+    "b6",
+    "b7",
+    "b8",
+    "b9",
+    "b10",
+    "b11",
+    "b12",
+    "b13",
+    "b14",
+    "b15",
+    "b16",
+    "b17",
+    "b18",
+    "b19",
+    "b20",
+    "b21",
+    "b22",
+    "b23",
+    "b24"
+  ],
+  "itemUrlsByBucket": {
+    "b0": [
+      "https://forum.example.io/articles/2022/000092/benchmarking?utm_source=newsletter&utm_campaign=partner-share&ref=share-92&pad=pppppppppppppppppppppppppppppppppppppppppp",
+      "https://forum.example.io/articles/2024/000028/case-study?utm_source=newsletter&utm_campaign=evergreen&ref=share-28&pad=pppppppppppppppppppppppppppppppppppppppppppp",
+      "https://press.example.co/articles/2023/000087/quickstart-guide?utm_source=newsletter&utm_campaign=partner-share&ref=share-87&pad=pppppppppppppppppppppppppppppppppp",
+      "https://press.example.co/articles/2025/000047/explainer?utm_source=newsletter&utm_campaign=partner-share&ref=share-47&pad=pppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://shop.example.com/articles/2025/000011/explainer?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-11&pad=pppppppppppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b1": [
+      "https://shop.example.com/articles/2021/000067/postmortem?utm_source=newsletter&utm_campaign=partner-share&ref=share-67&pad=pppppppppppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b2": [
+      "https://blog.example.org/articles/2025/000065/release-notes?utm_source=newsletter&utm_campaign=spring-launch&ref=share-65&pad=pppppppppppppppppppppppppppppppp",
+      "https://blog.example.org/articles/2025/000089/release-notes?utm_source=newsletter&utm_campaign=q3-push&ref=share-89&pad=pppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://docs.example.net/articles/2020/000018/design-review?utm_source=newsletter&utm_campaign=evergreen&ref=share-18&pad=pppppppppppppppppppppppppppppppppppppp",
+      "https://press.example.co/articles/2023/000015/quickstart-guide?utm_source=newsletter&utm_campaign=spring-launch&ref=share-15&pad=pppppppppppppppppppppppppp",
+      "https://press.example.co/articles/2025/000095/explainer?utm_source=newsletter&utm_campaign=spring-launch&ref=share-95&pad=pppppppppppppppppppppppppppppppppppppppp",
+      "https://reader.example.app/articles/2024/000046/opinion?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-46&pad=pppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://reader.example.app/articles/2024/000070/opinion?utm_source=newsletter&utm_campaign=spring-launch&ref=share-70&pad=pppppppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b3": [
+      "https://docs.example.net/articles/2020/000066/design-review?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-66&pad=pppppppppppppppppppppppppppppppppppppp",
+      "https://wiki.example.dev/articles/2025/000005/release-notes?utm_source=newsletter&utm_campaign=spring-launch&ref=share-5&pad=pppppppppppppppppppppppppppppppppp"
+    ],
+    "b4": [
+      "https://docs.example.net/articles/2022/000098/field-notes?utm_source=newsletter&utm_campaign=evergreen&ref=share-98&pad=pppppppppppppppppppppppppppppppppppppppppp",
+      "https://docs.example.net/articles/2024/000034/opinion?utm_source=newsletter&utm_campaign=q3-push&ref=share-34&pad=pppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://forum.example.io/articles/2020/000084/deep-dive?utm_source=newsletter&utm_campaign=q3-push&ref=share-84&pad=pppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://news.example.com/articles/2024/000064/case-study?utm_source=newsletter&utm_campaign=q3-push&ref=share-64&pad=pppppppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://reader.example.app/articles/2024/000094/opinion?utm_source=newsletter&utm_campaign=q3-push&ref=share-94&pad=pppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b5": [
+      "https://docs.example.net/articles/2020/000090/design-review?utm_source=newsletter&utm_campaign=spring-launch&ref=share-90&pad=pppppppppppppppppppppppppppppppp",
+      "https://docs.example.net/articles/2024/000082/opinion?utm_source=newsletter&utm_campaign=partner-share&ref=share-82&pad=pppppppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://news.example.com/articles/2020/000024/deep-dive?utm_source=newsletter&utm_campaign=q3-push&ref=share-24&pad=pppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b6": [
+      "https://blog.example.org/articles/2021/000097/weekly-roundup?utm_source=newsletter&utm_campaign=partner-share&ref=share-97&pad=pppppppppppppppppppppppppppppppppppppp",
+      "https://docs.example.net/articles/2022/000002/field-notes?utm_source=newsletter&utm_campaign=partner-share&ref=share-2&pad=ppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://news.example.com/articles/2020/000000/deep-dive?utm_source=newsletter&utm_campaign=spring-launch&ref=share-0&pad=pppppppppppppppppppppppppppppppppppppppppp",
+      "https://reader.example.app/articles/2020/000006/design-review?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-6&pad=pppppppppppppppppppppppppppppppppppppp",
+      "https://reader.example.app/articles/2020/000030/design-review?utm_source=newsletter&utm_campaign=spring-launch&ref=share-30&pad=pppppppppppppppppppppppppppppp",
+      "https://wiki.example.dev/articles/2021/000013/weekly-roundup?utm_source=newsletter&utm_campaign=evergreen&ref=share-13&pad=pppppppppppppppppppppppppppppppppppp",
+      "https://wiki.example.dev/articles/2023/000093/interview?utm_source=newsletter&utm_campaign=evergreen&ref=share-93&pad=pppppppppppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b7": [
+      "https://blog.example.org/articles/2023/000057/interview?utm_source=newsletter&utm_campaign=partner-share&ref=share-57&pad=pppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://forum.example.io/articles/2022/000020/benchmarking?utm_source=newsletter&utm_campaign=spring-launch&ref=share-20&pad=pppppppppppppppppppppppppppppppppp",
+      "https://forum.example.io/articles/2022/000068/benchmarking?utm_source=newsletter&utm_campaign=evergreen&ref=share-68&pad=pppppppppppppppppppppppppppppppppppppppp",
+      "https://press.example.co/articles/2021/000007/postmortem?utm_source=newsletter&utm_campaign=partner-share&ref=share-7&pad=ppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://press.example.co/articles/2025/000023/explainer?utm_source=newsletter&utm_campaign=evergreen&ref=share-23&pad=pppppppppppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b8": [
+      "https://blog.example.org/articles/2025/000017/release-notes?utm_source=newsletter&utm_campaign=partner-share&ref=share-17&pad=pppppppppppppppppppppppppppppppppppppppp",
+      "https://news.example.com/articles/2020/000072/deep-dive?utm_source=newsletter&utm_campaign=partner-share&ref=share-72&pad=pppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://shop.example.com/articles/2023/000099/quickstart-guide?utm_source=newsletter&utm_campaign=q3-push&ref=share-99&pad=pppppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b9": [
+      "https://docs.example.net/articles/2024/000058/opinion?utm_source=newsletter&utm_campaign=evergreen&ref=share-58&pad=pppppppppppppppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b10": [
+      "https://docs.example.net/articles/2020/000042/design-review?utm_source=newsletter&utm_campaign=partner-share&ref=share-42&pad=pppppppppppppppppppppppppppppppppppppppp",
+      "https://shop.example.com/articles/2023/000003/quickstart-guide?utm_source=newsletter&utm_campaign=evergreen&ref=share-3&pad=pppppppppppppppppppppppppppppppppp",
+      "https://wiki.example.dev/articles/2023/000045/interview?utm_source=newsletter&utm_campaign=spring-launch&ref=share-45&pad=pppppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b11": [
+      "https://blog.example.org/articles/2021/000073/weekly-roundup?utm_source=newsletter&utm_campaign=evergreen&ref=share-73&pad=pppppppppppppppppppppppppppppppppppp",
+      "https://press.example.co/articles/2021/000055/postmortem?utm_source=newsletter&utm_campaign=spring-launch&ref=share-55&pad=pppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b12": [
+      "https://forum.example.io/articles/2024/000076/case-study?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-76&pad=pppppppppppppppppppppppppppppppppppppppppppp",
+      "https://reader.example.app/articles/2022/000014/field-notes?utm_source=newsletter&utm_campaign=q3-push&ref=share-14&pad=pppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://shop.example.com/articles/2021/000019/postmortem?utm_source=newsletter&utm_campaign=q3-push&ref=share-19&pad=pppppppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://shop.example.com/articles/2021/000043/postmortem?utm_source=newsletter&utm_campaign=evergreen&ref=share-43&pad=pppppppppppppppppppppppppppppppppppppppppppp",
+      "https://shop.example.com/articles/2023/000027/quickstart-guide?utm_source=newsletter&utm_campaign=partner-share&ref=share-27&pad=pppppppppppppppppppppppppppppppppp"
+    ],
+    "b13": [
+      "https://news.example.com/articles/2024/000016/case-study?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-16&pad=pppppppppppppppppppppppppppppppppppppppppppp",
+      "https://shop.example.com/articles/2025/000083/explainer?utm_source=newsletter&utm_campaign=evergreen&ref=share-83&pad=pppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://wiki.example.dev/articles/2021/000061/weekly-roundup?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-61&pad=pppppppppppppppppppppppppppppppppppp"
+    ],
+    "b14": [
+      "https://blog.example.org/articles/2023/000033/interview?utm_source=newsletter&utm_campaign=evergreen&ref=share-33&pad=pppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://press.example.co/articles/2021/000079/postmortem?utm_source=newsletter&utm_campaign=q3-push&ref=share-79&pad=pppppppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://wiki.example.dev/articles/2025/000077/release-notes?utm_source=newsletter&utm_campaign=partner-share&ref=share-77&pad=pppppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b15": [
+      "https://blog.example.org/articles/2023/000081/interview?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-81&pad=pppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://forum.example.io/articles/2020/000036/deep-dive?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-36&pad=pppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://news.example.com/articles/2024/000088/case-study?utm_source=newsletter&utm_campaign=evergreen&ref=share-88&pad=pppppppppppppppppppppppppppppppppppppppppppp",
+      "https://press.example.co/articles/2023/000063/quickstart-guide?utm_source=newsletter&utm_campaign=evergreen&ref=share-63&pad=pppppppppppppppppppppppppppppppp",
+      "https://reader.example.app/articles/2022/000038/field-notes?utm_source=newsletter&utm_campaign=evergreen&ref=share-38&pad=pppppppppppppppppppppppppppppppppppppppp",
+      "https://wiki.example.dev/articles/2025/000053/release-notes?utm_source=newsletter&utm_campaign=evergreen&ref=share-53&pad=pppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b16": [
+      "https://blog.example.org/articles/2021/000049/weekly-roundup?utm_source=newsletter&utm_campaign=q3-push&ref=share-49&pad=pppppppppppppppppppppppppppppppppppppppppppp",
+      "https://news.example.com/articles/2022/000056/benchmarking?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-56&pad=pppppppppppppppppppppppppppppppppppppppp",
+      "https://reader.example.app/articles/2020/000054/design-review?utm_source=newsletter&utm_campaign=q3-push&ref=share-54&pad=pppppppppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b17": [
+      "https://forum.example.io/articles/2020/000012/deep-dive?utm_source=newsletter&utm_campaign=partner-share&ref=share-12&pad=pppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://wiki.example.dev/articles/2021/000037/weekly-roundup?utm_source=newsletter&utm_campaign=partner-share&ref=share-37&pad=pppppppppppppppppppppppppppppppppppppp",
+      "https://wiki.example.dev/articles/2021/000085/weekly-roundup?utm_source=newsletter&utm_campaign=spring-launch&ref=share-85&pad=pppppppppppppppppppppppppppppp"
+    ],
+    "b18": [
+      "https://news.example.com/articles/2022/000032/benchmarking?utm_source=newsletter&utm_campaign=partner-share&ref=share-32&pad=pppppppppppppppppppppppppppppppppppppppppp",
+      "https://press.example.co/articles/2021/000031/postmortem?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-31&pad=pppppppppppppppppppppppppppppppppppppppppppp",
+      "https://press.example.co/articles/2023/000039/quickstart-guide?utm_source=newsletter&utm_campaign=q3-push&ref=share-39&pad=pppppppppppppppppppppppppppppppppppppppp",
+      "https://shop.example.com/articles/2025/000059/explainer?utm_source=newsletter&utm_campaign=q3-push&ref=share-59&pad=pppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://wiki.example.dev/articles/2023/000069/interview?utm_source=newsletter&utm_campaign=q3-push&ref=share-69&pad=pppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b19": [
+      "https://shop.example.com/articles/2025/000035/explainer?utm_source=newsletter&utm_campaign=spring-launch&ref=share-35&pad=pppppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b20": [
+      "https://blog.example.org/articles/2021/000001/weekly-roundup?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-1&pad=pppppppppppppppppppppppppppppppppppppp",
+      "https://blog.example.org/articles/2021/000025/weekly-roundup?utm_source=newsletter&utm_campaign=spring-launch&ref=share-25&pad=pppppppppppppppppppppppppppppp",
+      "https://blog.example.org/articles/2023/000009/interview?utm_source=newsletter&utm_campaign=q3-push&ref=share-9&pad=pppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://docs.example.net/articles/2022/000050/field-notes?utm_source=newsletter&utm_campaign=spring-launch&ref=share-50&pad=pppppppppppppppppppppppppppppppppppp",
+      "https://docs.example.net/articles/2022/000074/field-notes?utm_source=newsletter&utm_campaign=q3-push&ref=share-74&pad=pppppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://docs.example.net/articles/2024/000010/opinion?utm_source=newsletter&utm_campaign=spring-launch&ref=share-10&pad=pppppppppppppppppppppppppppppppppppppppppppp",
+      "https://news.example.com/articles/2020/000048/deep-dive?utm_source=newsletter&utm_campaign=evergreen&ref=share-48&pad=pppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://press.example.co/articles/2025/000071/explainer?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-71&pad=pppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://reader.example.app/articles/2020/000078/design-review?utm_source=newsletter&utm_campaign=evergreen&ref=share-78&pad=pppppppppppppppppppppppppppppppppppp",
+      "https://shop.example.com/articles/2021/000091/postmortem?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-91&pad=pppppppppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b21": [
+      "https://news.example.com/articles/2022/000080/benchmarking?utm_source=newsletter&utm_campaign=spring-launch&ref=share-80&pad=pppppppppppppppppppppppppppppppppp",
+      "https://reader.example.app/articles/2024/000022/opinion?utm_source=newsletter&utm_campaign=partner-share&ref=share-22&pad=pppppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://shop.example.com/articles/2023/000075/quickstart-guide?utm_source=newsletter&utm_campaign=spring-launch&ref=share-75&pad=pppppppppppppppppppppppppp",
+      "https://wiki.example.dev/articles/2023/000021/interview?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-21&pad=pppppppppppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b22": [
+      "https://blog.example.org/articles/2025/000041/release-notes?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-41&pad=pppppppppppppppppppppppppppppppppppppp",
+      "https://forum.example.io/articles/2020/000060/deep-dive?utm_source=newsletter&utm_campaign=spring-launch&ref=share-60&pad=pppppppppppppppppppppppppppppppppppppppp",
+      "https://forum.example.io/articles/2024/000004/case-study?utm_source=newsletter&utm_campaign=q3-push&ref=share-4&pad=pppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://shop.example.com/articles/2023/000051/quickstart-guide?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-51&pad=pppppppppppppppppppppppppppppppp"
+    ],
+    "b23": [
+      "https://forum.example.io/articles/2022/000044/benchmarking?utm_source=newsletter&utm_campaign=q3-push&ref=share-44&pad=pppppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://forum.example.io/articles/2024/000052/case-study?utm_source=newsletter&utm_campaign=partner-share&ref=share-52&pad=pppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://news.example.com/articles/2022/000008/benchmarking?utm_source=newsletter&utm_campaign=evergreen&ref=share-8&pad=pppppppppppppppppppppppppppppppppppppppppp",
+      "https://reader.example.app/articles/2022/000062/field-notes?utm_source=newsletter&utm_campaign=partner-share&ref=share-62&pad=pppppppppppppppppppppppppppppppppppppppppp",
+      "https://reader.example.app/articles/2022/000086/field-notes?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-86&pad=pppppppppppppppppppppppppppppppppppppppp",
+      "https://wiki.example.dev/articles/2025/000029/release-notes?utm_source=newsletter&utm_campaign=q3-push&ref=share-29&pad=pppppppppppppppppppppppppppppppppppppppppppppp"
+    ],
+    "b24": [
+      "https://docs.example.net/articles/2022/000026/field-notes?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-26&pad=pppppppppppppppppppppppppppppppppppppppppp",
+      "https://news.example.com/articles/2020/000096/deep-dive?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-96&pad=pppppppppppppppppppppppppppppppppppppppppppppp",
+      "https://news.example.com/articles/2024/000040/case-study?utm_source=newsletter&utm_campaign=spring-launch&ref=share-40&pad=pppppppppppppppppppppppppppppppppppppp"
+    ]
+  },
+  "otherKeys": []
+}

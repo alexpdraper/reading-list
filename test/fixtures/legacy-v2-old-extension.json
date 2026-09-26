@@ -1,0 +1,111 @@
+{
+  "sync": {
+    "https://news.oldreader.test/2019/06/12/browser-extensions-then-and-now": {
+      "url": "https://news.oldreader.test/2019/06/12/browser-extensions-then-and-now",
+      "title": "Browser extensions, then and now",
+      "addedAt": 1560340000000,
+      "viewed": true
+    },
+    "https://blog.oldreader.test/posts/manifest-v2-migration-notes": {
+      "url": "https://blog.oldreader.test/posts/manifest-v2-migration-notes",
+      "title": "Manifest V2 migration notes",
+      "addedAt": 1561000000000,
+      "viewed": false
+    },
+    "https://docs.oldreader.test/guide/sync-storage-limits": {
+      "url": "https://docs.oldreader.test/guide/sync-storage-limits",
+      "title": "Understanding sync storage limits",
+      "addedAt": 1561500000000,
+      "viewed": false
+    },
+    "https://forum.oldreader.test/t/reading-list-workflows/482": {
+      "url": "https://forum.oldreader.test/t/reading-list-workflows/482",
+      "title": "Reading list workflows megathread",
+      "addedAt": 1562000000000,
+      "viewed": true,
+      "index": 0
+    },
+    "https://shop.oldreader.test/reviews/mechanical-keyboards-2019": {
+      "url": "https://shop.oldreader.test/reviews/mechanical-keyboards-2019",
+      "title": "Mechanical keyboards worth buying in 2019",
+      "addedAt": 1562400000000,
+      "viewed": false
+    },
+    "https://wiki.oldreader.test/wiki/Context_menus": {
+      "url": "https://wiki.oldreader.test/wiki/Context_menus",
+      "title": "Context menus",
+      "addedAt": 1562800000000,
+      "viewed": false,
+      "index": 0
+    },
+    "https://news.oldreader.test/2019/07/03/offline-first-apps": {
+      "url": "https://news.oldreader.test/2019/07/03/offline-first-apps",
+      "title": "Offline-first apps done right",
+      "addedAt": 1563200000000,
+      "viewed": true
+    },
+    "https://blog.oldreader.test/posts/why-we-rewrote-our-sidebar": {
+      "url": "https://blog.oldreader.test/posts/why-we-rewrote-our-sidebar",
+      "title": "Why we rewrote our sidebar",
+      "addedAt": 1563600000000,
+      "viewed": false
+    },
+    "https://docs.oldreader.test/guide/badge-icons": {
+      "url": "https://docs.oldreader.test/guide/badge-icons",
+      "title": "Badge icons across browsers",
+      "addedAt": 1564000000000,
+      "viewed": false
+    },
+    "https://forum.oldreader.test/t/dark-mode-requests/501": {
+      "url": "https://forum.oldreader.test/t/dark-mode-requests/501",
+      "title": "Dark mode requests thread",
+      "addedAt": 1564400000000,
+      "viewed": true
+    },
+    "https://shop.oldreader.test/reviews/usb-c-docks": {
+      "url": "https://shop.oldreader.test/reviews/usb-c-docks",
+      "title": "USB-C docks, one year later",
+      "addedAt": 1564800000000,
+      "viewed": false
+    },
+    "https://wiki.oldreader.test/wiki/Service_workers": {
+      "url": "https://wiki.oldreader.test/wiki/Service_workers",
+      "title": "Service workers",
+      "addedAt": 1565200000000,
+      "viewed": false
+    },
+    "https://news.oldreader.test/2019/08/14/link-sharing-etiquette": {
+      "url": "https://news.oldreader.test/2019/08/14/link-sharing-etiquette",
+      "title": "Link sharing etiquette",
+      "addedAt": 1565600000000,
+      "viewed": true
+    },
+    "https://blog.oldreader.test/posts/testing-storage-quotas": {
+      "url": "https://blog.oldreader.test/posts/testing-storage-quotas",
+      "title": "Testing storage quotas the hard way",
+      "addedAt": 1566000000000,
+      "viewed": false
+    },
+    "https://docs.oldreader.test/guide/import-export": {
+      "url": "https://docs.oldreader.test/guide/import-export",
+      "title": "Import and export formats",
+      "addedAt": 1566400000000,
+      "viewed": false
+    },
+    "settings": {
+      "addContextMenu": true,
+      "addPageAction": true,
+      "animateItems": false,
+      "askedForReview": true,
+      "openNewTab": false,
+      "theme": "light",
+      "viewAll": true,
+      "sortOption": "date",
+      "sortOrder": "desc"
+    }
+  },
+  "local": {},
+  "meta": {
+    "itemCount": 15
+  }
+}

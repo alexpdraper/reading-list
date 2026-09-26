@@ -1,0 +1,108 @@
+{
+  "sync": {
+    "https://news.example.com/articles/2020/000000/deep-dive?utm_source=newsletter&utm_campaign=spring-launch&ref=share-0&pad=pppppppppppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1640000000000,
+      "title": "A deep dive on distributed systems, part 0",
+      "url": "https://news.example.com/articles/2020/000000/deep-dive?utm_source=newsletter&utm_campaign=spring-launch&ref=share-0&pad=pppppppppppppppppppppppppppppppppppppppppp"
+    },
+    "https://blog.example.org/articles/2021/000001/weekly-roundup?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-1&pad=pppppppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1639999580000,
+      "title": "weekly roundup: what changed in release 1",
+      "url": "https://blog.example.org/articles/2021/000001/weekly-roundup?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-1&pad=pppppppppppppppppppppppppppppppppppppp"
+    },
+    "https://docs.example.net/articles/2022/000002/field-notes?utm_source=newsletter&utm_campaign=partner-share&ref=share-2&pad=ppppppppppppppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1639999160000,
+      "title": "Why field notes still matters in 2022",
+      "url": "https://docs.example.net/articles/2022/000002/field-notes?utm_source=newsletter&utm_campaign=partner-share&ref=share-2&pad=ppppppppppppppppppppppppppppppppppppppppppppp"
+    },
+    "https://shop.example.com/articles/2023/000003/quickstart-guide?utm_source=newsletter&utm_campaign=evergreen&ref=share-3&pad=pppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1639998740000,
+      "title": "Notes from a quickstart guide session, issue #3",
+      "url": "https://shop.example.com/articles/2023/000003/quickstart-guide?utm_source=newsletter&utm_campaign=evergreen&ref=share-3&pad=pppppppppppppppppppppppppppppppppp"
+    },
+    "https://forum.example.io/articles/2024/000004/case-study?utm_source=newsletter&utm_campaign=q3-push&ref=share-4&pad=pppppppppppppppppppppppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1639998320000,
+      "title": "The state of case study — issue 4",
+      "url": "https://forum.example.io/articles/2024/000004/case-study?utm_source=newsletter&utm_campaign=q3-push&ref=share-4&pad=pppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    },
+    "https://wiki.example.dev/articles/2025/000005/release-notes?utm_source=newsletter&utm_campaign=spring-launch&ref=share-5&pad=pppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1639997900000,
+      "title": "A release notes on distributed systems, part 5",
+      "url": "https://wiki.example.dev/articles/2025/000005/release-notes?utm_source=newsletter&utm_campaign=spring-launch&ref=share-5&pad=pppppppppppppppppppppppppppppppppp"
+    },
+    "https://reader.example.app/articles/2020/000006/design-review?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-6&pad=pppppppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1639997480000,
+      "title": "design review: what changed in release 6",
+      "url": "https://reader.example.app/articles/2020/000006/design-review?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-6&pad=pppppppppppppppppppppppppppppppppppppp"
+    },
+    "https://press.example.co/articles/2021/000007/postmortem?utm_source=newsletter&utm_campaign=partner-share&ref=share-7&pad=ppppppppppppppppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1639997060000,
+      "title": "Why postmortem still matters in 2021",
+      "url": "https://press.example.co/articles/2021/000007/postmortem?utm_source=newsletter&utm_campaign=partner-share&ref=share-7&pad=ppppppppppppppppppppppppppppppppppppppppppppppp"
+    },
+    "https://news.example.com/articles/2022/000008/benchmarking?utm_source=newsletter&utm_campaign=evergreen&ref=share-8&pad=pppppppppppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1639996640000,
+      "title": "Notes from a benchmarking session, issue #8",
+      "url": "https://news.example.com/articles/2022/000008/benchmarking?utm_source=newsletter&utm_campaign=evergreen&ref=share-8&pad=pppppppppppppppppppppppppppppppppppppppppp"
+    },
+    "https://blog.example.org/articles/2023/000009/interview?utm_source=newsletter&utm_campaign=q3-push&ref=share-9&pad=pppppppppppppppppppppppppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1639996220000,
+      "title": "The state of interview — issue 9",
+      "url": "https://blog.example.org/articles/2023/000009/interview?utm_source=newsletter&utm_campaign=q3-push&ref=share-9&pad=pppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    },
+    "https://docs.example.net/articles/2024/000010/opinion?utm_source=newsletter&utm_campaign=spring-launch&ref=share-10&pad=pppppppppppppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1639995800000,
+      "title": "A opinion on distributed systems, part 10",
+      "url": "https://docs.example.net/articles/2024/000010/opinion?utm_source=newsletter&utm_campaign=spring-launch&ref=share-10&pad=pppppppppppppppppppppppppppppppppppppppppppp"
+    },
+    "https://shop.example.com/articles/2025/000011/explainer?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-11&pad=pppppppppppppppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1639995380000,
+      "title": "explainer: what changed in release 11",
+      "url": "https://shop.example.com/articles/2025/000011/explainer?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-11&pad=pppppppppppppppppppppppppppppppppppppppppppppp"
+    },
+    "https://forum.example.io/articles/2020/000012/deep-dive?utm_source=newsletter&utm_campaign=partner-share&ref=share-12&pad=pppppppppppppppppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1639994960000,
+      "title": "Why deep dive still matters in 2020",
+      "url": "https://forum.example.io/articles/2020/000012/deep-dive?utm_source=newsletter&utm_campaign=partner-share&ref=share-12&pad=pppppppppppppppppppppppppppppppppppppppppppppppp"
+    },
+    "https://wiki.example.dev/articles/2021/000013/weekly-roundup?utm_source=newsletter&utm_campaign=evergreen&ref=share-13&pad=pppppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1639994540000,
+      "title": "Notes from a weekly roundup session, issue #13",
+      "url": "https://wiki.example.dev/articles/2021/000013/weekly-roundup?utm_source=newsletter&utm_campaign=evergreen&ref=share-13&pad=pppppppppppppppppppppppppppppppppppp"
+    },
+    "https://reader.example.app/articles/2022/000014/field-notes?utm_source=newsletter&utm_campaign=q3-push&ref=share-14&pad=pppppppppppppppppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1639994120000,
+      "title": "The state of field notes — issue 14",
+      "url": "https://reader.example.app/articles/2022/000014/field-notes?utm_source=newsletter&utm_campaign=q3-push&ref=share-14&pad=pppppppppppppppppppppppppppppppppppppppppppppppp"
+    },
+    "https://press.example.co/articles/2023/000015/quickstart-guide?utm_source=newsletter&utm_campaign=spring-launch&ref=share-15&pad=pppppppppppppppppppppppppp": {
+      "addedAt": 1639993700000,
+      "title": "A quickstart guide on distributed systems, part 15",
+      "url": "https://press.example.co/articles/2023/000015/quickstart-guide?utm_source=newsletter&utm_campaign=spring-launch&ref=share-15&pad=pppppppppppppppppppppppppp"
+    },
+    "https://news.example.com/articles/2024/000016/case-study?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-16&pad=pppppppppppppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1639993280000,
+      "title": "case study: what changed in release 16",
+      "url": "https://news.example.com/articles/2024/000016/case-study?utm_source=newsletter&utm_campaign=weekly-digest&ref=share-16&pad=pppppppppppppppppppppppppppppppppppppppppppp"
+    },
+    "https://blog.example.org/articles/2025/000017/release-notes?utm_source=newsletter&utm_campaign=partner-share&ref=share-17&pad=pppppppppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1639992860000,
+      "title": "Why release notes still matters in 2025",
+      "url": "https://blog.example.org/articles/2025/000017/release-notes?utm_source=newsletter&utm_campaign=partner-share&ref=share-17&pad=pppppppppppppppppppppppppppppppppppppppp"
+    },
+    "https://docs.example.net/articles/2020/000018/design-review?utm_source=newsletter&utm_campaign=evergreen&ref=share-18&pad=pppppppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1639992440000,
+      "title": "Notes from a design review session, issue #18",
+      "url": "https://docs.example.net/articles/2020/000018/design-review?utm_source=newsletter&utm_campaign=evergreen&ref=share-18&pad=pppppppppppppppppppppppppppppppppppppp"
+    },
+    "https://shop.example.com/articles/2021/000019/postmortem?utm_source=newsletter&utm_campaign=q3-push&ref=share-19&pad=pppppppppppppppppppppppppppppppppppppppppppppppppppp": {
+      "addedAt": 1639992020000,
+      "title": "The state of postmortem — issue 19",
+      "url": "https://shop.example.com/articles/2021/000019/postmortem?utm_source=newsletter&utm_campaign=q3-push&ref=share-19&pad=pppppppppppppppppppppppppppppppppppppppppppppppppppp"
+    }
+  },
+  "local": {},
+  "meta": {
+    "itemCount": 20
+  }
+}

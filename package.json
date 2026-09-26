@@ -5,7 +5,10 @@
   "scripts": {
     "build": "rm -rf extension/scripts build && tsc && rollup -c",
     "format": "prettier --write src",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "pretest": "npm run build",
+    "test": "node --test test/*.test.mjs",
+    "test:update-snapshots": "npm run build && RL_UPDATE_SNAPSHOTS=1 node --test test/storage-load.test.mjs",
+    "test:gen-fixtures": "node test/fixtures/generate.mjs"
   },
   "type": "module",
   "author": "",
