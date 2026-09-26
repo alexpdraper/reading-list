@@ -1,14 +1,14 @@
 import { ListItemData, loadItems, saveItems, clearItems, onItemsChanged } from './buckets.js';
 
-// data: favicons (e.g. Gmail) can exceed a bucket's 8KB quota, so they're
-// stripped before storing.
+function stripOversizedDataUriFavicon(item: ListItemData): ListItemData {
+  return item.favIconUrl?.startsWith('data:') ? { ...item, favIconUrl: undefined } : item;
+}
+
 function normalizeItemForStorage(item: ListItemData): ListItemData {
   if (!/^https?:\/\//i.test(item.url)) {
     throw new Error(`Unsupported URL scheme: ${item.url}`);
   }
-  return item.favIconUrl?.startsWith('data:')
-    ? { ...item, favIconUrl: undefined }
-    : item;
+  return stripOversizedDataUriFavicon(item);
 }
 
 class RL {
@@ -37,13 +37,11 @@ class RL {
     return items;
   }
 
-  // Rapid pings can leave two reloads in flight; storage reads don't resolve
-  // in start order, so only the read started most recently may be applied.
   private async reloadFromRemoteChange() {
-    const generation = ++this.reloadGeneration;
+    const startedDuringGeneration = ++this.reloadGeneration;
     this.initialized = false;
     const items = await this.fetchItems();
-    if (generation !== this.reloadGeneration) return;
+    if (startedDuringGeneration !== this.reloadGeneration) return;
     this.list = items;
     this.initialized = true;
     this.notifySubscribers();
@@ -58,11 +56,7 @@ class RL {
     return this.list;
   }
 
-  // New items must sort above every existing indexed item (see compareByIndex
-  // in list-filter.ts), so each one takes the current minimum minus one.
-  // Going negative is fine and cheap; renumbering the whole list on every
-  // add would recreate the first-reorder cliff this exists to avoid.
-  private minExistingIndex(): number {
+  private lowestExistingIndex(): number {
     let min = 0;
     for (const item of this.list) {
       if (item.index != null && item.index < min) min = item.index;
@@ -84,7 +78,7 @@ class RL {
   async addReadingItem(listItem: ListItemData): Promise<ListItemData | null> {
     if (!this.initialized) await this.getListItems();
     listItem = normalizeItemForStorage(listItem);
-    listItem = { ...listItem, index: this.minExistingIndex() - 1 };
+    listItem = { ...listItem, index: this.lowestExistingIndex() - 1 };
 
     const previousList = this.list;
     this.list = [listItem, ...this.list.filter((item) => item.url !== listItem.url)];
@@ -98,9 +92,6 @@ class RL {
     return listItem;
   }
 
-  // Adds many items at once, batching writes so a large import doesn't fire
-  // one chrome.storage.sync.set() call per item — that blows through the
-  // write-rate limit (120/min) long before the byte quota is ever reached.
   async bulkAddReadingItems(
     rawItems: ListItemData[],
   ): Promise<{ succeeded: number; failed: number; firstError: unknown }> {
@@ -110,10 +101,7 @@ class RL {
     let succeeded = 0;
     let firstError: unknown = null;
 
-    // Imported items are placed above all existing ones, as a single add
-    // would, in the order they appear in the file: earlier in the file gets
-    // a lower index (further above), all below the current minimum.
-    const topIndex = this.minExistingIndex();
+    const importInsertionBaseIndex = this.lowestExistingIndex();
 
     for (let i = 0; i < rawItems.length; i += BATCH_SIZE) {
       const batch = rawItems.slice(i, i + BATCH_SIZE);
@@ -121,7 +109,7 @@ class RL {
       batch.forEach((raw, j) => {
         try {
           const item = normalizeItemForStorage(raw);
-          validated.push({ ...item, index: topIndex - rawItems.length + i + j });
+          validated.push({ ...item, index: importInsertionBaseIndex - rawItems.length + i + j });
         } catch (err) {
           firstError ??= err;
         }

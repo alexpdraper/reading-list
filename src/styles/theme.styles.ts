@@ -1,5 +1,17 @@
 import { css } from 'lit';
 
+export const reset = css`
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--rl-focus-color);
+  }
+`;
+
 export const theme = css`
   :host {
     --base-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,

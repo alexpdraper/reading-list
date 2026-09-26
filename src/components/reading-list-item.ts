@@ -4,16 +4,9 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { getSettings } from '../lib/settings.js';
 import { isFirefox, openLink } from '../lib/browser.js';
 import { styles } from '../styles/item.styles.js';
-import { theme } from '../styles/theme.styles.js';
-import { reset } from '../styles/reset.styles.js';
+import { theme, reset } from '../styles/theme.styles.js';
 
-// Matches the original CSS `slidein-bounce` keyframes (src/styles/animations.styles.ts
-// on v3_beta) exactly - same offsets, same shape. Runs on the inner content only,
-// at the same time as (but slower than) the outer card's own quick reveal in
-// reading-list-app.ts, reproducing the original's two-target layered motion.
-// Exit never had a separate content animation in the original - only the outer
-// card animates out - so there's no CONTENT_OUT_KEYFRAMES.
-const CONTENT_IN_KEYFRAMES: Keyframe[] = [
+const INNER_CONTENT_BOUNCE_IN_KEYFRAMES: Keyframe[] = [
   { transform: 'translateX(100%) scaleY(0)', offset: 0 },
   { transform: 'translateX(100%) scaleY(0)', offset: 0.2 },
   { transform: 'translateX(30px) scaleY(1)', offset: 0.35 },
@@ -22,7 +15,7 @@ const CONTENT_IN_KEYFRAMES: Keyframe[] = [
   { transform: 'translateX(0) scaleY(1)', offset: 1 },
 ];
 
-const CONTENT_TIMING: KeyframeAnimationOptions = {
+const INNER_CONTENT_BOUNCE_IN_TIMING: KeyframeAnimationOptions = {
   duration: 950,
   easing: 'ease-out',
 };
@@ -92,8 +85,8 @@ export class ReadingListItemElement extends LitElement {
     if (!this.animateItems) return { disabled: true };
     return {
       properties: [],
-      keyframeOptions: CONTENT_TIMING,
-      in: CONTENT_IN_KEYFRAMES,
+      keyframeOptions: INNER_CONTENT_BOUNCE_IN_TIMING,
+      in: INNER_CONTENT_BOUNCE_IN_KEYFRAMES,
     };
   }
 

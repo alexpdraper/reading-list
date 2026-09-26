@@ -328,9 +328,7 @@ export async function getStorageDiagnostics(): Promise<string> {
   let bytesInUse: number | string = 'unavailable';
   try {
     bytesInUse = await chrome.storage.sync.getBytesInUse(null);
-  } catch {
-    // not supported by this browser build; manual estimate below still applies
-  }
+  } catch {}
 
   const quotaBytes = chrome.storage.sync.QUOTA_BYTES ?? 102400;
   const quotaBytesPerItem = chrome.storage.sync.QUOTA_BYTES_PER_ITEM ?? 8192;

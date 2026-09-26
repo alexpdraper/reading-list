@@ -2,37 +2,45 @@ import { LitElement, html, PropertyValues } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import { animate } from '@lit-labs/motion';
 import { customElement, state } from 'lit/decorators.js';
-import { i18n } from '../lib/i18n.js';
 import { rl } from '../lib/rl.js';
 import { ListItemData } from '../lib/buckets.js';
 import { getSettings, updateSettings, onSettingsChanged } from '../lib/settings.js';
-import { syncBadgeForTab } from '../lib/badge.js';
+import { i18n, syncBadgeForTab, isFirefox, getActiveTab, addReadingItemAndSyncBadge } from '../lib/browser.js';
 import { ListFilter, SortOption, SortOrder } from '../lib/list-filter.js';
-import { maybeGetReviewItem, dismissReview } from '../lib/review.js';
-import { isFirefox, getActiveTab } from '../lib/browser.js';
-import { addReadingItemAndSyncBadge } from '../lib/add-item.js';
 import { ReadingListItemElement } from './reading-list-item.js';
 import { DragReorderController } from './drag-reorder-controller.js';
-import { styles } from '../styles/app.styles.js';
-import { header } from '../styles/header.styles.js';
-import { search } from '../styles/search.styles.js';
-import { controls } from '../styles/controls.styles.js';
-import { theme } from '../styles/theme.styles.js';
-import { reset } from '../styles/reset.styles.js';
+import { styles, header, search, controls } from '../styles/app.styles.js';
+import { theme, reset } from '../styles/theme.styles.js';
 import './reading-list-item.js';
 
-// Matches the original CSS `slidein`/`slideout` keyframes (src/styles/animations.styles.ts
-// on v3_beta): only the outer card animates on exit, and on entry it's a quick,
-// non-bouncy reveal - the bounce lives entirely on the inner .item-content
-// (see CONTENT_IN_KEYFRAMES in reading-list-item.ts), running at its own,
-// slower pace at the same time.
-const CARD_IN_KEYFRAMES: Keyframe[] = [
+const REVIEW_URL_FIREFOX = 'https://addons.mozilla.org/en-US/firefox/addon/reading_list/';
+const REVIEW_URL_CHROME =
+  'https://chrome.google.com/webstore/detail/reading-list/lloccabjgblebdmncjndmiibianflabo/reviews';
+
+async function maybeGetReviewItem(itemCount: number): Promise<ListItemData | null> {
+  if (itemCount < 6) return null;
+  const settings = await getSettings();
+  if (settings.askedForReview) return null;
+
+  return {
+    title: 'Like the Reading List? Give us a review!',
+    url: isFirefox ? REVIEW_URL_FIREFOX : REVIEW_URL_CHROME,
+    addedAt: Date.now(),
+    favIconUrl: chrome.runtime.getURL('icons/icon48.png'),
+  };
+}
+
+async function dismissReview(): Promise<void> {
+  await updateSettings({ askedForReview: true });
+}
+
+const OUTER_CARD_SLIDE_IN_KEYFRAMES: Keyframe[] = [
   { maxHeight: '0px', transform: 'translateX(100%) scaleY(0)', offset: 0 },
   { maxHeight: '100px', offset: 0.8 },
   { transform: 'translateX(0) scaleY(1)', offset: 1 },
 ];
 
-const CARD_OUT_KEYFRAMES: Keyframe[] = [
+const OUTER_CARD_SLIDE_OUT_KEYFRAMES: Keyframe[] = [
   { maxHeight: '100px', transform: 'translateX(0) scaleY(1)', offset: 0 },
   { maxHeight: '0px', offset: 0.4 },
   { transform: 'translateX(100%) scaleY(0)', offset: 1 },
@@ -207,8 +215,8 @@ export class ReadingListAppElement extends LitElement {
       keyframeOptions: this._dragReorder.isDragging
         ? ITEM_DRAG_FLIP_TIMING
         : ITEM_ENTER_EXIT_TIMING,
-      in: CARD_IN_KEYFRAMES,
-      out: CARD_OUT_KEYFRAMES,
+      in: OUTER_CARD_SLIDE_IN_KEYFRAMES,
+      out: OUTER_CARD_SLIDE_OUT_KEYFRAMES,
       skipInitial: true,
       disabled: this._dragReorder.draggedUrl === url,
     };

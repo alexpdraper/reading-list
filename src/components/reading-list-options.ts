@@ -3,11 +3,33 @@ import { state } from 'lit/decorators.js';
 import { rl } from '../lib/rl.js';
 import { getSettings, updateSettings, onSettingsChanged } from '../lib/settings.js';
 import { getStorageDiagnostics, readItemsReadOnly, getLocalBackup, ListItemData } from '../lib/buckets.js';
-import { downloadJson } from '../lib/download-json.js';
-import { i18n } from '../lib/i18n.js';
+import { i18n } from '../lib/browser.js';
 import { styles } from '../styles/options.styles.js';
-import { theme } from '../styles/theme.styles.js';
-import { reset } from '../styles/reset.styles.js';
+import { theme, reset } from '../styles/theme.styles.js';
+
+function extractItemsFromCurrentOrLegacySyncDumpExport(parsed: unknown): ListItemData[] | null {
+  if (Array.isArray(parsed)) return parsed;
+  if (parsed && typeof parsed === 'object') {
+    return Object.entries(parsed as Record<string, ListItemData>)
+      .filter(([key]) => /^https?:\/\//i.test(key))
+      .map(([, value]) => value);
+  }
+  return null;
+}
+
+function downloadJson(filename: string, data: unknown): void {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
+}
 
 type CheckboxSettingKey = 'openNewTab' | 'animateItems' | 'addContextMenu';
 
@@ -140,16 +162,7 @@ export class ReadingListOptions extends LitElement {
     try {
       const text = await file.text();
       const parsed = JSON.parse(text);
-      // The old extension's export is a raw chrome.storage.sync dump: one
-      // key per item URL, plus a "settings" key - not an array like this
-      // app's own export. Only the URL-keyed entries are reading items.
-      const items: ListItemData[] | null = Array.isArray(parsed)
-        ? parsed
-        : parsed && typeof parsed === 'object'
-          ? Object.entries(parsed as Record<string, ListItemData>)
-              .filter(([key]) => /^https?:\/\//i.test(key))
-              .map(([, value]) => value)
-          : null;
+      const items = extractItemsFromCurrentOrLegacySyncDumpExport(parsed);
 
       if (items) {
         await rl.getListItems();
