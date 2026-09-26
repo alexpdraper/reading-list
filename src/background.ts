@@ -6,7 +6,7 @@ import {addReadingItemAndSyncBadge} from './lib/add-item.js';
 
 chrome.action.setBadgeBackgroundColor({color: '#2ea99c'});
 
-function createContextMenu(id: string, i18nKey: string, defaultTitle: string, contexts: chrome.contextMenus.ContextType[]) {
+function createContextMenu(id: string, i18nKey: string, defaultTitle: string, contexts: chrome.contextMenus.CreateProperties['contexts']) {
   chrome.contextMenus.create({
     id,
     title: i18n.getMessage(i18nKey, defaultTitle),
