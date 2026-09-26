@@ -67,6 +67,17 @@ export const styles = css`
     margin-top: 1em;
   }
 
+  .diagnostics pre {
+    margin-top: 1em;
+    padding: 1em;
+    border: 1px solid var(--rl-border-color);
+    border-radius: 4px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 0.85em;
+    user-select: text;
+  }
+
   @media (prefers-color-scheme: dark) {
     button {
       background: var(--rl-bg-color);
