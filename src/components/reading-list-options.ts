@@ -1,13 +1,17 @@
 import { html, LitElement } from 'lit';
-import { state } from 'lit/decorators.js';
+import { query, state } from 'lit/decorators.js';
 import { rl } from '../lib/rl.js';
-import { getSettings, updateSettings, onSettingsChanged } from '../lib/settings.js';
+import {
+  getSettings,
+  updateSettings,
+  onSettingsChanged,
+} from '../lib/settings.js';
+import { message } from '../lib/browser.js';
 import { getStorageDiagnostics } from '../lib/storage/diagnostics.js';
-import { getItemsReadOnly } from '../lib/storage/migrations.js';
+import { readItemsWithoutWriting } from '../lib/storage/load.js';
 import { getLocalBackup } from '../lib/storage/local-backup.js';
-import { downloadJson } from '../lib/download-json.js';
-import { ListItemData } from '../lib/storage/buckets.js';
-import { i18n } from '../lib/i18n.js';
+import { flatStore } from '../lib/storage/flat-store.js';
+import { ListItemData } from '../lib/storage/store.js';
 import { styles } from '../styles/options.styles.js';
 import { theme } from '../styles/theme.styles.js';
 import { reset } from '../styles/reset.styles.js';
@@ -17,7 +21,10 @@ type CheckboxSettingKey = 'openNewTab' | 'animateItems' | 'addContextMenu';
 const CHECKBOX_SETTINGS: { key: CheckboxSettingKey; label: string }[] = [
   { key: 'openNewTab', label: 'Open items in new tab by default' },
   { key: 'animateItems', label: 'Animate items' },
-  { key: 'addContextMenu', label: 'Show "Add to Reading List" in the right-click menu' },
+  {
+    key: 'addContextMenu',
+    label: 'Show "Add to Reading List" in the right-click menu',
+  },
 ];
 
 export class ReadingListOptions extends LitElement {
@@ -31,6 +38,7 @@ export class ReadingListOptions extends LitElement {
 
   @state() private _diagnostics = '';
   @state() private _diagnosticsCopied = false;
+  @query('#importInput') private _importInput?: HTMLInputElement;
 
   private _unsubscribeSettings?: () => void;
 
@@ -77,33 +85,45 @@ export class ReadingListOptions extends LitElement {
       <div class="section">
         <h3>Backup & Restore</h3>
         <button @click=${this.exportList}>Export Reading List</button>
-        <input id="importInput" type="file" accept="application/json" style="display:none" @change=${this.importList} />
+        <input
+          id="importInput"
+          type="file"
+          accept="application/json"
+          style="display:none"
+          @change=${this.importList}
+        />
         <button @click=${this.openImportDialog}>Import Reading List</button>
       </div>
 
       <details class="section">
         <summary>Advanced</summary>
         <div>
-          <button @click=${this._onDiagnosticsClick}>Storage Diagnostics</button>
-          <button @click=${this._onDownloadLocalBackupClick}>Download Local Backup</button>
+          <button @click=${this._onDiagnosticsClick}>
+            Storage Diagnostics
+          </button>
+          <button @click=${this._onDownloadLocalBackupClick}>
+            Download Local Backup
+          </button>
           <button class="danger" @click=${this._onResetClick}>
-            ${i18n.getMessage('clearData', 'Clear Reading List')}
+            ${message('clearData', 'Clear Reading List')}
           </button>
         </div>
-        ${this._diagnostics
-          ? html`
-              <div class="diagnostics">
-                <p>
-                  Contains counts and sizes only - no page addresses or titles - so it's safe to
-                  send in a bug report.
-                </p>
-                <button @click=${this._onCopyDiagnosticsClick}>
-                  ${this._diagnosticsCopied ? 'Copied' : 'Copy to Clipboard'}
-                </button>
-                <pre>${this._diagnostics}</pre>
-              </div>
-            `
-          : ''}
+        ${
+          this._diagnostics
+            ? html`
+                <div class="diagnostics">
+                  <p>
+                    Contains counts and sizes only - no page addresses or titles
+                    - so it's safe to send in a bug report.
+                  </p>
+                  <button @click=${this._onCopyDiagnosticsClick}>
+                    ${this._diagnosticsCopied ? 'Copied' : 'Copy to Clipboard'}
+                  </button>
+                  <pre>${this._diagnostics}</pre>
+                </div>
+              `
+            : ''
+        }
       </details>
     `;
   }
@@ -124,13 +144,14 @@ export class ReadingListOptions extends LitElement {
   }
 
   async _onResetClick() {
-    const confirmed = confirm(
-      i18n.getMessage(
-        'confirmMsg',
-        'You are about to delete everything in the reading list. Are you sure?',
-      ),
-    );
-    if (confirmed) {
+    if (
+      confirm(
+        message(
+          'confirmMsg',
+          'You are about to delete everything in the reading list. Are you sure?',
+        ),
+      )
+    ) {
       await rl.clearAll();
     }
   }
@@ -152,37 +173,31 @@ export class ReadingListOptions extends LitElement {
   async _onDownloadLocalBackupClick() {
     const backup = await getLocalBackup();
     if (!backup) {
-      alert('No local backup found yet. One is saved automatically before the extension migrates data from an older version.');
+      alert(
+        'No local backup found yet. One is saved automatically before the extension migrates data from an older version.',
+      );
       return;
     }
     downloadJson('reading-list-backup.json', backup.items);
   }
 
   openImportDialog() {
-    const input = (this.renderRoot as ShadowRoot)?.getElementById('importInput') as HTMLInputElement;
-    if (input) input.click();
+    this._importInput?.click();
   }
 
   async importList(e: Event) {
     const input = e.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
-    const file = input.files[0];
+    const file = input.files?.[0];
+    if (!file) return;
     try {
-      const text = await file.text();
-      const parsed = JSON.parse(text);
-      // The old extension's export is a raw chrome.storage.sync dump: one
-      // key per item URL, plus a "settings" key - not an array like this
-      // app's own export. Only the URL-keyed entries are reading items.
+      const parsed = JSON.parse(await file.text());
       const items: ListItemData[] | null = Array.isArray(parsed)
         ? parsed
         : parsed && typeof parsed === 'object'
-          ? Object.entries(parsed as Record<string, ListItemData>)
-              .filter(([key]) => /^https?:\/\//i.test(key))
-              .map(([, value]) => value)
+          ? flatStore.readItems(parsed)
           : null;
 
       if (items) {
-        await rl.getListItems();
         const { succeeded, firstError, diagnostics } =
           await rl.bulkAddReadingItems(items);
         if (succeeded === items.length) {
@@ -205,9 +220,23 @@ export class ReadingListOptions extends LitElement {
   }
 
   async exportList() {
-    const data = await getItemsReadOnly();
-    downloadJson('reading-list.json', data);
+    downloadJson('reading-list.json', await readItemsWithoutWriting());
   }
+}
+
+function downloadJson(filename: string, data: unknown): void {
+  const url = URL.createObjectURL(
+    new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }),
+  );
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  setTimeout(() => {
+    link.remove();
+    URL.revokeObjectURL(url);
+  }, 100);
 }
 
 customElements.define('reading-list-options', ReadingListOptions);
