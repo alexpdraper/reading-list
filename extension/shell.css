@@ -1,8 +1,4 @@
-/*
- * Light-DOM page chrome, outside the Lit component tree, so it can't
- * import src/styles/theme.styles.ts directly. Keep these values in
- * sync with that file by hand.
- */
+/* Keep in sync with src/styles/theme.styles.ts by hand (can't import it here). */
 :root {
   --base-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;

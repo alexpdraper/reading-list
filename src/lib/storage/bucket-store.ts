@@ -36,10 +36,12 @@ export const isBucketKey = (key: string): boolean => BUCKET_KEY.test(key);
 export const isOldEncoding = (raw: unknown): boolean =>
   typeof raw === 'string' && /[^\x00-\x7f]/.test(raw);
 
+const decompressCurrentOrPre30Encoding = (raw: string) =>
+  LZString.decompressFromBase64(raw) || LZString.decompressFromUTF16(raw);
+
 export function decodeBucket(raw: unknown): ListItemData[] {
   if (typeof raw !== 'string') return [];
-  const json =
-    LZString.decompressFromBase64(raw) || LZString.decompressFromUTF16(raw);
+  const json = decompressCurrentOrPre30Encoding(raw);
   if (!json) return [];
   try {
     return JSON.parse(json) as ListItemData[];
@@ -49,6 +51,7 @@ export function decodeBucket(raw: unknown): ListItemData[] {
 }
 
 function encodeBucket(items: ListItemData[]): string {
+  // Base64, not UTF16: see AGENTS.md "Why compressToBase64".
   return LZString.compressToBase64(JSON.stringify(items));
 }
 
