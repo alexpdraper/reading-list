@@ -29,6 +29,9 @@ export class ReadingListOptions extends LitElement {
     addContextMenu: true,
   };
 
+  @state() private _diagnostics = '';
+  @state() private _diagnosticsCopied = false;
+
   private _unsubscribeSettings?: () => void;
 
   override connectedCallback() {
@@ -87,6 +90,20 @@ export class ReadingListOptions extends LitElement {
             ${i18n.getMessage('clearData', 'Clear Reading List')}
           </button>
         </div>
+        ${this._diagnostics
+          ? html`
+              <div class="diagnostics">
+                <p>
+                  Contains counts and sizes only - no page addresses or titles - so it's safe to
+                  send in a bug report.
+                </p>
+                <button @click=${this._onCopyDiagnosticsClick}>
+                  ${this._diagnosticsCopied ? 'Copied' : 'Copy to Clipboard'}
+                </button>
+                <pre>${this._diagnostics}</pre>
+              </div>
+            `
+          : ''}
       </details>
     `;
   }
@@ -119,7 +136,17 @@ export class ReadingListOptions extends LitElement {
   }
 
   async _onDiagnosticsClick() {
-    alert(await getStorageDiagnostics());
+    this._diagnosticsCopied = false;
+    try {
+      this._diagnostics = await getStorageDiagnostics();
+    } catch (err) {
+      this._diagnostics = `Storage Diagnostics itself failed: ${err}`;
+    }
+  }
+
+  async _onCopyDiagnosticsClick() {
+    await navigator.clipboard.writeText(this._diagnostics);
+    this._diagnosticsCopied = true;
   }
 
   async _onDownloadLocalBackupClick() {

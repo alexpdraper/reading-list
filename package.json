@@ -1,6 +1,6 @@
 {
   "name": "reading-list-extension",
-  "version": "3.2",
+  "version": "3.3",
   "description": "Reading List extension with manifest v3",
   "scripts": {
     "build": "rm -rf extension/scripts build && tsc && rollup -c",

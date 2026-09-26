@@ -24,9 +24,8 @@ export interface ListItemData {
 // size-based guess alone can't catch an actual collision - a list stuck at,
 // say, 150 items whose URLs happen to cluster badly into one bucket would
 // keep computing the same answer forever, even while that one bucket is
-// actually failing. BUCKET_COUNT_LADDER exists for that: when a bucket write
-// actually fails (migrations.ts), the caller retries at the next count up the
-// ladder instead of accepting the size-based guess as final.
+// too big. BUCKET_COUNT_LADDER exists for that: planBuckets() (migrations.ts)
+// moves up the ladder until every encoded bucket fits, before writing.
 //
 // Every size tier below deliberately stops one rung short of MAX_BUCKET_COUNT,
 // so every list size keeps at least one rung of real escalation room above its
@@ -37,6 +36,8 @@ export const MAX_BUCKET_COUNT = 40;
 export const BUCKET_COUNT_LADDER = [25, 30, 35, 40];
 export const BUCKET_KEY_RE = /^b\d+$/;
 export const BUCKET_VERSION_KEY = '__bv';
+// Pre-bucketing layout: one key per item, keyed by its URL.
+export const LEGACY_KEY_RE = /^https?:\/\//i;
 
 // Starting guess, not a guarantee - see BUCKET_COUNT_LADDER above for what
 // happens when this guess turns out to be wrong for the actual data. 150 and
