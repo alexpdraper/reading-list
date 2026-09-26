@@ -37,6 +37,8 @@ export const MAX_BUCKET_COUNT = 40;
 export const BUCKET_COUNT_LADDER = [25, 30, 35, 40];
 export const BUCKET_KEY_RE = /^b\d+$/;
 export const BUCKET_VERSION_KEY = '__bv';
+// Pre-bucketing layout: one key per item, keyed by its URL.
+export const LEGACY_KEY_RE = /^https?:\/\//i;
 
 // Starting guess, not a guarantee - see BUCKET_COUNT_LADDER above for what
 // happens when this guess turns out to be wrong for the actual data. 150 and

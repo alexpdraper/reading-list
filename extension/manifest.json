@@ -40,7 +40,7 @@
     }
   },
   "minimum_chrome_version": "88",
-  "version": "3.2",
+  "version": "3.3",
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true
