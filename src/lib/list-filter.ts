@@ -1,62 +1,52 @@
 import Fuse from 'fuse.js';
-import { ListItemData } from './storage/buckets.js';
-
-export type SortOption = 'date' | 'title' | '';
-export type SortOrder = 'up' | 'down' | '';
+import { SortOption, SortOrder } from './settings.js';
+import { ListItemData } from './storage/store.js';
 
 export interface FilterOptions {
   query: string;
   viewAll: boolean;
   sortOption: SortOption;
   sortOrder: SortOrder;
-  preserveOrder?: boolean;
+  keepCurrentOrder?: boolean;
 }
 
-function compareItems(
-  a: ListItemData,
-  b: ListItemData,
-  sortOption: SortOption,
-  sortOrder: SortOrder,
-): number {
-  if (sortOption === 'date') {
-    return sortOrder === 'up' ? a.addedAt - b.addedAt : b.addedAt - a.addedAt;
+const searchIndexes = new WeakMap<ListItemData[], Fuse<ListItemData>>();
+
+function search(items: ListItemData[], query: string): ListItemData[] {
+  let index = searchIndexes.get(items);
+  if (!index) {
+    index = new Fuse(items, { keys: ['title', 'url'], threshold: 0.4 });
+    searchIndexes.set(items, index);
   }
-  const cmp = a.title.localeCompare(b.title, undefined, { numeric: true, sensitivity: 'base' });
-  return sortOrder === 'up' ? -cmp : cmp;
+  return index.search(query).map((result) => result.item);
 }
 
-// Manual drag order when no explicit sort is active. Indexed items sort
-// first by index; items without one (never dragged) fall after, newest first.
-function compareByIndex(a: ListItemData, b: ListItemData): number {
+function compareBySort(sortOption: SortOption, sortOrder: SortOrder) {
+  const direction = sortOrder === 'up' ? -1 : 1;
+  return (a: ListItemData, b: ListItemData) =>
+    sortOption === 'date'
+      ? direction * (b.addedAt - a.addedAt)
+      : direction *
+        a.title.localeCompare(b.title, undefined, {
+          numeric: true,
+          sensitivity: 'base',
+        });
+}
+
+function compareByDragOrder(a: ListItemData, b: ListItemData): number {
   if (a.index == null && b.index == null) return b.addedAt - a.addedAt;
   if (a.index == null) return 1;
   if (b.index == null) return -1;
   return a.index - b.index;
 }
 
-export class ListFilter {
-  private fuse: Fuse<ListItemData> | null = null;
-
-  setItems(items: ListItemData[] | null) {
-    this.fuse = items ? new Fuse(items, { keys: ['title', 'url'], threshold: 0.4 }) : null;
-  }
-
-  visibleItems(
-    items: ListItemData[],
-    { query, viewAll, sortOption, sortOrder, preserveOrder }: FilterOptions,
-  ): ListItemData[] {
-    let result = query ? (this.fuse?.search(query).map((r) => r.item) ?? []) : items;
-
-    if (!viewAll) {
-      result = result.filter((item) => !item.viewed);
-    }
-
-    if (sortOption) {
-      result = [...result].sort((a, b) => compareItems(a, b, sortOption, sortOrder));
-    } else if (!preserveOrder) {
-      result = [...result].sort(compareByIndex);
-    }
-
-    return result;
-  }
+export function visibleItems(
+  items: ListItemData[],
+  { query, viewAll, sortOption, sortOrder, keepCurrentOrder }: FilterOptions,
+): ListItemData[] {
+  let result = query ? search(items, query) : items;
+  if (!viewAll) result = result.filter((item) => !item.viewed);
+  if (sortOption) return [...result].sort(compareBySort(sortOption, sortOrder));
+  if (keepCurrentOrder) return result;
+  return [...result].sort(compareByDragOrder);
 }

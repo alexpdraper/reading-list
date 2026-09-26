@@ -1,35 +1,54 @@
+import { loadItems, PREFERRED_STORE } from './storage/load.js';
 import {
-  bucketKey,
-  encodeBucket,
+  ItemStore,
   ListItemData,
-  MIN_BUCKET_COUNT,
-  readBucket,
-  utf8ByteLength,
-  writeBucket,
-} from './storage/buckets.js';
-import { getItemsRemote } from './storage/migrations.js';
-import { broadcastListChange, onListChange } from './list-sync.js';
+  syncBytes,
+  writeSync,
+} from './storage/store.js';
 
-// data: favicons (e.g. Gmail) can exceed a bucket's 8KB quota, so they're
-// stripped before storing.
-function normalizeItemForStorage(item: ListItemData): ListItemData {
-  if (!/^https?:\/\//i.test(item.url)) {
-    throw new Error(`Unsupported URL scheme: ${item.url}`);
-  }
+const LIST_CHANGED_MESSAGE = 'reading-list:changed';
+const IMPORT_BATCH_SIZE = 25;
+
+export interface ImportResult {
+  succeeded: number;
+  failed: number;
+  firstError: unknown;
+  diagnostics: string;
+}
+
+function assertHttpUrl(url: string): void {
+  if (!/^https?:\/\//i.test(url))
+    throw new Error(`Unsupported URL scheme: ${url}`);
+}
+
+function withoutDataFavicon(item: ListItemData): ListItemData {
   return item.favIconUrl?.startsWith('data:')
     ? { ...item, favIconUrl: undefined }
     : item;
 }
 
+function toStoredItem(item: ListItemData, index: number): ListItemData {
+  assertHttpUrl(item.url);
+  return { ...withoutDataFavicon(item), index };
+}
+
+const newestFirst = (a: ListItemData, b: ListItemData) => b.addedAt - a.addedAt;
+
 class RL {
   private list: ListItemData[] = [];
-  private bucketCount: number = MIN_BUCKET_COUNT;
-  private initialized = false;
-  private subscribers = new Set<() => void>();
+  private store: ItemStore = PREFERRED_STORE;
+  private loaded = false;
   private reloadGeneration = 0;
+  private subscribers = new Set<() => void>();
 
   constructor() {
-    onListChange(() => void this.reloadFromRemoteChange());
+    chrome?.runtime?.onMessage?.addListener((message: unknown) => {
+      if (
+        (message as { kind?: unknown } | null)?.kind === LIST_CHANGED_MESSAGE
+      ) {
+        void this.reloadAfterRemoteChange();
+      }
+    });
   }
 
   subscribe(callback: () => void): () => void {
@@ -37,163 +56,95 @@ class RL {
     return () => this.subscribers.delete(callback);
   }
 
-  private async fetchItems(): Promise<ListItemData[]> {
-    if (!chrome) return [];
-    const { items, bucketCount } = await getItemsRemote();
-    this.bucketCount = bucketCount;
-    items.sort((a, b) => b.addedAt - a.addedAt);
-    return items;
-  }
-
-  // Rapid pings can leave two reloads in flight; storage reads don't resolve
-  // in start order, so only the read started most recently may be applied.
-  private async reloadFromRemoteChange() {
-    const generation = ++this.reloadGeneration;
-    this.initialized = false;
-    const items = await this.fetchItems();
-    if (generation !== this.reloadGeneration) return;
-    this.list = items;
-    this.initialized = true;
-    for (const callback of this.subscribers) callback();
-  }
-
-  async getListItems() {
-    if (!this.initialized) {
-      this.list = await this.fetchItems();
-      this.initialized = true;
+  async getListItems(): Promise<ListItemData[]> {
+    if (!this.loaded) {
+      const { items, store } = await loadItems();
+      this.store = store;
+      this.list = items.sort(newestFirst);
+      this.loaded = true;
     }
-
     return this.list;
   }
 
-  // New items must sort above every existing indexed item (see compareByIndex
-  // in list-filter.ts), so each one takes the current minimum minus one.
-  // Going negative is fine and cheap; renumbering the whole list on every
-  // add would recreate the first-reorder cliff this exists to avoid.
-  private minExistingIndex(): number {
-    let min = 0;
-    for (const item of this.list) {
-      if (item.index != null && item.index < min) min = item.index;
-    }
-    return min;
+  private async reloadAfterRemoteChange() {
+    const generation = ++this.reloadGeneration;
+    this.loaded = false;
+    const { items, store } = await loadItems();
+    if (generation !== this.reloadGeneration) return;
+    this.store = store;
+    this.list = items.sort(newestFirst);
+    this.loaded = true;
+    for (const callback of this.subscribers) callback();
   }
 
-  private groupItemsByBucket(items: ListItemData[]): Map<string, ListItemData[]> {
-    const byBucket = new Map<string, ListItemData[]>();
-    for (const item of items) {
-      const key = bucketKey(item.url, this.bucketCount);
-      if (!byBucket.has(key)) {
-        byBucket.set(
-          key,
-          this.list.filter((existing) => bucketKey(existing.url, this.bucketCount) === key),
-        );
-      }
-      const bucket = byBucket.get(key)!;
-      const idx = bucket.findIndex((existing) => existing.url === item.url);
-      if (idx >= 0) bucket[idx] = item;
-      else bucket.push(item);
-    }
-    return byBucket;
+  private broadcastChange() {
+    void chrome?.runtime
+      ?.sendMessage?.({ kind: LIST_CHANGED_MESSAGE })
+      ?.catch(() => {});
   }
 
-  async addReadingItem(listItem: ListItemData): Promise<ListItemData> {
-    if (!this.initialized) await this.getListItems();
-    listItem = normalizeItemForStorage(listItem);
-    listItem = { ...listItem, index: this.minExistingIndex() - 1 };
-    const key = bucketKey(listItem.url, this.bucketCount);
-    const bucket = await readBucket(key);
-    await writeBucket(key, [
-      listItem,
-      ...bucket.filter((item) => item.url !== listItem.url),
-    ]);
+  private topIndex(): number {
+    return Math.min(0, ...this.list.map((item) => item.index ?? 0));
+  }
+
+  private replaceItems(items: ListItemData[]) {
+    const byUrl = new Map(items.map((item) => [item.url, item]));
     this.list = [
-      listItem,
-      ...this.list.filter((item) => item.url !== listItem.url),
+      ...[...byUrl.values()].reverse(),
+      ...this.list.filter((item) => !byUrl.has(item.url)),
     ];
-    broadcastListChange();
-    return listItem;
   }
 
-  // Adds many items at once, batching writes so a large import doesn't fire
-  // one chrome.storage.sync.set() call per item — that blows through the
-  // write-rate limit (120/min) long before the byte quota is ever reached.
-  // Each batch merges into its buckets and writes them in one call instead.
-  async bulkAddReadingItems(
-    rawItems: ListItemData[],
-  ): Promise<{
-    succeeded: number;
-    failed: number;
-    firstError: unknown;
-    diagnostics: string;
-  }> {
-    if (!this.initialized) {
-      return {
-        succeeded: 0,
-        failed: rawItems.length,
-        firstError: new Error('Reading list not initialized'),
-        diagnostics: '',
-      };
-    }
+  async addReadingItem(item: ListItemData): Promise<ListItemData> {
+    await this.getListItems();
+    const stored = toStoredItem(item, this.topIndex() - 1);
+    await writeSync(await this.store.planUpsert([stored]));
+    this.replaceItems([stored]);
+    this.broadcastChange();
+    return stored;
+  }
 
-    const BATCH_SIZE = 25;
+  async bulkAddReadingItems(rawItems: ListItemData[]): Promise<ImportResult> {
+    await this.getListItems();
+    const firstIndex = this.topIndex() - rawItems.length;
     let succeeded = 0;
     let firstError: unknown = null;
     let bytesWrittenSoFar = 0;
     let diagnostics = '';
 
-    // Imported items are placed above all existing ones, as a single add
-    // would, in the order they appear in the file: earlier in the file gets
-    // a lower index (further above), all below the current minimum.
-    const topIndex = this.minExistingIndex();
+    for (let start = 0; start < rawItems.length; start += IMPORT_BATCH_SIZE) {
+      const batch: ListItemData[] = [];
+      rawItems
+        .slice(start, start + IMPORT_BATCH_SIZE)
+        .forEach((raw, offset) => {
+          try {
+            batch.push(toStoredItem(raw, firstIndex + start + offset));
+          } catch (err) {
+            firstError ??= err;
+          }
+        });
 
-    for (let i = 0; i < rawItems.length; i += BATCH_SIZE) {
-      const batch = rawItems.slice(i, i + BATCH_SIZE);
-      const validated: ListItemData[] = [];
-      batch.forEach((raw, j) => {
-        try {
-          const item = normalizeItemForStorage(raw);
-          validated.push({ ...item, index: topIndex - rawItems.length + i + j });
-        } catch (err) {
-          firstError ??= err;
-        }
-      });
-
-      const byBucket = this.groupItemsByBucket(validated);
-
-      const toWrite: Record<string, string> = {};
-      let batchBytes = 0;
-      let maxKeyBytes = 0;
-      for (const [key, items] of byBucket) {
-        const encoded = encodeBucket(items);
-        toWrite[key] = encoded;
-        const keyBytes = key.length + utf8ByteLength(encoded);
-        batchBytes += keyBytes;
-        maxKeyBytes = Math.max(maxKeyBytes, keyBytes);
-      }
-
+      const write = await this.store.planUpsert(batch);
+      const keyBytes = Object.entries(write.set).map(([key, value]) =>
+        syncBytes(key, value),
+      );
+      const batchBytes = keyBytes.reduce((total, bytes) => total + bytes, 0);
       try {
-        await chrome.storage.sync.set(toWrite);
+        await writeSync(write);
       } catch (err) {
-        const name = err instanceof Error ? err.name : typeof err;
-        const message = err instanceof Error ? err.message : String(err);
         diagnostics =
-          `at item ${i}/${rawItems.length}, ` +
-          `~${bytesWrittenSoFar}B written so far, ` +
-          `this batch: ${Object.keys(toWrite).length} keys / ~${batchBytes}B ` +
-          `(largest key ~${maxKeyBytes}B), error: ${name}: ${message}`;
+          `at item ${start}/${rawItems.length}, ~${bytesWrittenSoFar}B written so far, ` +
+          `this batch: ${keyBytes.length} keys / ~${batchBytes}B (largest key ~${Math.max(0, ...keyBytes)}B), ` +
+          `error: ${err instanceof Error ? `${err.name}: ${err.message}` : String(err)}`;
         firstError ??= err;
         break;
       }
-
       bytesWrittenSoFar += batchBytes;
-      for (const item of validated) {
-        this.list = [item, ...this.list.filter((i) => i.url !== item.url)];
-      }
-      succeeded += validated.length;
+      this.replaceItems(batch);
+      succeeded += batch.length;
     }
 
-    if (succeeded > 0) broadcastListChange();
-
+    if (succeeded > 0) this.broadcastChange();
     return {
       succeeded,
       failed: rawItems.length - succeeded,
@@ -202,81 +153,49 @@ class RL {
     };
   }
 
-  async removeReadingItem(url: string): Promise<boolean> {
-    if (!this.initialized) await this.getListItems();
-    const key = bucketKey(url, this.bucketCount);
-    const bucket = await readBucket(key);
-    try {
-      await writeBucket(
-        key,
-        bucket.filter((item) => item.url !== url),
-      );
-    } catch (err) {
-      console.error('removeReadingItem: write failed', err);
-      return false;
-    }
+  async removeReadingItem(url: string): Promise<void> {
+    await this.getListItems();
+    await writeSync(await this.store.planRemove([url]));
     this.list = this.list.filter((item) => item.url !== url);
-    broadcastListChange();
-    return true;
+    this.broadcastChange();
   }
 
-  async updateReadingItem(url: string, updates: Partial<ListItemData>) {
-    if (!this.initialized) await this.getListItems();
-    const item = this.list.find((item) => item.url === url);
-    if (item) {
-      const isNoop = (Object.keys(updates) as (keyof ListItemData)[]).every(
-        (key) => item[key] === updates[key],
-      );
-      if (isNoop) return;
-      const updatedItem = { ...item, ...updates };
-      const key = bucketKey(url, this.bucketCount);
-      const bucket = await readBucket(key);
-      await writeBucket(
-        key,
-        bucket.map((b) => (b.url === url ? updatedItem : b)),
-      );
-      Object.assign(item, updates);
-      broadcastListChange();
-    }
+  async updateReadingItem(
+    url: string,
+    updates: Partial<ListItemData>,
+  ): Promise<void> {
+    await this.getListItems();
+    const item = this.list.find((existing) => existing.url === url);
+    const changesSomething = (
+      Object.keys(updates) as (keyof ListItemData)[]
+    ).some((key) => item?.[key] !== updates[key]);
+    if (!item || !changesSomething) return;
+    const updated = { ...item, ...updates };
+    await writeSync(await this.store.planUpsert([updated]));
+    this.list = this.list.map((existing) =>
+      existing.url === url ? updated : existing,
+    );
+    this.broadcastChange();
   }
 
-  async reorderItems(orderedUrls: string[]): Promise<boolean> {
-    if (!this.initialized) await this.getListItems();
+  async reorderItems(orderedUrls: string[]): Promise<void> {
+    await this.getListItems();
     const indexByUrl = new Map(orderedUrls.map((url, index) => [url, index]));
-    const reordered: ListItemData[] = [];
-    const previousIndices = new Map<ListItemData, number | undefined>();
-    for (const item of this.list) {
-      const index = indexByUrl.get(item.url);
-      if (index === undefined) continue;
-      previousIndices.set(item, item.index);
-      item.index = index;
-      reordered.push(item);
-    }
-
-    const byBucket = this.groupItemsByBucket(reordered);
-    const toWrite: Record<string, string> = {};
-    for (const [key, items] of byBucket) {
-      toWrite[key] = encodeBucket(items);
-    }
-    if (Object.keys(toWrite).length === 0) return true;
-
-    try {
-      await chrome.storage.sync.set(toWrite);
-    } catch (err) {
-      for (const [item, index] of previousIndices) item.index = index;
-      console.error('reorderItems: write failed', err);
-      return false;
-    }
-
-    broadcastListChange();
-    return true;
+    const reordered = this.list
+      .filter((item) => indexByUrl.has(item.url))
+      .map((item) => ({ ...item, index: indexByUrl.get(item.url) }));
+    if (reordered.length === 0) return;
+    await writeSync(await this.store.planUpsert(reordered));
+    const reorderedByUrl = new Map(reordered.map((item) => [item.url, item]));
+    this.list = this.list.map((item) => reorderedByUrl.get(item.url) ?? item);
+    this.broadcastChange();
   }
 
-  async clearAll() {
+  async clearAll(): Promise<void> {
     await chrome.storage.sync.clear();
     this.list = [];
-    this.initialized = true;
-    broadcastListChange();
+    this.loaded = true;
+    this.broadcastChange();
   }
 }
 

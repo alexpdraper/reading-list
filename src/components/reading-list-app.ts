@@ -1,18 +1,26 @@
-import { LitElement, html, PropertyValues } from 'lit';
+import { LitElement, html } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import { animate } from '@lit-labs/motion';
 import { customElement, state } from 'lit/decorators.js';
-import { i18n } from '../lib/i18n.js';
 import { rl } from '../lib/rl.js';
-import { ListItemData } from '../lib/storage/buckets.js';
-import { getSettings, updateSettings, onSettingsChanged } from '../lib/settings.js';
-import { syncBadgeForTab } from '../lib/badge.js';
-import { ListFilter, SortOption, SortOrder } from '../lib/list-filter.js';
-import { maybeGetReviewItem, dismissReview } from '../lib/review.js';
-import { isFirefox, getActiveTab } from '../lib/browser.js';
-import { addReadingItemAndSyncBadge } from '../lib/add-item.js';
+import { ListItemData } from '../lib/storage/store.js';
+import {
+  getSettings,
+  onSettingsChanged,
+  Settings,
+  SortOption,
+  SortOrder,
+  updateSettings,
+} from '../lib/settings.js';
+import { visibleItems } from '../lib/list-filter.js';
+import {
+  addPage,
+  getActiveTab,
+  isFirefox,
+  message,
+  syncBadgeForActiveTab,
+} from '../lib/browser.js';
 import { ReadingListItemElement } from './reading-list-item.js';
-import { DragReorderController } from './drag-reorder-controller.js';
 import { styles } from '../styles/app.styles.js';
 import { header } from '../styles/header.styles.js';
 import { search } from '../styles/search.styles.js';
@@ -21,11 +29,6 @@ import { theme } from '../styles/theme.styles.js';
 import { reset } from '../styles/reset.styles.js';
 import './reading-list-item.js';
 
-// Matches the original CSS `slidein`/`slideout` keyframes (src/styles/animations.styles.ts
-// on v3_beta): only the outer card animates on exit, and on entry it's a quick,
-// non-bouncy reveal - the bounce lives entirely on the inner .item-content
-// (see CONTENT_IN_KEYFRAMES in reading-list-item.ts), running at its own,
-// slower pace at the same time.
 const CARD_IN_KEYFRAMES: Keyframe[] = [
   { maxHeight: '0px', transform: 'translateX(100%) scaleY(0)', offset: 0 },
   { maxHeight: '100px', offset: 0.8 },
@@ -38,240 +41,249 @@ const CARD_OUT_KEYFRAMES: Keyframe[] = [
   { transform: 'translateX(100%) scaleY(0)', offset: 1 },
 ];
 
-const ITEM_ENTER_EXIT_TIMING: KeyframeAnimationOptions = {
+const ENTER_EXIT_TIMING: KeyframeAnimationOptions = {
   duration: 220,
   easing: 'ease',
 };
+const DRAG_TIMING: KeyframeAnimationOptions = { duration: 180, easing: 'ease' };
 
-const ITEM_DRAG_FLIP_TIMING: KeyframeAnimationOptions = {
-  duration: 180,
-  easing: 'ease',
-};
+const REVEAL_ITEM_LIMIT = 10;
+const REVEAL_FIRST_DELAY_MS = 150;
+const SYNC_ERROR_VISIBLE_MS = 4000;
+
+const REVIEW_AFTER_ITEM_COUNT = 6;
+const REVIEW_URL = isFirefox
+  ? 'https://addons.mozilla.org/en-US/firefox/addon/reading_list/'
+  : 'https://chrome.google.com/webstore/detail/reading-list/lloccabjgblebdmncjndmiibianflabo/reviews';
+
+function itemElementFrom(event: Event): ReadingListItemElement | undefined {
+  return (event.composedPath() as HTMLElement[]).find(
+    (el) => el.tagName === 'READING-LIST-ITEM',
+  ) as ReadingListItemElement | undefined;
+}
 
 @customElement('reading-list-app')
 export class ReadingListAppElement extends LitElement {
   static override styles = [theme, reset, header, search, controls, styles];
 
+  @state() private _listItems: ListItemData[] | null = null;
+  @state() private _searchQuery = '';
+  @state() private _revealedUrls: Set<string> | null = null;
+  @state() private _reviewItem: ListItemData | null = null;
+  @state() private _viewAll = true;
+  @state() private _sortOption: SortOption = '';
+  @state() private _sortOrder: SortOrder = '';
+  @state() private _editingUrl: string | null = null;
+  @state() private _draggedUrl: string | null = null;
+  @state() private _animateItems = true;
+  @state() private _syncError = false;
+  @state() private _loadError = false;
+
+  private _syncErrorTimer?: ReturnType<typeof setTimeout>;
+  private _unsubscribeList?: () => void;
+  private _unsubscribeSettings?: () => void;
+
   constructor() {
     super();
-    Promise.all([rl.getListItems(), getSettings()]).then(([listItems, settings]) => {
-      this._animateItems = settings.animateItems;
-      this._viewAll = settings.viewAll;
-      this._sortOption = settings.sortOption;
-      this._sortOrder = settings.sortOrder;
-
-      this._listItems = listItems;
-      maybeGetReviewItem(listItems.length).then((item) => {
-        this._reviewItem = item;
-      });
-      if (this._animateItems) {
-        const revealOrder = this._listFilter.visibleItems(listItems, {
-          query: '',
-          viewAll: this._viewAll,
-          sortOption: this._sortOption,
-          sortOrder: this._sortOrder,
-        });
-        this._staggerReveal(revealOrder);
-      }
-    }).catch((err) => {
-      console.error('Failed to load reading list', err);
-      this._loadError = true;
-    });
+    void this._load();
   }
 
-  private async _onDismissReview() {
-    this._reviewItem = null;
-    await dismissReview();
+  private async _load() {
+    try {
+      const [items, settings] = await Promise.all([
+        rl.getListItems(),
+        getSettings(),
+      ]);
+      this._applySettings(settings);
+      this._listItems = items;
+      if (items.length >= REVIEW_AFTER_ITEM_COUNT && !settings.askedForReview) {
+        this._reviewItem = {
+          title: 'Like the Reading List? Give us a review!',
+          url: REVIEW_URL,
+          addedAt: Date.now(),
+          favIconUrl: chrome.runtime.getURL('icons/icon48.png'),
+        };
+      }
+      if (this._animateItems) this._staggerReveal(this._filteredItems());
+    } catch (err) {
+      console.error('Failed to load reading list', err);
+      this._loadError = true;
+    }
   }
 
   override connectedCallback(): void {
     super.connectedCallback();
-    document.title = i18n.getMessage('appName', 'Reading List');
-    this._unsubscribe?.();
-    this._unsubscribe = rl.subscribe(() => void this._onRemoteChange());
-    this._unsubscribeSettings?.();
-    this._unsubscribeSettings = onSettingsChanged((settings) => {
-      this._animateItems = settings.animateItems;
-      this._viewAll = settings.viewAll;
-      this._sortOption = settings.sortOption;
-      this._sortOrder = settings.sortOrder;
+    document.title = message('appName', 'Reading List');
+    this._unsubscribeList?.();
+    this._unsubscribeList = rl.subscribe(async () => {
+      this._listItems = await rl.getListItems();
     });
+    this._unsubscribeSettings?.();
+    this._unsubscribeSettings = onSettingsChanged((settings) =>
+      this._applySettings(settings),
+    );
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this._unsubscribe?.();
-    this._unsubscribe = undefined;
+    this._unsubscribeList?.();
+    this._unsubscribeList = undefined;
     this._unsubscribeSettings?.();
     this._unsubscribeSettings = undefined;
+    this._draggedUrl = null;
     clearTimeout(this._syncErrorTimer);
   }
 
-  notifySyncFailure() {
+  private _applySettings(settings: Required<Settings>) {
+    this._animateItems = settings.animateItems;
+    this._viewAll = settings.viewAll;
+    this._sortOption = settings.sortOption;
+    this._sortOrder = settings.sortOrder;
+  }
+
+  private _showSyncError() {
     clearTimeout(this._syncErrorTimer);
     this._syncError = true;
-    this._syncErrorTimer = setTimeout(() => {
-      this._syncError = false;
-    }, 4000);
+    this._syncErrorTimer = setTimeout(
+      () => (this._syncError = false),
+      SYNC_ERROR_VISIBLE_MS,
+    );
   }
 
-  private async _onRemoteChange() {
-    const generation = ++this._remoteChangeGeneration;
-    const items = await rl.getListItems();
-    if (generation !== this._remoteChangeGeneration) return;
-    this._listItems = items;
-  }
-
-  @state()
-  _listItems: ListItemData[] | null = null;
-
-  @state()
-  searchQuery = '';
-
-  @state()
-  private _revealedUrls: Set<string> | null = null;
-
-  @state()
-  private _reviewItem: ListItemData | null = null;
-
-  @state()
-  private _viewAll = true;
-
-  @state()
-  _sortOption: SortOption = '';
-
-  @state()
-  private _sortOrder: SortOrder = '';
-
-  @state()
-  private _editingUrl: string | null = null;
-
-  @state()
-  private _animateItems = true;
-
-  @state()
-  private _syncError = false;
-
-  @state()
-  private _loadError = false;
-
-  private _syncErrorTimer?: ReturnType<typeof setTimeout>;
-
-  private _remoteChangeGeneration = 0;
-
-  private _unsubscribe?: () => void;
-
-  private _unsubscribeSettings?: () => void;
-
-  private _listFilter = new ListFilter();
-
-  private _dragReorder = new DragReorderController(this);
-
-  override willUpdate(changedProperties: PropertyValues<this>) {
-    if (changedProperties.has('_listItems')) {
-      this._listFilter.setItems(this._listItems);
+  private async _saveChange(change: () => Promise<unknown>) {
+    try {
+      await change();
+    } catch (err) {
+      console.error(err);
+      this._showSyncError();
     }
+    this._listItems = await rl.getListItems();
   }
 
-  private get _unreadCount(): number {
-    return (this._listItems ?? []).filter((item) => !item.viewed).length;
+  private get _canReorder(): boolean {
+    return !this._sortOption && !this._searchQuery;
   }
 
-  private get _visibleItems(): ListItemData[] {
-    const visible = this._listFilter.visibleItems(this._listItems ?? [], {
-      query: this.searchQuery,
+  private _filteredItems(query = ''): ListItemData[] {
+    return visibleItems(this._listItems ?? [], {
+      query,
       viewAll: this._viewAll,
       sortOption: this._sortOption,
       sortOrder: this._sortOrder,
-      preserveOrder: this._dragReorder.isDragging,
+      keepCurrentOrder: this._draggedUrl !== null,
     });
-    return this._revealedUrls === null
-      ? visible
-      : visible.filter((item) => this._revealedUrls!.has(item.url));
+  }
+
+  private get _visibleItems(): ListItemData[] {
+    const visible = this._filteredItems(this._searchQuery);
+    return this._revealedUrls
+      ? visible.filter((item) => this._revealedUrls!.has(item.url))
+      : visible;
   }
 
   private _staggerReveal(items: ListItemData[]) {
-    const itemsToAnimate = Math.min(10, items.length);
+    const count = Math.min(REVEAL_ITEM_LIMIT, items.length);
     this._revealedUrls = new Set();
-    const animateNext = (index: number, waitTime: number) => {
-      if (index >= itemsToAnimate) {
+    const revealNext = (index: number, delay: number) => {
+      if (index >= count) {
         this._revealedUrls = null;
         return;
       }
       setTimeout(() => {
-        this._revealedUrls = new Set([...this._revealedUrls!, items[index].url]);
-        const nextWait = Math.trunc(waitTime * ((itemsToAnimate - (index + 1)) / itemsToAnimate));
-        animateNext(index + 1, nextWait);
-      }, waitTime);
+        this._revealedUrls = new Set([
+          ...this._revealedUrls!,
+          items[index].url,
+        ]);
+        revealNext(
+          index + 1,
+          Math.trunc(delay * ((count - (index + 1)) / count)),
+        );
+      }, delay);
     };
-    animateNext(0, 150);
+    revealNext(0, REVEAL_FIRST_DELAY_MS);
   }
 
-  private _itemMotionOptions(url: string) {
+  private _motion(url: string) {
     if (!this._animateItems) return { disabled: true };
     return {
       properties: ['top'],
-      keyframeOptions: this._dragReorder.isDragging
-        ? ITEM_DRAG_FLIP_TIMING
-        : ITEM_ENTER_EXIT_TIMING,
+      keyframeOptions:
+        this._draggedUrl !== null ? DRAG_TIMING : ENTER_EXIT_TIMING,
       in: CARD_IN_KEYFRAMES,
       out: CARD_OUT_KEYFRAMES,
       skipInitial: true,
-      disabled: this._dragReorder.draggedUrl === url,
+      disabled: this._draggedUrl === url,
     };
   }
 
   override render() {
     return html`
       ${this._renderHeader()} ${this._renderSearch()} ${this._renderControls()}
-      ${this._syncError
-        ? html`<p class="sync-error" role="status" aria-live="polite">
-            ${i18n.getMessage(
-              'syncFailed',
-              "Couldn't save that change. It may not appear on your other devices.",
-            )}
-          </p>`
-        : ''}
-      ${this._loadError
-        ? html`<p class="sync-error" role="status" aria-live="polite">
-            ${i18n.getMessage(
-              'loadFailed',
-              'Converting your reading list to the new format failed. Your saved pages are still safe in storage — open Options (the gear icon above) → Advanced to download a backup.',
-            )}
-          </p>`
-        : ''}
+      ${
+        this._syncError
+          ? this._renderError(
+              message(
+                'syncFailed',
+                "Couldn't save that change. It may not appear on your other devices.",
+              ),
+            )
+          : ''
+      }
+      ${
+        this._loadError
+          ? this._renderError(
+              message(
+                'loadFailed',
+                'Converting your reading list to the new format failed. Your saved pages are still safe in storage — open Options (the gear icon above) → Advanced to download a backup.',
+              ),
+            )
+          : ''
+      }
       ${this._renderList()}
       ${this._editingUrl !== null ? html`<div class="editing-overlay"></div>` : ''}
     `;
   }
 
+  private _renderError(text: string) {
+    return html`<p class="sync-error" role="status" aria-live="polite">
+      ${text}
+    </p>`;
+  }
+
   private _renderHeader() {
+    const isSidebar = document.body.classList.contains('sidebar-page');
     return html`
       <header>
         <div class="header-top">
-          ${isFirefox && !this._isSidebar
-            ? html`<button
-                class="sidebar-button"
-                aria-label="Open sidebar"
-                @click=${this._onSidebarClick}
-              >
-                Sidebar
-              </button>`
-            : html`<span></span>`}
+          ${
+            isFirefox && !isSidebar
+              ? html`<button
+                  class="sidebar-button"
+                  aria-label="Open sidebar"
+                  @click=${this._onSidebarClick}
+                >
+                  Sidebar
+                </button>`
+              : html`<span></span>`
+          }
           <button
             class="settings-button"
             aria-label="Options"
-            @click=${this._onSettingsClick}
-          >&#9881;</button>
+            @click=${() => chrome.runtime.openOptionsPage()}
+          >
+            &#9881;
+          </button>
         </div>
         <div class="header-title">
-          <h1>${i18n.getMessage('appName', 'Reading List')}</h1>
+          <h1>${message('appName', 'Reading List')}</h1>
           <button
             class="save-button${isFirefox ? ' save-button-nudge' : ''}"
             id="save-button"
-            aria-label=${i18n.getMessage('addPage', 'Add page to Reading List')}
-            @click=${this._onSaveButtonClick}
-          >+</button>
+            aria-label=${message('addPage', 'Add page to Reading List')}
+            @click=${this._onSaveClick}
+          >
+            +
+          </button>
         </div>
       </header>
     `;
@@ -281,21 +293,35 @@ export class ReadingListAppElement extends LitElement {
     return html`
       <search class="search">
         <label class="visually-hidden" for="list-search"
-          >${i18n.getMessage('search', 'Search')}</label
+          >${message('search', 'Search')}</label
         >
         <input
           type="search"
           id="list-search"
           name="search"
-          placeholder=${i18n.getMessage('search', 'Search')}
+          placeholder=${message('search', 'Search')}
           autocomplete="off"
-          @input=${this._onSearchInput}
+          @input=${(e: InputEvent) => (this._searchQuery = (e.target as HTMLInputElement).value.trim())}
         />
       </search>
     `;
   }
 
   private _renderControls() {
+    const unreadCount = (this._listItems ?? []).filter(
+      (item) => !item.viewed,
+    ).length;
+    const sortButton = (option: 'date' | 'title', label: string) => html`
+      <button
+        class=${this._sortOption === option ? 'active' : ''}
+        @click=${() => this._onSortClick(option)}
+      >
+        ${label}
+        <em
+          class="arrow ${this._sortOption === option ? this._sortOrder : ''}"
+        ></em>
+      </button>
+    `;
     return html`
       <div class="controls">
         <div class="filter">
@@ -303,33 +329,20 @@ export class ReadingListAppElement extends LitElement {
             class=${this._viewAll ? 'active' : ''}
             @click=${() => this._onFilterClick(true)}
           >
-            ${i18n.getMessage('allButton', 'all')}
+            ${message('allButton', 'all')}
             <span class="count">${this._listItems?.length ?? 0}</span>
           </button>
           <button
             class=${!this._viewAll ? 'active' : ''}
             @click=${() => this._onFilterClick(false)}
           >
-            ${i18n.getMessage('unreadButton', 'unread')}
-            <span class="count">${this._unreadCount}</span>
+            ${message('unreadButton', 'unread')}
+            <span class="count">${unreadCount}</span>
           </button>
         </div>
-
         <div class="sort">
-          <button
-            class=${this._sortOption === 'date' ? 'active' : ''}
-            @click=${() => this._onSortClick('date')}
-          >
-            ${i18n.getMessage('dateButton', 'date')}
-            <em class="arrow ${this._sortOption === 'date' ? this._sortOrder : ''}"></em>
-          </button>
-          <button
-            class=${this._sortOption === 'title' ? 'active' : ''}
-            @click=${() => this._onSortClick('title')}
-          >
-            ${i18n.getMessage('titleButton', 'title')}
-            <em class="arrow ${this._sortOption === 'title' ? this._sortOrder : ''}"></em>
-          </button>
+          ${sortButton('date', message('dateButton', 'date'))}
+          ${sortButton('title', message('titleButton', 'title'))}
         </div>
       </div>
     `;
@@ -339,57 +352,50 @@ export class ReadingListAppElement extends LitElement {
     return html`
       <div
         class="reading-list"
-        @dragstart=${this._dragReorder.onDragStart}
-        @dragover=${this._dragReorder.onDragOver}
-        @drop=${this._dragReorder.onDrop}
-        @dragend=${this._dragReorder.onDragEnd}
-        @edit-start=${this._onEditStart}
+        @dragstart=${this._onDragStart}
+        @dragover=${this._onDragOver}
+        @drop=${(e: DragEvent) => e.preventDefault()}
+        @dragend=${this._onDragEnd}
+        @edit-start=${(e: Event) => (this._editingUrl = (e.target as ReadingListItemElement).href)}
         @edit-end=${this._onEditEnd}
       >
-        ${this._reviewItem
-          ? html`<reading-list-item
-              ${animate(this._itemMotionOptions(this._reviewItem.url))}
-              .name=${this._reviewItem.title}
-              .href=${this._reviewItem.url}
-              .favIconUrl=${this._reviewItem.favIconUrl}
-              .shiny=${true}
-              .animateItems=${this._animateItems}
-              .locked=${this._editingUrl !== null}
-              @delete-item=${this._onDismissReview}
-            ></reading-list-item>`
-          : ''}
+        ${
+          this._reviewItem
+            ? html`<reading-list-item
+                ${animate(this._motion(this._reviewItem.url))}
+                .name=${this._reviewItem.title}
+                .href=${this._reviewItem.url}
+                .favIconUrl=${this._reviewItem.favIconUrl}
+                .shiny=${true}
+                .animateItems=${this._animateItems}
+                .locked=${this._editingUrl !== null}
+                @delete-item=${this._onDismissReview}
+              ></reading-list-item>`
+            : ''
+        }
         ${repeat(
           this._visibleItems,
           (item) => item.url,
-          (listItem) =>
+          (item) =>
             html`<reading-list-item
-              ${animate(this._itemMotionOptions(listItem.url))}
-              .name=${listItem.title}
-              .href=${listItem.url}
-              .favIconUrl=${listItem.favIconUrl}
+              ${animate(this._motion(item.url))}
+              .name=${item.title}
+              .href=${item.url}
+              .favIconUrl=${item.favIconUrl}
               .animateItems=${this._animateItems}
-              .reorderable=${!this._sortOption && !this.searchQuery}
-              .locked=${this._editingUrl !== null && this._editingUrl !== listItem.url}
-              @delete-item=${this._onDeleteItemClicked}
-              @edit-item=${this._onEditItemClicked}
+              .reorderable=${this._canReorder}
+              .locked=${this._editingUrl !== null && this._editingUrl !== item.url}
+              @delete-item=${this._onDeleteClick}
+              @edit-item=${this._onEditItem}
             ></reading-list-item>`,
         )}
       </div>
     `;
   }
 
-  private _onEditStart(event: Event) {
-    this._editingUrl = (event.target as ReadingListItemElement).href;
-  }
-
   private _onEditEnd(event: Event) {
-    const url = (event.target as ReadingListItemElement).href;
-    if (this._editingUrl === url) this._editingUrl = null;
-  }
-
-  private _onSearchInput(event: InputEvent) {
-    const input = event.target as HTMLInputElement;
-    this.searchQuery = input.value.trim();
+    if (this._editingUrl === (event.target as ReadingListItemElement).href)
+      this._editingUrl = null;
   }
 
   private async _onFilterClick(viewAll: boolean) {
@@ -398,80 +404,87 @@ export class ReadingListAppElement extends LitElement {
   }
 
   private async _onSortClick(option: 'date' | 'title') {
-    let nextOption: SortOption = option;
-    let nextOrder: SortOrder = 'down';
-    if (this._sortOption === option) {
-      if (this._sortOrder === 'down') {
-        nextOrder = 'up';
-      } else {
-        nextOption = '';
-        nextOrder = '';
-      }
-    }
+    const repeatClick = this._sortOption === option;
+    const nextOption: SortOption =
+      repeatClick && this._sortOrder !== 'down' ? '' : option;
+    const nextOrder: SortOrder = !repeatClick
+      ? 'down'
+      : this._sortOrder === 'down'
+        ? 'up'
+        : '';
     this._sortOption = nextOption;
     this._sortOrder = nextOrder;
     await updateSettings({ sortOption: nextOption, sortOrder: nextOrder });
   }
 
-  private async _onDeleteItemClicked(event: Event) {
-    if (!this._listItems) return;
-    const url = (event.target as ReadingListItemElement).href;
-    const ok = await rl.removeReadingItem(url);
-    if (!ok) {
-      this.notifySyncFailure();
-      return;
-    }
-    this._listItems = this._listItems.filter((item) => item.url !== url);
-    const tab = await getActiveTab();
-    if (tab?.id) await syncBadgeForTab(tab.id, tab.url);
+  private async _onDismissReview() {
+    this._reviewItem = null;
+    await updateSettings({ askedForReview: true });
   }
 
-  private async _onEditItemClicked(event: Event) {
-    if (!this._listItems) return;
-    const target = event.target as ReadingListItemElement;
-    const { title } = (event as CustomEvent<{ title: string }>).detail;
-    await rl.updateReadingItem(target.href, { title });
-    this._listItems = this._listItems.map((item) =>
-      item.url === target.href ? { ...item, title } : item,
+  private async _onDeleteClick(event: Event) {
+    const url = (event.target as ReadingListItemElement).href;
+    await this._saveChange(() => rl.removeReadingItem(url));
+    await syncBadgeForActiveTab();
+  }
+
+  private async _onEditItem(event: CustomEvent<{ title: string }>) {
+    const url = (event.target as ReadingListItemElement).href;
+    await this._saveChange(() =>
+      rl.updateReadingItem(url, { title: event.detail.title }),
     );
   }
 
-  private async _addReadingItem(url: string, title: string, favIconUrl?: string) {
-    if (!this._listItems) return;
-
-    const listItem = await addReadingItemAndSyncBadge(url, title, favIconUrl);
-    if (!listItem) return;
-
-    this._listItems = [
-      listItem,
-      ...this._listItems.filter((item) => item.url !== url),
-    ];
-  }
-
-  private async _onSaveButtonClick() {
+  private async _onSaveClick() {
     const tab = await getActiveTab();
-    if (tab && tab.url && tab.title && this._listItems) {
-      return this._addReadingItem(tab.url, tab.title, tab.favIconUrl);
-    }
-  }
-
-  private _onSettingsClick() {
-    chrome.runtime.openOptionsPage();
-  }
-
-  private get _isSidebar() {
-    return document.body.classList.contains('sidebar-page');
+    if (!tab?.url || !tab.title || !this._listItems) return;
+    await this._saveChange(() => addPage(tab.url!, tab.title!, tab.favIconUrl));
   }
 
   private _onSidebarClick() {
-    (window as unknown as { browser?: { sidebarAction?: { toggle: () => void } } }).browser
-      ?.sidebarAction?.toggle();
+    (
+      window as unknown as {
+        browser?: { sidebarAction?: { toggle: () => void } };
+      }
+    ).browser?.sidebarAction?.toggle();
   }
+
+  private _onDragStart = (event: DragEvent) => {
+    if (!this._canReorder) {
+      event.preventDefault();
+      return;
+    }
+    this._draggedUrl = itemElementFrom(event)?.href ?? null;
+  };
+
+  private _onDragOver = (event: DragEvent) => {
+    if (!this._canReorder || !this._listItems || !this._draggedUrl) return;
+    event.preventDefault();
+    const targetUrl = itemElementFrom(event)?.href;
+    if (!targetUrl || targetUrl === this._draggedUrl) return;
+    const items = [...this._listItems];
+    const from = items.findIndex((item) => item.url === this._draggedUrl);
+    const to = items.findIndex((item) => item.url === targetUrl);
+    if (from === -1 || to === -1) return;
+    items.splice(to, 0, ...items.splice(from, 1));
+    this._listItems = items;
+  };
+
+  private _onDragEnd = async () => {
+    const wasDragging = this._draggedUrl !== null;
+    this._draggedUrl = null;
+    if (!wasDragging || !this._canReorder || !this._listItems) return;
+    const orderedUrls = this._listItems.map((item) => item.url);
+    this._listItems = this._listItems.map((item, index) => ({
+      ...item,
+      index,
+    }));
+    await this._saveChange(() => rl.reorderItems(orderedUrls));
+  };
 }
 
 declare global {
   interface HTMLElementTagNameMap {
     'reading-list-app': ReadingListAppElement;
-    'reading-list-item': ReadingListItemElement;
   }
 }

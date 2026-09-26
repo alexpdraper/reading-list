@@ -86,7 +86,7 @@ export class ReadingListItemElement extends LitElement {
   }
 
   @state()
-  faviconError = false;
+  private _faviconError = false;
 
   private _contentMotionOptions() {
     if (!this.animateItems) return { disabled: true };
@@ -112,44 +112,52 @@ export class ReadingListItemElement extends LitElement {
         @dragend=${() => (this._dragging = false)}
       >
         <div class="item-content" ${animate(this._contentMotionOptions())}>
-          ${this._editing
-            ? html`<input
-                class="edit-title"
-                autocomplete="off"
-                .value=${this._editValue}
-                @input=${(e: Event) => (this._editValue = (e.target as HTMLInputElement).value)}
-                @keydown=${this._onEditKeydown}
-                @blur=${this._onEditBlur}
-              />`
-            : html`<a
-                class="title"
-                href=${this.href}
-                draggable="false"
-                @click=${this._onLinkClick}
-                >${this.name}</a
-              >`}
+          ${
+            this._editing
+              ? html`<input
+                  class="edit-title"
+                  autocomplete="off"
+                  .value=${this._editValue}
+                  @input=${(e: Event) => (this._editValue = (e.target as HTMLInputElement).value)}
+                  @keydown=${this._onEditKeydown}
+                  @blur=${() => this._commitEdit(true)}
+                />`
+              : html`<a
+                  class="title"
+                  href=${this.href}
+                  draggable="false"
+                  @click=${this._onLinkClick}
+                  >${this.name}</a
+                >`
+          }
           <div class="host">${this.url?.hostname ?? this.href}</div>
           <div class="favicon">
-            ${this.favicon && !this.faviconError
-              ? html`<img
-                  class="favicon-img"
-                  @error=${() => (this.faviconError = true)}
-                  src=${this.favicon}
-                />`
-              : ''}
+            ${
+              this.favicon && !this._faviconError
+                ? html`<img
+                    class="favicon-img"
+                    @error=${() => (this._faviconError = true)}
+                    src=${this.favicon}
+                  />`
+                : ''
+            }
           </div>
         </div>
-        ${this.shiny
-          ? ''
-          : html`<button
-              class="edit-button"
-              aria-label="Edit title"
-              @mousedown=${(e: Event) => e.preventDefault()}
-              @click=${this._onEditClick}
-            >
-              <span class="edit-button-content">${this._editing ? '\u{1F4BE}' : '✎'}</span>
-            </button>`}
-        <button class="delete-button" @click=${this._onDeleteClick}>
+        ${
+          this.shiny
+            ? ''
+            : html`<button
+                class="edit-button"
+                aria-label="Edit title"
+                @mousedown=${(e: Event) => e.preventDefault()}
+                @click=${this._onEditClick}
+              >
+                <span class="edit-button-content"
+                  >${this._editing ? '\u{1F4BE}' : '✎'}</span
+                >
+              </button>`
+        }
+        <button class="delete-button" @click=${() => this._emit('delete-item')}>
           <span class="delete-button-content">&times;</span>
         </button>
       </div>
@@ -160,7 +168,8 @@ export class ReadingListItemElement extends LitElement {
     if (this.href) {
       event.preventDefault();
       const settings = await getSettings();
-      const modifierDown = event.ctrlKey || event.metaKey || settings.openNewTab;
+      const modifierDown =
+        event.ctrlKey || event.metaKey || settings.openNewTab;
       openLink(this.href, modifierDown);
     }
   }
@@ -172,9 +181,7 @@ export class ReadingListItemElement extends LitElement {
     } else {
       this._editValue = this.name;
       this._editing = true;
-      this.dispatchEvent(
-        new Event('edit-start', { bubbles: true, composed: true }),
-      );
+      this._emit('edit-start');
     }
   }
 
@@ -188,31 +195,18 @@ export class ReadingListItemElement extends LitElement {
     }
   }
 
-  private _onEditBlur() {
-    this._commitEdit(true);
-  }
-
   private _commitEdit(save: boolean) {
     if (!this._editing) return;
     this._editing = false;
     const title = this._editValue.trim();
-    if (save && title && title !== this.name) {
-      this.dispatchEvent(
-        new CustomEvent('edit-item', {
-          detail: { title },
-          bubbles: true,
-          composed: true,
-        }),
-      );
-    }
-    this.dispatchEvent(
-      new Event('edit-end', { bubbles: true, composed: true }),
-    );
+    if (save && title && title !== this.name)
+      this._emit('edit-item', { title });
+    this._emit('edit-end');
   }
 
-  private _onDeleteClick() {
+  private _emit(type: string, detail?: unknown) {
     this.dispatchEvent(
-      new Event('delete-item', { bubbles: true, composed: true }),
+      new CustomEvent(type, { detail, bubbles: true, composed: true }),
     );
   }
 
