@@ -77,11 +77,9 @@ export class DragReorderController implements ReactiveController {
     this._draggedUrl = null;
     if (!wasDragging || this._reorderSuppressed || !this.host._listItems) return;
 
-    const items = this.host._listItems.map((item, index) => ({ ...item, index }));
-    this.host._listItems = items;
-    const ok = await rl.reorderItems(items.map((item) => item.url));
+    const orderedUrls = this.host._listItems.map((item) => item.url);
+    const ok = await rl.reorderItems(orderedUrls);
     if (!ok) {
-      this.host._listItems = await rl.getListItems();
       this.host.notifySyncFailure();
     }
   };

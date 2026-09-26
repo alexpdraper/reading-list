@@ -88,7 +88,9 @@ export class ReadingListAppElement extends LitElement {
     super.connectedCallback();
     document.title = i18n.getMessage('appName', 'Reading List');
     this._unsubscribe?.();
-    this._unsubscribe = rl.subscribe(() => void this._onRemoteChange());
+    this._unsubscribe = rl.subscribe((list) => {
+      this._listItems = list;
+    });
     this._unsubscribeSettings?.();
     this._unsubscribeSettings = onSettingsChanged((settings) => {
       this._animateItems = settings.animateItems;
@@ -113,13 +115,6 @@ export class ReadingListAppElement extends LitElement {
     this._syncErrorTimer = setTimeout(() => {
       this._syncError = false;
     }, 4000);
-  }
-
-  private async _onRemoteChange() {
-    const generation = ++this._remoteChangeGeneration;
-    const items = await rl.getListItems();
-    if (generation !== this._remoteChangeGeneration) return;
-    this._listItems = items;
   }
 
   @state()
@@ -156,8 +151,6 @@ export class ReadingListAppElement extends LitElement {
   private _loadError = false;
 
   private _syncErrorTimer?: ReturnType<typeof setTimeout>;
-
-  private _remoteChangeGeneration = 0;
 
   private _unsubscribe?: () => void;
 
@@ -421,7 +414,6 @@ export class ReadingListAppElement extends LitElement {
       this.notifySyncFailure();
       return;
     }
-    this._listItems = this._listItems.filter((item) => item.url !== url);
     const tab = await getActiveTab();
     if (tab?.id) await syncBadgeForTab(tab.id, tab.url);
   }
@@ -431,21 +423,11 @@ export class ReadingListAppElement extends LitElement {
     const target = event.target as ReadingListItemElement;
     const { title } = (event as CustomEvent<{ title: string }>).detail;
     await rl.updateReadingItem(target.href, { title });
-    this._listItems = this._listItems.map((item) =>
-      item.url === target.href ? { ...item, title } : item,
-    );
   }
 
   private async _addReadingItem(url: string, title: string, favIconUrl?: string) {
     if (!this._listItems) return;
-
-    const listItem = await addReadingItemAndSyncBadge(url, title, favIconUrl);
-    if (!listItem) return;
-
-    this._listItems = [
-      listItem,
-      ...this._listItems.filter((item) => item.url !== url),
-    ];
+    await addReadingItemAndSyncBadge(url, title, favIconUrl);
   }
 
   private async _onSaveButtonClick() {

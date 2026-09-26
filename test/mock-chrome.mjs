@@ -122,6 +122,7 @@ function createSyncArea(onChanged) {
   let writeOpsThisWindow = 0;
   let setCallCount = 0;
   let removeCallCount = 0;
+  let getAllCallCount = 0;
   let failurePredicate = null;
 
   function totalBytes(candidateStore) {
@@ -152,7 +153,10 @@ function createSyncArea(onChanged) {
 
     async get(keysArg) {
       const keys = normalizeGetKeys(keysArg);
-      if (keys === null) return cloneValue(store);
+      if (keys === null) {
+        getAllCallCount += 1;
+        return cloneValue(store);
+      }
       const result = {};
       for (const key of keys) {
         if (key in store) result[key] = cloneValue(store[key]);
@@ -236,6 +240,14 @@ function createSyncArea(onChanged) {
       removeCallCount = 0;
     },
 
+    __getGetAllCallCount() {
+      return getAllCallCount;
+    },
+
+    __resetGetAllCallCount() {
+      getAllCallCount = 0;
+    },
+
     __resetRateLimit() {
       writeOpsThisWindow = 0;
     },
@@ -315,6 +327,14 @@ export function getWriteCounts() {
 
 export function resetWriteCounts() {
   globalThis.chrome.storage.sync.__resetWriteCounts();
+}
+
+export function getSyncGetAllCallCount() {
+  return globalThis.chrome.storage.sync.__getGetAllCallCount();
+}
+
+export function resetSyncGetAllCallCount() {
+  globalThis.chrome.storage.sync.__resetGetAllCallCount();
 }
 
 export function resetSyncRateLimit() {

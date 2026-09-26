@@ -73,6 +73,7 @@ class RL {
   private async persist(touchedUrls: string[]): Promise<{ ok: boolean; error?: unknown }> {
     try {
       await saveItems(this.list, touchedUrls);
+      this.notifySubscribers();
       return { ok: true };
     } catch (error) {
       console.error('Failed to save reading list', error);
@@ -91,6 +92,7 @@ class RL {
     const { ok } = await this.persist([listItem.url]);
     if (!ok) {
       this.list = previousList;
+      this.notifySubscribers();
       return null;
     }
     return listItem;
@@ -133,6 +135,7 @@ class RL {
       const { ok, error } = await this.persist(validated.map((item) => item.url));
       if (!ok) {
         this.list = previousList;
+        this.notifySubscribers();
         firstError ??= error;
         break;
       }
@@ -149,7 +152,10 @@ class RL {
     this.list = this.list.filter((item) => item.url !== url);
 
     const { ok } = await this.persist([url]);
-    if (!ok) this.list = previousList;
+    if (!ok) {
+      this.list = previousList;
+      this.notifySubscribers();
+    }
     return ok;
   }
 
@@ -167,7 +173,10 @@ class RL {
     Object.assign(item, updates);
 
     const { ok } = await this.persist([url]);
-    if (!ok) Object.assign(item, previous);
+    if (!ok) {
+      Object.assign(item, previous);
+      this.notifySubscribers();
+    }
     return ok;
   }
 
@@ -188,6 +197,7 @@ class RL {
     const { ok } = await this.persist(touchedUrls);
     if (!ok) {
       for (const [item, index] of previousIndices) item.index = index;
+      this.notifySubscribers();
     }
     return ok;
   }
@@ -196,6 +206,7 @@ class RL {
     await clearItems();
     this.list = [];
     this.initialized = true;
+    this.notifySubscribers();
   }
 }
 
