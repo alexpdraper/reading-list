@@ -23,7 +23,7 @@ const REPO_ROOT = path.resolve(fileURLToPath(new URL('../../', import.meta.url))
 const FIXTURES_DIR = path.join(REPO_ROOT, 'test/fixtures');
 const SCRATCH_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), 'rl-fixture-worktrees-'));
 
-const { getItemsReadOnly } = await import(MIGRATIONS_URL);
+const { readItemsReadOnly } = await import(MIGRATIONS_URL);
 
 let freshCounter = 0;
 async function importFresh(moduleUrl) {
@@ -36,7 +36,7 @@ function run(command, args, options = {}) {
 }
 
 async function writeFixture(name) {
-  const items = await getItemsReadOnly();
+  const items = await readItemsReadOnly();
   const target = path.join(FIXTURES_DIR, `${name}.json`);
   const payload = { sync: dumpSync(), local: dumpLocal(), meta: { itemCount: items.length } };
   fs.writeFileSync(target, `${JSON.stringify(payload, null, 2)}\n`);

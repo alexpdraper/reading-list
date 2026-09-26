@@ -1,6 +1,6 @@
 import { ReactiveController, ReactiveControllerHost } from 'lit';
 import { rl } from '../lib/rl.js';
-import { ListItemData } from '../lib/storage/buckets.js';
+import { ListItemData } from '../lib/buckets.js';
 import { SortOption } from '../lib/list-filter.js';
 import { ReadingListItemElement } from './reading-list-item.js';
 

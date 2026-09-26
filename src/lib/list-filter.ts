@@ -1,5 +1,5 @@
 import Fuse from 'fuse.js';
-import { ListItemData } from './storage/buckets.js';
+import { ListItemData } from './buckets.js';
 
 export type SortOption = 'date' | 'title' | '';
 export type SortOrder = 'up' | 'down' | '';

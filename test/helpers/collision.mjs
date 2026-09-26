@@ -1,6 +1,7 @@
 import { BUCKETS_URL } from '../lib-paths.mjs';
 
-const { bucketKey, encodeBucket } = await import(BUCKETS_URL);
+const { testOnlyInternals } = await import(BUCKETS_URL);
+const { bucketKey, encodeBucket } = testOnlyInternals;
 
 function utf8ByteLength(value) {
   return Buffer.byteLength(value, 'utf8');

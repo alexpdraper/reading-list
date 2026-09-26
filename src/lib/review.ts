@@ -1,4 +1,4 @@
-import { ListItemData } from './storage/buckets.js';
+import { ListItemData } from './buckets.js';
 import { getSettings, updateSettings } from './settings.js';
 import { isFirefox } from './browser.js';
 

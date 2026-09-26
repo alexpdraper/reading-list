@@ -1,9 +1,9 @@
 import { BUCKETS_URL } from '../lib-paths.mjs';
 
-const bucketsModule = await import(BUCKETS_URL);
+const { testOnlyInternals } = await import(BUCKETS_URL);
 
 export const { bucketKey, bucketCountForItemCount, decodeBucket, BUCKET_KEY_RE, BUCKET_VERSION_KEY } =
-  bucketsModule;
+  testOnlyInternals;
 
 export function snapshotSyncLayout(syncDump) {
   const bucketVersion = syncDump[BUCKET_VERSION_KEY] ?? null;

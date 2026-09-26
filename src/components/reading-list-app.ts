@@ -4,7 +4,7 @@ import { animate } from '@lit-labs/motion';
 import { customElement, state } from 'lit/decorators.js';
 import { i18n } from '../lib/i18n.js';
 import { rl } from '../lib/rl.js';
-import { ListItemData } from '../lib/storage/buckets.js';
+import { ListItemData } from '../lib/buckets.js';
 import { getSettings, updateSettings, onSettingsChanged } from '../lib/settings.js';
 import { syncBadgeForTab } from '../lib/badge.js';
 import { ListFilter, SortOption, SortOrder } from '../lib/list-filter.js';

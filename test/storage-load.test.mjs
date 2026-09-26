@@ -9,7 +9,7 @@ import { loadFixture, FIXTURE_NAMES } from './helpers/fixtures.mjs';
 import { snapshotSyncLayout } from './helpers/bucket-layout.mjs';
 import * as definitions from './fixtures/definitions.mjs';
 
-const { getItemsReadOnly } = await import(MIGRATIONS_URL);
+const { readItemsReadOnly } = await import(MIGRATIONS_URL);
 
 const LOADABLE_FIXTURE_NAMES = FIXTURE_NAMES.filter((name) => name !== 'v3.2-near-capacity');
 
@@ -127,6 +127,6 @@ test('v3.2-near-capacity (current behavior, bug): crossing a bucket-count tier o
   installMockChrome();
   seedSync(fixture.sync);
   seedLocal(fixture.local);
-  const readOnlyItems = await getItemsReadOnly();
+  const readOnlyItems = await readItemsReadOnly();
   assert.equal(readOnlyItems.length, fixture.meta.itemCount, 'no data is lost: the original 25-bucket layout was never touched');
 });

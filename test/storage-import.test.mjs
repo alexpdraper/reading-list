@@ -22,8 +22,7 @@ test('bulkAddReadingItems (current behavior): import stops at the first batch th
   assert.equal(result.succeeded, fixture.meta.itemCount, 'this reproduces the committed near-capacity fixture exactly');
   assert.equal(result.failed, definitions.V32_NEAR_CAPACITY_SOURCE_ITEMS.length - fixture.meta.itemCount);
   assert.ok(result.firstError, 'a failing import must surface the error that stopped it');
-  assert.ok(result.diagnostics.length > 0, 'a failing import must surface batch-level diagnostics');
-  assert.match(result.diagnostics, /QuotaExceededError/);
+  assert.match(String(result.firstError), /QuotaExceededError/);
 });
 
 test('addReadingItem (current behavior): a data: favicon is stripped before storing', async () => {

@@ -2,11 +2,8 @@ import { html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
 import { rl } from '../lib/rl.js';
 import { getSettings, updateSettings, onSettingsChanged } from '../lib/settings.js';
-import { getStorageDiagnostics } from '../lib/storage/diagnostics.js';
-import { getItemsReadOnly } from '../lib/storage/migrations.js';
-import { getLocalBackup } from '../lib/storage/local-backup.js';
+import { getStorageDiagnostics, readItemsReadOnly, getLocalBackup, ListItemData } from '../lib/buckets.js';
 import { downloadJson } from '../lib/download-json.js';
-import { ListItemData } from '../lib/storage/buckets.js';
 import { i18n } from '../lib/i18n.js';
 import { styles } from '../styles/options.styles.js';
 import { theme } from '../styles/theme.styles.js';
@@ -156,16 +153,14 @@ export class ReadingListOptions extends LitElement {
 
       if (items) {
         await rl.getListItems();
-        const { succeeded, firstError, diagnostics } =
-          await rl.bulkAddReadingItems(items);
+        const { succeeded, firstError } = await rl.bulkAddReadingItems(items);
         if (succeeded === items.length) {
           alert(`Import complete! Added ${succeeded} items.`);
         } else {
           alert(
             `Imported ${succeeded} of ${items.length} items. ` +
               `${items.length - succeeded} failed` +
-              (firstError ? ` (first error: ${firstError})` : '') +
-              (diagnostics ? `\n\nDiagnostics: ${diagnostics}` : ''),
+              (firstError ? ` (first error: ${firstError})` : ''),
           );
         }
       } else {
@@ -178,7 +173,7 @@ export class ReadingListOptions extends LitElement {
   }
 
   async exportList() {
-    const data = await getItemsReadOnly();
+    const data = await readItemsReadOnly();
     downloadJson('reading-list.json', data);
   }
 }

@@ -31,7 +31,7 @@ function makeFillerLegacyItems(count, baseTimestamp) {
   return items;
 }
 
-const { getItemsReadOnly } = await import(MIGRATIONS_URL);
+const { readItemsReadOnly } = await import(MIGRATIONS_URL);
 
 function sortedUrls(items) {
   return items.map((i) => i.url).sort();
@@ -121,7 +121,7 @@ test('partly failed migration (current behavior): a real per-bucket overflow at 
   }
 });
 
-test('ladder exhausted (current behavior): getListItems rejects, lastLoadError is saved, and getItemsReadOnly still returns every item', async () => {
+test('ladder exhausted (current behavior): getListItems rejects, lastLoadError is saved, and readItemsReadOnly still returns every item', async () => {
   const fixture = loadFixture('v3.2-tier-25');
   installMockChrome();
   const staleVersionSync = { ...fixture.sync, __bv: 999 };
@@ -137,6 +137,6 @@ test('ladder exhausted (current behavior): getListItems rejects, lastLoadError i
   assert.match(local.lastLoadError.message, /QuotaExceededError/);
 
   clearSyncFailurePredicate();
-  const readOnlyItems = await getItemsReadOnly();
-  assert.equal(readOnlyItems.length, fixture.meta.itemCount, 'getItemsReadOnly bypasses rebalancing and never fails the way getListItems can');
+  const readOnlyItems = await readItemsReadOnly();
+  assert.equal(readOnlyItems.length, fixture.meta.itemCount, 'readItemsReadOnly bypasses rebalancing and never fails the way getListItems can');
 });
